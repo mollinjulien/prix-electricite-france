@@ -14,7 +14,7 @@
   <header class="entete">
     <div class="entete-haut">
       <div>
-        <h1 data-t="titre">Prix de l'électricité de demain en France</h1>
+        <h1 data-t="titre"></h1>
         <p class="sous-titre" data-t="sous_titre"></p>
       </div>
       <div class="reglages">
@@ -22,46 +22,135 @@
         <button type="button" id="theme" class="bouton-discret" aria-label="Thème clair ou sombre">◐</button>
       </div>
     </div>
-    <p class="maj" id="maj"></p>
+    <nav class="onglets" role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="tab-prevision" data-onglet="prevision" aria-controls="prevision" data-t="o_prevision"></button>
+      <button type="button" role="tab" id="tab-historique" data-onglet="historique" aria-controls="historique" data-t="o_historique"></button>
+      <button type="button" role="tab" id="tab-performance" data-onglet="performance" aria-controls="performance" data-t="o_performance"></button>
+      <button type="button" role="tab" id="tab-modeles" data-onglet="modeles" aria-controls="modeles" data-t="o_modeles"></button>
+    </nav>
   </header>
 
   <main>
-    <section id="demain" class="carte" aria-labelledby="titre-demain">
-      <h2 id="titre-demain"></h2>
-      <p class="intro" id="intro-demain"></p>
-      <div id="alerte-gaz" class="alerte" hidden></div>
-      <div class="tuiles" id="tuiles-demain"></div>
-      <div class="graphique"><canvas id="graphique-demain" role="img"></canvas></div>
-    </section>
-
-    <section id="jour" class="carte" aria-labelledby="titre-jour">
-      <h2 id="titre-jour" data-t="titre_jour"></h2>
-      <div class="navigation-jour">
-        <button type="button" id="jour-prec" class="bouton" aria-label="Jour précédent">‹</button>
-        <select id="choix-jour" aria-label="Choisir un jour"></select>
-        <button type="button" id="jour-suiv" class="bouton" aria-label="Jour suivant">›</button>
-        <span id="badge-source" class="badge"></span>
+    <!-- ============================================================ PRÉVISION -->
+    <section id="prevision" role="tabpanel" aria-labelledby="tab-prevision" class="panneau">
+      <div id="bandeau-retard" class="alerte echec" hidden></div>
+      <div class="titre-jour">
+        <h2 id="prev-titre"></h2>
+        <span id="prev-badge" class="badge"></span>
+        <span id="maj" class="maj"></span>
       </div>
-      <div class="graphique"><canvas id="graphique-jour" role="img"></canvas></div>
-      <div class="table-defilante"><table id="table-jour"></table></div>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="etat_du_jour"></h3>
+        <ul class="coches" id="prev-coches"></ul>
+      </div>
+      <div class="tuiles" id="prev-tuiles"></div>
+      <div class="carte">
+        <div class="barre-outils">
+          <h3 class="petit-titre" data-t="prix_du_jour"></h3>
+          <div class="segments" id="prev-pas" role="group"></div>
+        </div>
+        <div class="duo">
+          <div class="cadre-table"><table id="prev-table" class="table-donnees"></table></div>
+          <div class="graphique"><canvas id="prev-graphique" role="img"></canvas></div>
+        </div>
+        <p class="note" id="prev-note"></p>
+      </div>
     </section>
 
-    <section id="historique" class="carte" aria-labelledby="titre-historique">
-      <h2 id="titre-historique" data-t="titre_historique"></h2>
-      <p class="intro" data-t="intro_historique"></p>
-      <div class="segments" id="periodes" role="group"></div>
-      <div class="table-defilante"><table id="table-resume"></table></div>
-      <div class="graphique"><canvas id="graphique-historique" role="img"></canvas></div>
-      <details>
-        <summary data-t="voir_tableau"></summary>
-        <div class="table-defilante"><table id="table-jours"></table></div>
-      </details>
+    <!-- ============================================================ HISTORIQUE -->
+    <section id="historique" role="tabpanel" aria-labelledby="tab-historique" class="panneau" hidden>
+      <div class="segments grands" id="hist-mode" role="group"></div>
+
+      <div id="hist-jour">
+        <div class="carte">
+          <div class="navigation-jour">
+            <button type="button" id="hist-prec" class="bouton" aria-label="Jour précédent">‹</button>
+            <input type="date" id="hist-date" aria-label="Date">
+            <button type="button" id="hist-suiv" class="bouton" aria-label="Jour suivant">›</button>
+            <span id="hist-badge" class="badge"></span>
+          </div>
+          <div class="tuiles" id="hist-tuiles"></div>
+        </div>
+        <div class="carte">
+          <div class="barre-outils">
+            <h3 class="petit-titre" id="hist-sous-titre"></h3>
+            <div class="segments" id="hist-pas" role="group"></div>
+          </div>
+          <div class="duo large">
+            <div class="cadre-table"><table id="hist-table" class="table-donnees"></table></div>
+            <div class="graphique"><canvas id="hist-graphique" role="img"></canvas></div>
+          </div>
+          <p class="note" data-t="note_ecarts"></p>
+        </div>
+      </div>
+
+      <div id="hist-plage" hidden>
+        <div class="carte">
+          <div class="barre-outils">
+            <div class="segments" id="plage-presets" role="group"></div>
+            <div class="dates-perso">
+              <label><span data-t="du"></span> <input type="date" id="plage-debut"></label>
+              <label><span data-t="au"></span> <input type="date" id="plage-fin"></label>
+            </div>
+          </div>
+          <div class="barre-outils">
+            <h3 class="petit-titre" id="plage-sous-titre"></h3>
+            <div class="segments" id="plage-pas" role="group"></div>
+          </div>
+          <div class="graphique haut"><canvas id="plage-graphique" role="img"></canvas></div>
+        </div>
+        <div class="carte">
+          <h3 class="petit-titre" data-t="jour_par_jour"></h3>
+          <p class="note" data-t="clic_jour"></p>
+          <div class="cadre-table libre"><table id="plage-table" class="table-donnees cliquable"></table></div>
+        </div>
+      </div>
     </section>
 
-    <section id="methode" class="carte" aria-labelledby="titre-methode">
-      <h2 id="titre-methode" data-t="titre_methode"></h2>
-      <div class="modeles" id="fiches-modeles"></div>
-      <ul class="points" id="points-methode"></ul>
+    <!-- ============================================================ PERFORMANCE -->
+    <section id="performance" role="tabpanel" aria-labelledby="tab-performance" class="panneau" hidden>
+      <div class="carte">
+        <p class="intro" data-t="intro_perf"></p>
+        <div class="segments" id="perf-periode" role="group"></div>
+        <div class="cadre-table libre"><table id="perf-resume" class="table-donnees"></table></div>
+      </div>
+      <div class="deux-cartes">
+        <div class="carte">
+          <h3 class="petit-titre" data-t="perf_jours"></h3>
+          <div class="graphique"><canvas id="perf-jours" role="img"></canvas></div>
+        </div>
+        <div class="carte">
+          <h3 class="petit-titre" data-t="perf_heures"></h3>
+          <div class="graphique"><canvas id="perf-heures" role="img"></canvas></div>
+        </div>
+      </div>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="perf_difficiles"></h3>
+        <p class="note" data-t="clic_jour"></p>
+        <div class="cadre-table libre"><table id="perf-difficiles" class="table-donnees cliquable"></table></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ MODÈLES -->
+    <section id="modeles" role="tabpanel" aria-labelledby="tab-modeles" class="panneau" hidden>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="m_qui"></h3>
+        <div class="fiches" id="m-fiches"></div>
+      </div>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="m_chaine"></h3>
+        <ol class="etapes" id="m-etapes"></ol>
+      </div>
+      <div class="deux-cartes">
+        <div class="carte">
+          <h3 class="petit-titre" data-t="m_lexique"></h3>
+          <dl class="lexique" id="m-lexique"></dl>
+        </div>
+        <div class="carte">
+          <h3 class="petit-titre" data-t="m_limites"></h3>
+          <ul class="points" id="m-limites"></ul>
+        </div>
+      </div>
     </section>
   </main>
 
