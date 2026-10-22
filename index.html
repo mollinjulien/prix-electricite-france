@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prix de l'électricité de demain</title>
+  <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-haut">
+      <div>
+        <h1 data-t="titre">Prix de l'électricité de demain en France</h1>
+        <p class="sous-titre" data-t="sous_titre"></p>
+      </div>
+      <div class="reglages">
+        <button type="button" id="langue" class="bouton-discret" aria-label="Language / langue">EN</button>
+        <button type="button" id="theme" class="bouton-discret" aria-label="Thème clair ou sombre">◐</button>
+      </div>
+    </div>
+    <p class="maj" id="maj"></p>
+  </header>
+
+  <main>
+    <section id="demain" class="carte" aria-labelledby="titre-demain">
+      <h2 id="titre-demain"></h2>
+      <p class="intro" id="intro-demain"></p>
+      <div id="alerte-gaz" class="alerte" hidden></div>
+      <div class="tuiles" id="tuiles-demain"></div>
+      <div class="graphique"><canvas id="graphique-demain" role="img"></canvas></div>
+    </section>
+
+    <section id="jour" class="carte" aria-labelledby="titre-jour">
+      <h2 id="titre-jour" data-t="titre_jour"></h2>
+      <div class="navigation-jour">
+        <button type="button" id="jour-prec" class="bouton" aria-label="Jour précédent">‹</button>
+        <select id="choix-jour" aria-label="Choisir un jour"></select>
+        <button type="button" id="jour-suiv" class="bouton" aria-label="Jour suivant">›</button>
+        <span id="badge-source" class="badge"></span>
+      </div>
+      <div class="graphique"><canvas id="graphique-jour" role="img"></canvas></div>
+      <div class="table-defilante"><table id="table-jour"></table></div>
+    </section>
+
+    <section id="historique" class="carte" aria-labelledby="titre-historique">
+      <h2 id="titre-historique" data-t="titre_historique"></h2>
+      <p class="intro" data-t="intro_historique"></p>
+      <div class="segments" id="periodes" role="group"></div>
+      <div class="table-defilante"><table id="table-resume"></table></div>
+      <div class="graphique"><canvas id="graphique-historique" role="img"></canvas></div>
+      <details>
+        <summary data-t="voir_tableau"></summary>
+        <div class="table-defilante"><table id="table-jours"></table></div>
+      </details>
+    </section>
+
+    <section id="methode" class="carte" aria-labelledby="titre-methode">
+      <h2 id="titre-methode" data-t="titre_methode"></h2>
+      <div class="modeles" id="fiches-modeles"></div>
+      <ul class="points" id="points-methode"></ul>
+    </section>
+  </main>
+
+  <footer class="pied" id="pied"></footer>
+</body>
+</html>
