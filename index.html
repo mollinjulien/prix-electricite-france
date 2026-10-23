@@ -6,9 +6,9 @@
   <title>Prix de l'électricité de demain</title>
   <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=2" defer></script>
+  <script src="app.js?v=3" defer></script>
 </head>
 <body>
   <header class="entete">
@@ -34,27 +34,9 @@
     <!-- ============================================================ PRÉVISION -->
     <section id="prevision" role="tabpanel" aria-labelledby="tab-prevision" class="panneau">
       <div id="bandeau-retard" class="alerte echec" hidden></div>
-      <div class="titre-jour">
-        <h2 id="prev-titre"></h2>
-        <span id="prev-badge" class="badge"></span>
-        <span id="maj" class="maj"></span>
-      </div>
-      <div class="carte">
-        <h3 class="petit-titre" data-t="etat_du_jour"></h3>
-        <ul class="coches" id="prev-coches"></ul>
-      </div>
-      <div class="tuiles" id="prev-tuiles"></div>
-      <div class="carte">
-        <div class="barre-outils">
-          <h3 class="petit-titre" data-t="prix_du_jour"></h3>
-          <div class="segments" id="prev-pas" role="group"></div>
-        </div>
-        <div class="duo">
-          <div class="cadre-table"><table id="prev-table" class="table-donnees"></table></div>
-          <div class="graphique"><canvas id="prev-graphique" role="img"></canvas></div>
-        </div>
-        <p class="note" id="prev-note"></p>
-      </div>
+      <p id="maj" class="maj"></p>
+      <div id="prev-haut" class="bloc-jour"></div>
+      <div id="prev-bas" class="bloc-jour second"></div>
     </section>
 
     <!-- ============================================================ HISTORIQUE -->
@@ -76,6 +58,7 @@
             <h3 class="petit-titre" id="hist-sous-titre"></h3>
             <div class="segments" id="hist-pas" role="group"></div>
           </div>
+          <div class="choix" id="hist-choix"></div>
           <div class="duo large">
             <div class="cadre-table"><table id="hist-table" class="table-donnees"></table></div>
             <div class="graphique"><canvas id="hist-graphique" role="img"></canvas></div>
@@ -97,11 +80,13 @@
             <h3 class="petit-titre" id="plage-sous-titre"></h3>
             <div class="segments" id="plage-pas" role="group"></div>
           </div>
+          <div class="choix" id="plage-choix"></div>
           <div class="graphique haut"><canvas id="plage-graphique" role="img"></canvas></div>
         </div>
         <div class="carte">
           <h3 class="petit-titre" data-t="jour_par_jour"></h3>
           <p class="note" data-t="clic_jour"></p>
+          <div class="choix" id="plage-choix2"></div>
           <div class="cadre-table libre"><table id="plage-table" class="table-donnees cliquable"></table></div>
         </div>
       </div>
@@ -112,6 +97,7 @@
       <div class="carte">
         <p class="intro" data-t="intro_perf"></p>
         <div class="segments" id="perf-periode" role="group"></div>
+        <div class="choix" id="perf-choix"></div>
         <div class="cadre-table libre"><table id="perf-resume" class="table-donnees"></table></div>
       </div>
       <div class="deux-cartes">
@@ -127,6 +113,7 @@
       <div class="carte">
         <h3 class="petit-titre" data-t="perf_difficiles"></h3>
         <p class="note" data-t="clic_jour"></p>
+        <div class="choix" id="perf-choix2"></div>
         <div class="cadre-table libre"><table id="perf-difficiles" class="table-donnees cliquable"></table></div>
       </div>
     </section>

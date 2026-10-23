@@ -20,6 +20,7 @@
   --ok-texte: #006300;
   --alerte-bg: #fbe5d4; --alerte-texte: #7f2704;
   --echec-bg: #f9dede; --echec-texte: #8f1d1d;
+  --ecart-rgb: 11, 11, 11;
   --rayon: 10px;
 }
 @media (prefers-color-scheme: dark) {
@@ -31,6 +32,7 @@
     --s-gr: #3987e5; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
     --ok-texte: #0ca30c;
     --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
+    --ecart-rgb: 240, 239, 236;
   }
 }
 :root[data-theme="dark"] {
@@ -41,6 +43,7 @@
   --s-gr: #3987e5; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
   --ok-texte: #0ca30c;
   --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
+  --ecart-rgb: 240, 239, 236;
 }
 
 * { box-sizing: border-box; }
@@ -88,6 +91,14 @@ h2 { font-size: 1.3rem; margin: 0; }
 .coche.info { background: var(--muted); }
 .coches .libelle { font-weight: 500; font-size: 0.9rem; }
 .coches .detail { display: block; color: var(--muted); font-size: 0.8rem; }
+.etapes-jour { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 24px; }
+@media (max-width: 900px) { .etapes-jour { grid-template-columns: minmax(0, 1fr); } }
+.etapes-jour .coches { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+.groupe-etapes h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+.groupe-etapes .num { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--wash); border: 1px solid var(--border); font-size: 0.72rem; color: var(--ink); }
+details.replie summary { cursor: pointer; margin: 0; }
+details.replie[open] summary { margin-bottom: 14px; }
+.bloc-jour.second { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--border); }
 .alerte.echec, .alerte.alerte { border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-weight: 500; }
 .alerte.echec { background: var(--echec-bg); color: var(--echec-texte); }
 .alerte.alerte { background: var(--alerte-bg); color: var(--alerte-texte); }
@@ -110,7 +121,7 @@ h2 { font-size: 1.3rem; margin: 0; }
 .duo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
 .duo.large { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 @media (max-width: 1250px) { .duo.large { grid-template-columns: minmax(0, 1fr); } .duo.large .graphique { order: -1; } }
-#hist-table th, #hist-table td { padding: 4px 7px; font-size: 0.8rem; }
+#hist-table th, #hist-table td { padding: 5px 9px; font-size: 0.82rem; }
 @media (max-width: 980px) { .duo, .duo.large { grid-template-columns: minmax(0, 1fr); } .duo .graphique { order: -1; } }
 .graphique { position: relative; height: 440px; }
 .graphique.haut { height: 420px; }
@@ -128,7 +139,10 @@ h2 { font-size: 1.3rem; margin: 0; }
 .table-donnees.cliquable tbody tr { cursor: pointer; }
 .table-donnees .groupe { border-left: 1px solid var(--grid); }
 .table-donnees .reel { font-weight: 600; }
-.table-donnees .ns { color: var(--muted); }
+.table-donnees th.modele { white-space: normal; min-width: 76px; line-height: 1.3; }
+.table-donnees tfoot { position: sticky; bottom: 0; z-index: 1; }
+.table-donnees tfoot td { background: var(--surface); font-weight: 600; border-bottom: 0; box-shadow: inset 0 1px 0 var(--axis); }
+.table-donnees td.fort { font-weight: 700; }
 .table-donnees tr.meilleur td { font-weight: 600; }
 .nom-modele { display: inline-flex; align-items: center; gap: 8px; }
 .positif { color: var(--ok-texte); }
@@ -150,12 +164,24 @@ input[type="date"] { cursor: text; }
 .dates-perso { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--ink-2); }
 .dates-perso label { display: inline-flex; align-items: center; gap: 6px; }
 
+.choix { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 12px; font-size: 0.84rem; }
+.choix-titre { color: var(--muted); margin-right: 2px; }
+.choix-item { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; padding: 4px 11px 4px 8px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; user-select: none; }
+.choix-item:hover { background: var(--wash); }
+.choix-item:has(input:checked) { color: var(--ink); border-color: var(--axis); }
+.choix-item input { margin: 0; accent-color: var(--ink); width: 15px; height: 15px; flex-shrink: 0; }
+.choix-item:has(input:focus-visible) { outline: 2px solid var(--s-gr); outline-offset: 2px; }
+.choix-legende { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; margin-left: 6px; color: var(--ink-2); }
+.choix-fixe { display: inline-flex; align-items: center; gap: 7px; }
+.pastille.bande { height: 10px; border-top: 0; background: var(--bande); }
+
 /* ---------------------------------------------------------------- modèles */
 .fiches { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
 .fiche { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
 .fiche h4 { font-size: 0.95rem; margin: 0 0 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .fiche p { margin: 0 0 6px; color: var(--ink-2); font-size: 0.88rem; }
 .fiche .chiffre { color: var(--ink); font-size: 0.85rem; }
+.fiche .court { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
 .etapes { margin: 0; padding-left: 0; list-style: none; counter-reset: etape; display: grid; gap: 10px; }
 .etapes li { counter-increment: etape; display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: start; }
 .etapes li::before { content: counter(etape); width: 26px; height: 26px; border-radius: 50%; background: var(--wash); border: 1px solid var(--border); display: grid; place-items: center; font-weight: 600; font-size: 0.85rem; }
