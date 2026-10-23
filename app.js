@@ -86,7 +86,7 @@ const TXT = {
     etapes: [
       ["Vers 10 h 15, la veille", "Mise à jour des données : prix des jours passés, consommation et prévision de consommation de RTE, production régionale récente, prix du gaz."],
       ["Météo de demain", "Téléchargement du dernier run de minuit du modèle météo GFS (NOAA) : rayonnement, vent à 100 m, température, nuages, pression sur la France."],
-      ["Production prévue", "Nos modèles de production transforment la météo en production solaire et éolienne par région (utilisée par le modèle « GFS + gaz + production »)."],
+      ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région (utilisée par le modèle « GFS + gaz + production »)."],
       ["Prix horaire", "Les trois modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain."],
       ["Quart d'heure", "Un second modèle répartit chaque heure en quatre quarts d'heure (le prix varie dans l'heure, surtout matin et soir)."],
       ["Publication", "Le site est mis à jour vers 10 h 30, avant l'enchère de 12 h 45."],
@@ -162,8 +162,12 @@ const TXT = {
                   ["Heure (2)", ["heure : sinus et cosinus"]],
                   ["Région (1)", ["l'une des 12 régions"]],
                   ["Indicateurs nationaux (3)", ["éolien national prévu (GW)", "taux de charge éolien national", "solaire national prévu (GW)"]]],
-    pm_sol_appr: ["Appris une seule fois sur les prévisions GFS de 2020 au 31/08/2026 (343 691 lignes région × heure), sans météo observée.", "LightGBM : 63 feuilles par arbre, au moins 400 lignes par feuille, 200 arbres, moyenne de 3 graines.", "Appris en écartant les heures à prix négatif, où une partie des parcs s'arrête : il prévoit donc la production avant écrêtement.", "Pas réentraîné depuis : chaque matin, seules ses entrées changent (météo du jour, rendement observé et capacité mis à jour avec les données de RTE)."],
-    pm_eol_appr: ["Appris une seule fois sur les prévisions GFS de 2020 au 31/08/2026 (670 519 lignes région × heure), sans météo observée.", "LightGBM : 31 feuilles par arbre, au moins 400 lignes par feuille, 5 185 arbres, moyenne de 3 graines.", "Capacité éolienne de chaque région recalculée chaque mois avec les données temps réel de RTE.", "Pas réentraîné depuis le 31/08/2026."],
+    pm_sol_appr: ["Réappris de zéro chaque matin (depuis le 24/10/2026) : toutes les heures × régions depuis janvier 2020 (environ 350 000 lignes), prévisions GFS et production réelle de RTE jusqu'à la veille ; jamais de météo observée.", "LightGBM : 63 feuilles par arbre, au moins 400 lignes par feuille, nombre d'arbres choisi chaque matin par arrêt précoce sur les 2 derniers mois, moyenne de 3 graines.", "Appris en écartant les heures à prix négatif, où une partie des parcs s'arrête : il prévoit donc la production avant écrêtement.", "Test du 01/09 au 22/10/2026 : réappris chaque jour, son erreur journalière passe de 12,4 % (modèle figé au 31/08) à 9,8 % ; il surestime moins (+8 % au lieu de +12 %)."],
+    pm_eol_appr: ["Réappris de zéro chaque matin (depuis le 24/10/2026) : toutes les heures × régions depuis janvier 2020 (environ 680 000 lignes), prévisions GFS et production réelle de RTE jusqu'à la veille ; jamais de météo observée.", "LightGBM : 31 feuilles par arbre, au moins 400 lignes par feuille, 4 000 à 7 000 arbres selon les jours (arrêt précoce), moyenne de 3 graines.", "Capacité éolienne de chaque région recalculée chaque mois avec les données temps réel de RTE.", "Test du 01/09 au 22/10/2026 : même erreur journalière (8,7 %) qu'il soit réappris chaque jour ou figé au 31/08 : le vent prévu fait l'essentiel."],
+    pm_dernier: "Dernier réapprentissage (pour le {d}) : solaire {s} arbres, éolien {e} arbres.",
+    ck_prod_modeles: "Modèles de production réappris", nk_prod_modeles: "Réapprentissage des modèles de production",
+    ck_prod_modeles_d: "avec la production réelle jusqu'au {d} inclus · solaire {s} arbres · éolien {e} arbres",
+    ck_prod_modeles_echec: "échec : modèles de la veille utilisés", ck_prod_modeles_fige: "figés au 31/08/2026 (réapprentissage quotidien depuis le 25/10)",
     intro_sources: "Toutes les données utilisées sont publiques et gratuites. Voici d'où elles viennent, à quoi elles servent et où les retrouver.",
     s_outils: "Outils",
     s_utilise: "Utilisé pour : {u}",
@@ -273,7 +277,7 @@ const TXT = {
     etapes: [
       ["Around 10:15, the day before", "Data update: past prices, RTE load and load forecast, recent regional output, gas price."],
       ["Tomorrow's weather", "Download of the latest midnight run of the GFS weather model (NOAA): radiation, 100 m wind, temperature, clouds, pressure over France."],
-      ["Forecast output", "Our production models turn the weather into solar and wind output per region (used by the \"GFS + gas + output\" model)."],
+      ["Forecast output", "Our production models are retrained with RTE actual output up to yesterday, then turn the weather into solar and wind output per region (used by the \"GFS + gas + output\" model)."],
       ["Hourly price", "The three models are retrained on the full history up to midnight, then forecast the price of each hour of tomorrow."],
       ["Quarter-hour", "A second model splits each hour into four quarter-hours (prices move within the hour, especially morning and evening)."],
       ["Publication", "The site is updated around 10:30, before the 12:45 auction."],
@@ -349,8 +353,12 @@ const TXT = {
                   ["Hour (2)", ["hour: sine and cosine"]],
                   ["Region (1)", ["one of the 12 regions"]],
                   ["National indicators (3)", ["national forecast wind (GW)", "national wind load factor", "national forecast solar (GW)"]]],
-    pm_sol_appr: ["Trained once on GFS forecasts from 2020 to 31/08/2026 (343,691 region × hour rows), with no observed weather.", "LightGBM: 63 leaves per tree, at least 400 rows per leaf, 200 trees, average of 3 seeds.", "Trained without negative-price hours, when some plants stop: it therefore forecasts output before curtailment.", "Not retrained since: every morning only its inputs change (today's weather, observed yield and capacity updated with RTE data)."],
-    pm_eol_appr: ["Trained once on GFS forecasts from 2020 to 31/08/2026 (670,519 region × hour rows), with no observed weather.", "LightGBM: 31 leaves per tree, at least 400 rows per leaf, 5,185 trees, average of 3 seeds.", "Each region's wind capacity recomputed every month from RTE real-time data.", "Not retrained since 31/08/2026."],
+    pm_sol_appr: ["Retrained from scratch every morning (since 24/10/2026): every hour × region since January 2020 (about 350,000 rows), GFS forecasts and RTE actual output up to the day before; never observed weather.", "LightGBM: 63 leaves per tree, at least 400 rows per leaf, number of trees chosen every morning by early stopping on the last 2 months, average of 3 seeds.", "Trained without negative-price hours, when some plants stop: it therefore forecasts output before curtailment.", "Test from 01/09 to 22/10/2026: retrained daily, its daily error falls from 12.4% (model frozen on 31/08) to 9.8%; it overestimates less (+8% instead of +12%)."],
+    pm_eol_appr: ["Retrained from scratch every morning (since 24/10/2026): every hour × region since January 2020 (about 680,000 rows), GFS forecasts and RTE actual output up to the day before; never observed weather.", "LightGBM: 31 leaves per tree, at least 400 rows per leaf, 4,000 to 7,000 trees depending on the day (early stopping), average of 3 seeds.", "Each region's wind capacity recomputed every month from RTE real-time data.", "Test from 01/09 to 22/10/2026: same daily error (8.7%) whether retrained daily or frozen on 31/08: the wind forecast does most of the work."],
+    pm_dernier: "Latest retraining (for {d}): solar {s} trees, wind {e} trees.",
+    ck_prod_modeles: "Production models retrained", nk_prod_modeles: "Production model retraining",
+    ck_prod_modeles_d: "with actual output up to {d} included · solar {s} trees · wind {e} trees",
+    ck_prod_modeles_echec: "failed: previous day's models used", ck_prod_modeles_fige: "frozen on 31/08/2026 (daily retraining since 25/10)",
     intro_sources: "All the data used is public and free. Here is where it comes from, what it is used for and where to find it.",
     s_outils: "Tools",
     s_utilise: "Used for: {u}",
@@ -616,6 +624,10 @@ function etapesJour(j) {
     if (m) ajout("donnees", m.heures_sans_valeur ? "alerte" : "ok", t(m.heures_sans_valeur ? "ck_meteo_trou" : "ck_meteo"),
                  t("ck_meteo_d", { d: dateCourte(m.run.slice(0, 10)), h: m.heures - m.heures_sans_valeur, n: m.heures }));
     else ajout("donnees", "info", t("nk_meteo"), t("ck_inconnu"));
+    const pm = c.production_modeles;
+    if (pm && pm.reappris) ajout("calculs", "ok", t("ck_prod_modeles"), t("ck_prod_modeles_d", { d: dateCourte(ajouterJours(j.jour, -2)), s: nombre(pm.arbres.solaire, 0), e: nombre(pm.arbres.eolien, 0) }));
+    else if (pm) ajout("calculs", "alerte", t("nk_prod_modeles"), t("ck_prod_modeles_echec"));
+    else ajout("calculs", "info", t("nk_prod_modeles"), t("ck_prod_modeles_fige"));
     const p = c.production_GWh;
     if (p) ajout("calculs", "ok", t("ck_prod"), t("ck_prod_d", { s: nombre(p.solaire, 0), e: nombre(p.eolien, 0) }));
     else ajout("calculs", "info", t("nk_prod"), t("ck_inconnu"));
@@ -930,10 +942,12 @@ function tuileProd(lib, prevu, reel, n, nTot) {
 }
 function ficheProduction(cle) {
   const groupes = t(`pm_${cle}_vars`), n = groupes.reduce((s, g) => s + Number(g[0].match(/\((\d+)\)/)[1]), 0);
+  const dir = [...jours()].reverse().find((j) => j.controles && j.controles.production_modeles && j.controles.production_modeles.reappris);
+  const appr = t(`pm_${cle}_appr`).concat(dir ? [t("pm_dernier", { d: dateCourte(dir.jour), s: nombre(dir.controles.production_modeles.arbres.solaire, 0), e: nombre(dir.controles.production_modeles.arbres.eolien, 0) })] : []);
   return `<div class="fiche"><h4><span class="pastille" style="color:${css(cle === "sol" ? "--s-sol" : "--s-eol")}"></span>${t(`pm_${cle}_titre`)}</h4>`
     + `<div class="detail-bloc"><h5>${t("d_cible")}</h5><ul><li>${t(`pm_${cle}_cible`)}</li></ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_vars", { n })}</h5><ul>${groupes.map(([g, l]) => `<li><b>${g}</b> : ${l.join(" ; ")}</li>`).join("")}</ul></div>`
-    + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${t(`pm_${cle}_appr`).map((x) => `<li>${x}</li>`).join("")}</ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${appr.map((x) => `<li>${x}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${["gfs", "prod", "capa", "registre"].map(lienSource).join("")}</ul></div></div>`;
 }
 function rendreProduction() {
