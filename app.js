@@ -394,7 +394,8 @@ const MODELES = [
   { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: null },
 ];
 const etat = { d: null, langue: "fr", onglet: "prevision", jourHist: null, modeHist: "jour", plage: { preset: "7", debut: null, fin: null },
-               visibles: { GR: true, CR: true, GT: true, hier: false, bande: true },          // cases à cocher, communes à tous les tableaux et graphiques
+               visibles: { GR: true, CR: true, GT: true, hier: false, bande: true },
+               prodVisibles: { sol: true, eol: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
 
@@ -952,19 +953,31 @@ function ficheProduction(cle) {
     + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${appr.map((x) => `<li>${x}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${["gfs", "prod", "capa", "registre"].map(lienSource).join("")}</ul></div></div>`;
 }
+const TECHS = [{ k: "sol", c: "--s-sol", lib: "sol_court", prevu: "sol_prevu", reel: "sol_reel" }, { k: "eol", c: "--s-eol", lib: "eol_court", prevu: "eol_prevu", reel: "eol_reel" }];
+const pastTech = (x) => `<span class="pastille" style="color:${css(x.c)}"></span>`;
+function choixProd(id) {                                             // cases Solaire / Éolien de l'onglet Production (un seul état pour tout l'onglet)
+  const el = $(id);
+  el.innerHTML = `<span class="choix-titre">${t("afficher")}</span>` + TECHS.map((x) => `<label class="choix-item"><input type="checkbox" id="${id}-${x.k}" data-k="${x.k}"${etat.prodVisibles[x.k] ? " checked" : ""}>${pastTech(x)}<span>${t(x.lib)}</span></label>`).join("");
+  el.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => {
+    etat.prodVisibles[inp.dataset.k] = inp.checked;
+    rendreProduction();
+    const n = $(inp.id);
+    if (n) n.focus({ preventScroll: true });
+  }));
+}
 function rendreProduction() {
   $("prod-modeles").innerHTML = ficheProduction("sol") + ficheProduction("eol");
   const js = jours().filter((j) => j.prod), now = maintenantParis();
   if (!js.length) { $("prod-tuiles").innerHTML = `<p class="note">${t("pas_de_prod")}</p>`; return; }
-  const pastSol = `<span class="pastille" style="color:${css("--s-sol")}"></span>`, pastEol = `<span class="pastille" style="color:${css("--s-eol")}"></span>`;
+  for (const id of ["prod-choix-demain", "prod-choix", "prod-choix-regions", "prod-choix-hist"]) choixProd(id);
+  const vus = TECHS.filter((x) => etat.prodVisibles[x.k]), deux = vus.length === 2;
   // 1) production prévue du prochain jour (demain après 10 h)
   const A = joursAccueil(), jd = A.jHaut && A.jHaut.prod ? A.jHaut : js[js.length - 1], pd = jd.prod;
   $("prod-demain-titre").textContent = t("prod_demain", { d: dateLongue(jd.jour) });
   $("prod-demain-badge").textContent = t(badgeJour(jd.jour, now));
   const tuileSimple = (lib, v) => tuile(lib, `${nombre(v)} <small>GWh</small>`, t("prod_prevu_jour"));
-  $("prod-demain-tuiles").innerHTML = tuileSimple(pastSol + t("sol_prevu"), somme(pd.sol)) + tuileSimple(pastEol + t("eol_prevu"), somme(pd.eol))
-    + tuileSimple(t("total_court"), somme(pd.sol) + somme(pd.eol));
-  dessiner("prod-g-demain", { type: "line", data: { labels: pd.heures, datasets: [dsProd(t("sol_prevu"), pd.sol, "--s-sol"), dsProd(t("eol_prevu"), pd.eol, "--s-eol")] }, options: optionsGW(12, "GW"), plugins: [curseur] });
+  $("prod-demain-tuiles").innerHTML = vus.map((x) => tuileSimple(pastTech(x) + t(x.prevu), somme(pd[x.k]))).join("") + (deux ? tuileSimple(t("total_court"), somme(pd.sol) + somme(pd.eol)) : "");
+  dessiner("prod-g-demain", { type: "line", data: { labels: pd.heures, datasets: vus.map((x) => dsProd(t(x.prevu), pd[x.k], x.c)) }, options: optionsGW(12, "GW"), plugins: [curseur] });
   // 2) contrôle : prévu contre réel, jour au choix (par défaut le dernier jour dont la production réelle est complète)
   const complets = js.filter((x) => x.prod.reel_complet);
   if (!etat.jourProd || !js.some((j) => j.jour === etat.jourProd)) etat.jourProd = (complets.length ? complets[complets.length - 1] : js[js.length - 1]).jour;
@@ -973,36 +986,33 @@ function rendreProduction() {
   inp.min = js[0].jour; inp.max = js[js.length - 1].jour; inp.value = j.jour;
   $("prod-prec").disabled = i === 0; $("prod-suiv").disabled = i === js.length - 1;
   $("prod-badge").textContent = `${dateLongue(j.jour)} · ${t(badgeJour(j.jour, now))}`;
-  const nT = p.heures.length, sp = somme(p.sol), ep = somme(p.eol), ns = nConnus(p.sol_reel), ne = nConnus(p.eol_reel);
-  const sr = ns === nT ? somme(p.sol_reel) : null, er = ne === nT ? somme(p.eol_reel) : null;
-  $("prod-tuiles").innerHTML = tuileProd(pastSol + t("sol_prevu"), sp, sr, ns, nT) + tuileProd(pastEol + t("eol_prevu"), ep, er, ne, nT)
-    + tuileProd(t("total_court"), sp + ep, sr !== null && er !== null ? sr + er : null, Math.min(ns, ne), nT);
-  const ds = [dsProd(t("sol_prevu"), p.sol, "--s-sol", { borderDash: [6, 4] }), dsProd(t("eol_prevu"), p.eol, "--s-eol", { borderDash: [6, 4] })];
-  if (p.sol_reel) ds.push(dsProd(t("sol_reel") + " (RTE)", p.sol_reel, "--s-sol", { borderWidth: 3 }));
-  if (p.eol_reel) ds.push(dsProd(t("eol_reel") + " (RTE)", p.eol_reel, "--s-eol", { borderWidth: 3 }));
+  const nT = p.heures.length, tp_ = (k) => somme(p[k]), tr_ = (k) => (nConnus(p[k + "_reel"]) === nT ? somme(p[k + "_reel"]) : null);
+  const T = vus.map((x) => tuileProd(pastTech(x) + t(x.prevu), tp_(x.k), tr_(x.k), nConnus(p[x.k + "_reel"]), nT));
+  if (deux) T.push(tuileProd(t("total_court"), tp_("sol") + tp_("eol"), tr_("sol") !== null && tr_("eol") !== null ? tr_("sol") + tr_("eol") : null, Math.min(nConnus(p.sol_reel), nConnus(p.eol_reel)), nT));
+  $("prod-tuiles").innerHTML = T.join("");
+  const ds = vus.map((x) => dsProd(t(x.prevu), p[x.k], x.c, { borderDash: [6, 4] }));
+  for (const x of vus) if (p[x.k + "_reel"]) ds.push(dsProd(t(x.reel) + " (RTE)", p[x.k + "_reel"], x.c, { borderWidth: 3 }));
   const ch = dessiner("prod-g-jour", { type: "line", data: { labels: p.heures, datasets: ds }, options: optionsGW(12, "GW"), plugins: [curseur] });
   $("prod-g-jour").setAttribute("aria-label", dateLongue(j.jour));
   const v = (a, k) => (a ? nombre(a[k]) : "–");
-  const ec = (a, b, k) => (a && b && b[k] !== null ? signe(a[k] - b[k]) : "–");
-  let h = `<thead><tr><th rowspan="2">${t("heure")}</th><th colspan="3" class="groupe modele">${pastSol} ${t("sol_court")}</th><th colspan="3" class="groupe modele">${pastEol} ${t("eol_court")}</th></tr>`
-    + `<tr><th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th><th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th></tr></thead><tbody>`;
-  p.heures.forEach((lab, k) => {
-    h += `<tr data-i="${k}"><td>${lab}</td><td class="groupe">${v(p.sol, k)}</td><td class="reel">${v(p.sol_reel, k)}</td><td>${ec(p.sol, p.sol_reel, k)}</td>`
-      + `<td class="groupe">${v(p.eol, k)}</td><td class="reel">${v(p.eol_reel, k)}</td><td>${ec(p.eol, p.eol_reel, k)}</td></tr>`;
-  });
+  const ec = (a, b, k) => (a && b && b[k] !== null && b[k] !== undefined ? signe(a[k] - b[k]) : "–");
   const ecJ = (a, b) => (b === null ? "–" : `${signe(ecartPc(a, b), 0)} %`);
-  h += `</tbody><tfoot><tr><td>GWh</td><td class="groupe">${nombre(sp)}</td><td class="reel">${sr === null ? "–" : nombre(sr)}</td><td>${ecJ(sp, sr)}</td>`
-    + `<td class="groupe">${nombre(ep)}</td><td class="reel">${er === null ? "–" : nombre(er)}</td><td>${ecJ(ep, er)}</td></tr></tfoot>`;
-  $("prod-table").innerHTML = h;
-  collerEntetes($("prod-table"));
-  lier(ch, "prod-table");
+  let h = `<thead><tr><th rowspan="2">${t("heure")}</th>${vus.map((x) => `<th colspan="3" class="groupe modele">${pastTech(x)} ${t(x.lib)}</th>`).join("")}</tr>`
+    + `<tr>${vus.map(() => `<th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th>`).join("")}</tr></thead><tbody>`;
+  p.heures.forEach((lab, k) => {
+    h += `<tr data-i="${k}"><td>${lab}</td>` + vus.map((x) => `<td class="groupe">${v(p[x.k], k)}</td><td class="reel">${v(p[x.k + "_reel"], k)}</td><td>${ec(p[x.k], p[x.k + "_reel"], k)}</td>`).join("") + "</tr>";
+  });
+  h += `</tbody><tfoot><tr><td>GWh</td>` + vus.map((x) => `<td class="groupe">${nombre(tp_(x.k))}</td><td class="reel">${tr_(x.k) === null ? "–" : nombre(tr_(x.k))}</td><td>${ecJ(tp_(x.k), tr_(x.k))}</td>`).join("") + "</tr></tfoot>";
+  $("prod-table").innerHTML = vus.length ? h : "";
+  if (vus.length) { collerEntetes($("prod-table")); lier(ch, "prod-table"); }
   const cellE = (pr, r) => (r === null ? "<td>–</td>" : `<td>${signe(ecartPc(pr, r), 0)} %</td>`);
-  let hr = `<thead><tr><th rowspan="2">${t("region")} · ${dateCourte(j.jour)}</th><th colspan="3" class="groupe modele">${t("sol_court")}</th><th colspan="3" class="groupe modele">${t("eol_court")}</th></tr>`
-    + `<tr><th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th><th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th></tr></thead><tbody>`;
-  for (const [nom, a, b, c, d] of p.regions) hr += `<tr><td>${nom}</td><td class="groupe">${nombre(a)}</td><td class="reel">${b === null ? "–" : nombre(b)}</td>${cellE(a, b)}<td class="groupe">${nombre(c)}</td><td class="reel">${d === null ? "–" : nombre(d)}</td>${cellE(c, d)}</tr>`;
-  hr += `</tbody><tfoot><tr><td>${t("france")}</td><td class="groupe">${nombre(sp)}</td><td class="reel">${sr === null ? "–" : nombre(sr)}</td>${cellE(sp, sr)}<td class="groupe">${nombre(ep)}</td><td class="reel">${er === null ? "–" : nombre(er)}</td>${cellE(ep, er)}</tr></tfoot>`;
-  $("prod-regions").innerHTML = hr;
-  collerEntetes($("prod-regions"));
+  const col = { sol: [1, 2], eol: [3, 4] };
+  let hr = `<thead><tr><th rowspan="2">${t("region")} · ${dateCourte(j.jour)}</th>${vus.map((x) => `<th colspan="3" class="groupe modele">${pastTech(x)} ${t(x.lib)}</th>`).join("")}</tr>`
+    + `<tr>${vus.map(() => `<th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th>`).join("")}</tr></thead><tbody>`;
+  for (const r of p.regions) hr += `<tr><td>${r[0]}</td>` + vus.map((x) => { const [a, b] = col[x.k].map((c) => r[c]); return `<td class="groupe">${nombre(a)}</td><td class="reel">${b === null ? "–" : nombre(b)}</td>${cellE(a, b)}`; }).join("") + "</tr>";
+  hr += `</tbody><tfoot><tr><td>${t("france")}</td>` + vus.map((x) => `<td class="groupe">${nombre(tp_(x.k))}</td><td class="reel">${tr_(x.k) === null ? "–" : nombre(tr_(x.k))}</td>${cellE(tp_(x.k), tr_(x.k))}`).join("") + "</tr></tfoot>";
+  $("prod-regions").innerHTML = vus.length ? hr : "";
+  if (vus.length) collerEntetes($("prod-regions"));
   // 3) précision sur tout l'historique (jours dont la production réelle est connue toute la journée)
   const perf = (P_, R_) => {
     let sj = 0, sh = 0, sb = 0, sr2 = 0;
@@ -1014,12 +1024,17 @@ function rendreProduction() {
     return sr2 ? { j: (100 * sj) / sr2, h: (100 * sh) / sr2, b: (100 * sb) / sr2 } : null;
   };
   const tp = (lib, q) => tuile(lib, q ? `${nombre(q.j)} <small>%</small>` : "–", q ? t("perf_ligne", { j: nombre(q.j), h: nombre(q.h), b: signe(q.b) }) + " · " + t("perf_n", { n: complets.length }) : "");
-  $("prod-perf").innerHTML = tp(pastSol + t("sol_court"), perf((x) => x.sol, (x) => x.sol_reel)) + tp(pastEol + t("eol_court"), perf((x) => x.eol, (x) => x.eol_reel))
-    + tp(t("total_court"), perf((x) => x.sol.map((y, k) => y + x.eol[k]), (x) => x.sol_reel.map((y, k) => y + x.eol_reel[k])));
+  $("prod-perf").innerHTML = vus.map((x) => tp(pastTech(x) + t(x.lib), perf((y) => y[x.k], (y) => y[x.k + "_reel"]))).join("")
+    + (deux ? tp(t("total_court"), perf((x) => x.sol.map((y, k) => y + x.eol[k]), (x) => x.sol_reel.map((y, k) => y + x.eol_reel[k]))) : "");
   const lab = js.map((x) => dateCourte(x.jour));
-  const tot = (x, k) => (x.prod[k] && nConnus(x.prod[k]) === x.prod.heures.length ? somme(x.prod[k]) : null);
-  dessiner("prod-h-sol", { type: "line", data: { labels: lab, datasets: [dsProd(t("sol_prevu"), js.map((x) => somme(x.prod.sol)), "--s-sol", { pointRadius: 2, borderDash: [6, 4] }), dsProd(t("sol_reel") + " (RTE)", js.map((x) => tot(x, "sol_reel")), "--s-sol", { pointRadius: 2, borderWidth: 3 })] }, options: optionsGW(8, "GWh"), plugins: [curseur] });
-  dessiner("prod-h-eol", { type: "line", data: { labels: lab, datasets: [dsProd(t("eol_prevu"), js.map((x) => somme(x.prod.eol)), "--s-eol", { pointRadius: 2, borderDash: [6, 4] }), dsProd(t("eol_reel") + " (RTE)", js.map((x) => tot(x, "eol_reel")), "--s-eol", { pointRadius: 2, borderWidth: 3 })] }, options: optionsGW(8, "GWh"), plugins: [curseur] });
+  const totJ = (x, k) => (x.prod[k] && nConnus(x.prod[k]) === x.prod.heures.length ? somme(x.prod[k]) : null);
+  for (const x of TECHS) {
+    const carte = $("prod-carte-h-" + x.k);
+    carte.hidden = !etat.prodVisibles[x.k];
+    if (carte.hidden) { effacer("prod-h-" + x.k); continue; }
+    dessiner("prod-h-" + x.k, { type: "line", data: { labels: lab, datasets: [dsProd(t(x.prevu), js.map((y) => somme(y.prod[x.k])), x.c, { pointRadius: 2, borderDash: [6, 4] }), dsProd(t(x.reel) + " (RTE)", js.map((y) => totJ(y, x.k + "_reel")), x.c, { pointRadius: 2, borderWidth: 3 })] }, options: optionsGW(8, "GWh"), plugins: [curseur] });
+  }
+  $("prod-hist-cartes").classList.toggle("une", !deux);
 }
 function ouvrirProd(iso) { etat.jourProd = iso; location.hash = "#production/" + iso; }
 
