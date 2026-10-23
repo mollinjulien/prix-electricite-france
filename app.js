@@ -27,7 +27,7 @@ const TXT = {
     ck_meteo_d: "run du {d} à 00 h UTC · {h} heures sur {n}",
     ck_prod: "Production solaire et éolienne prévue", nk_prod: "Prévision de production solaire et éolienne", ck_prod_d: "solaire {s} GWh · éolien {e} GWh sur la journée",
     ck_modele: "Modèle « {m} » calculé", nk_modele: "Modèle « {m} »", ck_modele_absent: "Modèle « {m} » non calculé",
-    ck_modele_d: "réentraîné jusqu'à hier · {h} heures prévues · {a} arbres", ck_modele_d_simple: "réentraîné jusqu'à hier",
+    ck_modele_d: "appris avec les prix jusqu'au {v} inclus · {h} heures prévues · {a} arbres", ck_modele_d_simple: "appris avec les prix jusqu'au {v} inclus",
     ck_modele_rejeu: "calculé a posteriori (rejeu)", ck_modele_absent_d: "absent de la prévision", ck_modele_sans_gaz: "pas de prix du gaz récent",
     ck_publie: "Prévision publiée", nk_publie: "Publication de la prévision",
     ck_publie_avant: "le {d}, avant l'enchère de 12 h 45", ck_publie_apres: "le {d}, après l'enchère de 12 h 45", ck_publie_att: "vers 10 h 30",
@@ -140,7 +140,7 @@ const TXT = {
     ck_meteo_d: "run of {d} 00 UTC · {h} hours out of {n}",
     ck_prod: "Solar and wind output forecast", nk_prod: "Solar and wind output forecast", ck_prod_d: "solar {s} GWh · wind {e} GWh over the day",
     ck_modele: "Model \"{m}\" computed", nk_modele: "Model \"{m}\"", ck_modele_absent: "Model \"{m}\" not computed",
-    ck_modele_d: "retrained up to yesterday · {h} hours forecast · {a} trees", ck_modele_d_simple: "retrained up to yesterday",
+    ck_modele_d: "trained on prices up to {v} included · {h} hours forecast · {a} trees", ck_modele_d_simple: "trained on prices up to {v} included",
     ck_modele_rejeu: "computed afterwards (replay)", ck_modele_absent_d: "missing from the forecast", ck_modele_sans_gaz: "no recent gas price",
     ck_publie: "Forecast published", nk_publie: "Forecast publication",
     ck_publie_avant: "{d}, before the 12:45 auction", ck_publie_apres: "{d}, after the 12:45 auction", ck_publie_att: "around 10:30",
@@ -473,7 +473,7 @@ function etapesJour(j) {
   }
   for (const m of MODELES) {
     const nom = courtModele(m.code), cm = (c.modeles || {})[m.code];
-    if (j[m.code]) ajout("calculs", "ok", t("ck_modele", { m: nom }), rejeu ? t("ck_modele_rejeu") : cm ? t("ck_modele_d", { h: cm.heures, a: nombre(cm.arbres, 0) }) : t("ck_modele_d_simple"));
+    if (j[m.code]) ajout("calculs", "ok", t("ck_modele", { m: nom }), rejeu ? t("ck_modele_rejeu") : cm ? t("ck_modele_d", { v: dateCourte(veille), h: cm.heures, a: nombre(cm.arbres, 0) }) : t("ck_modele_d_simple", { v: dateCourte(veille) }));
     else ajout("calculs", rejeu ? "info" : "echec", t("ck_modele_absent", { m: nom }),
                m.code === "GT" && j.gaz && j.gaz.niveau === "rouge" ? t("ck_modele_sans_gaz") : t("ck_modele_absent_d"));
   }
