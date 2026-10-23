@@ -178,6 +178,14 @@ const TXT = {
     ],
     src_usage: { prix: "les 3 modèles de prix", conso: "les 3 modèles de prix", gfs: "les modèles de prix et de production", gaz: "les 3 modèles de prix", prod: "les modèles de production", capa: "les modèles de production", registre: "les modèles de production" },
     outils: [["LightGBM (Microsoft) : l'algorithme de tous les modèles", "https://lightgbm.readthedocs.io/"], ["Python : pandas, NumPy, ecCodes pour lire les fichiers GFS", null], ["Chart.js : les graphiques de ce site", "https://www.chartjs.org/"], ["GitHub Pages : l'hébergement du site", null], ["Claude (Anthropic) : aide à l'écriture du code, des tests et de ce site", null]],
+    gt_pourquoi_titre: "Pourquoi rapporter le prix au coût du gaz ?",
+    gt_pourquoi: [
+      "En France, le prix de l'électricité est souvent fixé par la dernière centrale appelée pour équilibrer l'offre et la demande, et c'est très souvent une centrale à gaz. Son coût de combustible vaut environ prix du gaz ÷ 0,55, car elle transforme 55 % de l'énergie du gaz en électricité.",
+      "D'une année à l'autre, le niveau des prix est donc surtout une multiplication par le prix du gaz. Le modèle principal apprend le prix en euros : le gaz n'y est qu'une variable parmi 20, et il doit découvrir seul qu'un jour venteux fait baisser le prix de 30 € quand le gaz est bon marché mais de 80 € quand il est cher, avec peu d'exemples de gaz cher (surtout 2022).",
+      "Ce modèle apprend plutôt « combien de fois le coût du gaz » : le prix et les prix passés sont divisés par le coût du gaz, puis la prévision est remultipliée. Exemple : il prévoit 0,8 fois le coût du gaz ; avec un gaz à 90 €/MWh (coût 164 €/MWh), cela donne 0,8 × 164 = 131 €/MWh.",
+      "Ce qu'il a appris quand le gaz était bon marché reste ainsi valable quand il est cher : les effets du vent ou du soleil deviennent des pourcentages du prix. Conséquence : il réagit plus fort au vent. Très bon le 23/10/2026, quand le prix s'est effondré toute la journée ; moins bon le 21/10, quand seul l'après-midi s'est effondré.",
+    ],
+    gt_table: [["Prix du gaz TTF", "Coût de l'électricité d'une centrale à gaz"], ["10 €/MWh (2020)", "18 €/MWh"], ["35 €/MWh (2025)", "64 €/MWh"], ["90 €/MWh (octobre 2026)", "164 €/MWh"]],
     chargement: "Impossible de charger les données.",
     unite: "€/MWh",
   },
@@ -357,6 +365,14 @@ const TXT = {
     ],
     src_usage: { prix: "the 3 price models", conso: "the 3 price models", gfs: "the price and production models", gaz: "the 3 price models", prod: "the production models", capa: "the production models", registre: "the production models" },
     outils: [["LightGBM (Microsoft): the algorithm of every model", "https://lightgbm.readthedocs.io/"], ["Python: pandas, NumPy, ecCodes to read GFS files", null], ["Chart.js: this site's charts", "https://www.chartjs.org/"], ["GitHub Pages: site hosting", null], ["Claude (Anthropic): help writing the code, the tests and this site", null]],
+    gt_pourquoi_titre: "Why divide the price by the gas cost?",
+    gt_pourquoi: [
+      "In France, the electricity price is often set by the last plant called to balance supply and demand, very often a gas plant. Its fuel cost is about gas price ÷ 0.55, because it turns 55% of the gas energy into electricity.",
+      "From one year to the next, the price level is therefore mostly a multiplication by the gas price. The main model learns the price in euros: gas is just one variable out of 20, and it must find out by itself that a windy day lowers the price by 30 € when gas is cheap but by 80 € when it is expensive, with few examples of expensive gas (mostly 2022).",
+      "This model instead learns \"how many times the gas cost\": the price and past prices are divided by the gas cost, then the forecast is multiplied back. Example: it forecasts 0.8 times the gas cost; with gas at 90 €/MWh (cost 164 €/MWh), that gives 0.8 × 164 = 131 €/MWh.",
+      "What it learned when gas was cheap thus still applies when gas is expensive: the effects of wind or sun become percentages of the price. As a result it reacts more strongly to wind. Very good on 23/10/2026, when the price collapsed all day; worse on 21/10, when only the afternoon collapsed.",
+    ],
+    gt_table: [["TTF gas price", "Electricity cost of a gas plant"], ["10 €/MWh (2020)", "18 €/MWh"], ["35 €/MWh (2025)", "64 €/MWh"], ["90 €/MWh (October 2026)", "164 €/MWh"]],
     chargement: "Could not load the data.",
     unite: "€/MWh",
   },
@@ -886,7 +902,7 @@ function rendrePerformance() {
 /* ---------------------------------------------------------------- onglet Modèles */
 function rendreModeles() {
   const f = MODELES.map((m) => `<div class="fiche"><h4>${pastille(m.code)}${nomModele(m.code)}${etiquette(m)}</h4><p class="court">${t("nom_court", { c: courtModele(m.code) })}</p>`
-    + `${t("f_" + m.code).map((p, i) => `<p${i === 2 ? ' class="chiffre"' : ""}>${p}</p>`).join("")}${detailsModele(m.code)}</div>`);
+    + `${t("f_" + m.code).map((p, i) => `<p${i === 2 ? ' class="chiffre"' : ""}>${p}</p>`).join("")}${m.code === "GT" ? pourquoiGaz() : ""}${detailsModele(m.code)}</div>`);
   f.push(`<div class="fiche"><h4>${pastille("hier")}${t("hier")}</h4><p class="court">${t("nom_court", { c: t("hier_court") })}</p>${t("f_hier").map((p) => `<p>${p}</p>`).join("")}</div>`);
   $("m-fiches").innerHTML = f.join("");
   $("m-etapes").innerHTML = t("etapes").map(([a, b]) => `<li><div><b>${a}</b><span>${b}</span></div></li>`).join("");
@@ -997,6 +1013,11 @@ function detailsModele(code) {
     + `<div class="detail-bloc"><h5>${t("d_vars", { n })}</h5><ul>${groupes.map(([g, l]) => `<li><b>${g}</b> : ${l.join(" ; ")}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${appr.map((x) => `<li>${x}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${src.map(lienSource).join("")}</ul></div></details>`;
+}
+function pourquoiGaz() {                                            // explication du modèle « prix rapporté au gaz »
+  const [tete, ...lignes] = t("gt_table");
+  return `<details class="plus"><summary>${t("gt_pourquoi_titre")}</summary><div class="detail-bloc">${t("gt_pourquoi").map((p) => `<p class="petit">${p}</p>`).join("")}`
+    + `<table class="table-donnees mini"><thead><tr>${tete.map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${lignes.map((l) => `<tr>${l.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div></details>`;
 }
 function rendreSources() {
   $("s-liste").innerHTML = t("src").map(([id, titre, fournisseur, usage, liens]) => `<div class="source" id="source-${id}"><h4>${titre}</h4><p class="fournisseur">${fournisseur}</p><p>${usage}</p>`

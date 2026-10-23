@@ -220,3 +220,6 @@ a:hover { text-decoration-thickness: 2px; }
 .deux-cartes.droite { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
 @media (max-width: 900px) { .deux-cartes.droite { grid-template-columns: minmax(0, 1fr); } }
 #prod-regions th, #prod-regions td, #prod-table th, #prod-table td { padding: 5px 8px; font-size: 0.82rem; }
+.detail-bloc p.petit { font-size: 0.84rem; color: var(--ink-2); margin: 0 0 8px; }
+.table-donnees.mini { width: auto; margin: 4px 0 6px; }
+.table-donnees.mini th, .table-donnees.mini td { text-align: left; }
