@@ -6,9 +6,9 @@
   <title>Prix de l'électricité de demain</title>
   <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=4" defer></script>
+  <script src="app.js?v=5" defer></script>
 </head>
 <body>
   <header class="entete">
@@ -26,7 +26,9 @@
       <button type="button" role="tab" id="tab-prevision" data-onglet="prevision" aria-controls="prevision" data-t="o_prevision"></button>
       <button type="button" role="tab" id="tab-historique" data-onglet="historique" aria-controls="historique" data-t="o_historique"></button>
       <button type="button" role="tab" id="tab-performance" data-onglet="performance" aria-controls="performance" data-t="o_performance"></button>
+      <button type="button" role="tab" id="tab-production" data-onglet="production" aria-controls="production" data-t="o_production"></button>
       <button type="button" role="tab" id="tab-modeles" data-onglet="modeles" aria-controls="modeles" data-t="o_modeles"></button>
+      <button type="button" role="tab" id="tab-sources" data-onglet="sources" aria-controls="sources" data-t="o_sources"></button>
     </nav>
   </header>
 
@@ -118,6 +120,42 @@
       </div>
     </section>
 
+    <!-- ============================================================ PRODUCTION (bonus) -->
+    <section id="production" role="tabpanel" aria-labelledby="tab-production" class="panneau" hidden>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="prod_titre"></h3>
+        <p class="intro" data-t="intro_prod"></p>
+        <details class="plus"><summary data-t="prod_details"></summary><div class="fiches" id="prod-modeles"></div></details>
+      </div>
+      <div class="carte">
+        <div class="navigation-jour">
+          <button type="button" id="prod-prec" class="bouton" aria-label="Jour précédent">‹</button>
+          <input type="date" id="prod-date" aria-label="Date">
+          <button type="button" id="prod-suiv" class="bouton" aria-label="Jour suivant">›</button>
+          <span id="prod-badge" class="badge"></span>
+        </div>
+        <div class="tuiles" id="prod-tuiles"></div>
+      </div>
+      <div class="deux-cartes">
+        <div class="carte"><h3 class="petit-titre" data-t="prod_solaire"></h3><div class="graphique moyen"><canvas id="prod-g-sol" role="img"></canvas></div></div>
+        <div class="carte"><h3 class="petit-titre" data-t="prod_eolien"></h3><div class="graphique moyen"><canvas id="prod-g-eol" role="img"></canvas></div></div>
+      </div>
+      <div class="deux-cartes droite">
+        <div class="carte"><h3 class="petit-titre" data-t="prod_heure"></h3><div class="cadre-table"><table id="prod-table" class="table-donnees"></table></div></div>
+        <div class="carte"><h3 class="petit-titre" data-t="prod_regions"></h3><div class="cadre-table libre"><table id="prod-regions" class="table-donnees"></table></div></div>
+      </div>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="prod_historique"></h3>
+        <p class="note" data-t="prod_hist_note"></p>
+        <div class="tuiles" id="prod-perf"></div>
+      </div>
+      <div class="deux-cartes">
+        <div class="carte"><h3 class="petit-titre" data-t="prod_hist_sol"></h3><div class="graphique moyen"><canvas id="prod-h-sol" role="img"></canvas></div></div>
+        <div class="carte"><h3 class="petit-titre" data-t="prod_hist_eol"></h3><div class="graphique moyen"><canvas id="prod-h-eol" role="img"></canvas></div></div>
+      </div>
+      <p class="note" data-t="prod_note"></p>
+    </section>
+
     <!-- ============================================================ MODÈLES -->
     <section id="modeles" role="tabpanel" aria-labelledby="tab-modeles" class="panneau" hidden>
       <div class="carte">
@@ -137,6 +175,18 @@
           <h3 class="petit-titre" data-t="m_limites"></h3>
           <ul class="points" id="m-limites"></ul>
         </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ SOURCES -->
+    <section id="sources" role="tabpanel" aria-labelledby="tab-sources" class="panneau" hidden>
+      <div class="carte">
+        <p class="intro" data-t="intro_sources"></p>
+        <div class="sources" id="s-liste"></div>
+      </div>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="s_outils"></h3>
+        <ul class="points" id="s-outils"></ul>
       </div>
     </section>
   </main>

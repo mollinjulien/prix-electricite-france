@@ -34,7 +34,6 @@ const TXT = {
     ck_reel: "Prix réel de l'électricité reçu", nk_reel: "Prix réel de l'électricité", ck_reel_d: "le {d}", ck_reel_fichier: "fichier des prix du marché",
     ck_reel_attente: "publié vers 12 h 45 le {d}, récupéré vers 13 h 45", ck_reel_cours: "enchère publiée à 12 h 45 : récupération vers 13 h 45", ck_reel_retard: "pas encore reçu",
     ck_ecarts: "Écarts calculés", nk_ecarts: "Calcul des écarts", ck_ecarts_d: "meilleur : « {m} », {x} €/MWh d'erreur moyenne", ck_ecarts_att: "dès que le prix réel est reçu",
-    ck_rejeu: "Journée rejouée a posteriori", ck_rejeu_d: "avant la mise en ligne du site, avec exactement la méthode du service (étapes du jour non enregistrées)",
     ck_inconnu: "non enregistré", ck_attente_d: "en attente (vers 10 h 15)",
     prix_moyen: "prix moyen prévu", prevu_erreur: "prix moyen prévu · erreur moyenne {x} €", erreur_biais: "erreur moyenne · biais {b} €",
     marche_moyen: "Prix moyen du marché", veille: "Prix moyen de la veille",
@@ -112,6 +111,73 @@ const TXT = {
       "Projet étudiant (emlyon business school). Les modèles et ce site ont été construits avec l'aide de Claude (Anthropic). Ce n'est pas un conseil d'investissement.",
     ],
     pied: "Projet étudiant (emlyon business school), réalisé avec l'aide de Claude (Anthropic). Ces prévisions ne constituent pas un conseil d'investissement. Prix du marché : EPEX SPOT via Energy-Charts.info (Fraunhofer ISE).",
+    o_production: "Production (bonus)", o_sources: "Sources",
+    plus_details: "Plus de détails : variables, apprentissage, sources",
+    d_vars: "Variables d'entrée ({n})", d_cible: "Ce que le modèle prévoit", d_appr: "Apprentissage", d_sources: "Données utilisées", d_arbres: "Dernière prévision (pour le {d}) : {a} arbres.",
+    v_cal: ["Calendrier (7)", ["heure de la journée (heure de Paris)", "jour de la semaine", "week-end", "jour férié", "mois", "saison : sinus et cosinus du jour de l'année (2)"]],
+    v_prix: ["Prix passés (6)", ["prix de la même heure la veille", "prix de la même heure 7 jours avant", "moyenne de la même heure sur les 7 derniers jours", "prix moyen, minimum et maximum de la veille (3)"]],
+    v_prix_gaz: ["Prix passés rapportés au coût du gaz (6)", ["les 6 mêmes prix passés, chacun divisé par le coût du gaz d'une centrale (prix TTF ÷ 0,55)"]],
+    v_fond: ["Prévisions pour le jour visé (5)", ["consommation prévue par RTE", "solaire : indicateur national GFS (rayonnement prévu × capacité installée, en GW)", "vent : indicateur national GFS (vent prévu à 100 m → courbe de puissance × capacité installée, en GW)", "température prévue (moyenne nationale GFS)", "charge résiduelle = consommation − 0,845 × solaire − 0,9 × vent"]],
+    v_fond_prod: ["Prévisions pour le jour visé (5)", ["consommation prévue par RTE", "production solaire prévue par notre modèle de production (12 régions, en GW)", "production éolienne prévue par notre modèle de production (12 régions, en GW)", "température prévue (moyenne nationale GFS)", "charge résiduelle = consommation − solaire prévu − éolien prévu"]],
+    v_gaz: ["Gaz (2)", ["prix du gaz TTF : dernière clôture connue (avant-veille du jour visé)", "variation du prix du gaz sur 7 jours"]],
+    cible_prix: "Le prix de chaque heure du jour visé, en €/MWh, puis réparti en quarts d'heure.",
+    cible_GT: "Le prix de chaque heure divisé par le coût du gaz (TTF ÷ 0,55) ; la prévision est ensuite remultipliée par ce coût, puis répartie en quarts d'heure.",
+    a_GR: "Toutes les heures depuis le 15/01/2020 jusqu'à minuit (heure de Paris) la veille du jour visé : environ 59 000 heures.",
+    a_CR: "Toutes les heures depuis janvier 2021 (première année où notre production prévue existe sans avoir été apprise sur ces mêmes jours) jusqu'à minuit la veille du jour visé : environ 51 000 heures.",
+    a_commun: [
+      "Réentraîné de zéro chaque matin vers 10 h 15.",
+      "Algorithme : LightGBM, des centaines de petits arbres de décision ajoutés les uns après les autres, chacun corrigeant les erreurs des précédents. Perte L1 : le modèle vise la médiane, moins sensible aux pics de prix.",
+      "Réglages : 31 feuilles par arbre, taux d'apprentissage 0,06, au moins 50 heures par feuille, 90 % des variables et 80 % des heures tirées au hasard pour chaque arbre.",
+      "Nombre d'arbres choisi automatiquement : apprentissage jusqu'à il y a un an, validation sur les 12 derniers mois, arrêt quand l'erreur ne baisse plus, puis 10 % d'arbres en plus.",
+      "Poids : les heures récentes comptent davantage (demi-vie d'un an : une heure d'il y a un an pèse deux fois moins qu'une heure d'hier).",
+      "Moyenne de 3 modèles appris avec 3 graines aléatoires différentes, pour lisser le hasard.",
+      "Quart d'heure : un second LightGBM (22 variables : position du quart dans l'heure, calendrier, écarts des quarts d'heure des jours passés, prix de la veille, consommation, solaire, vent, charge résiduelle et leurs variations d'une heure à l'autre) prévoit l'écart de chaque quart d'heure à la moyenne de son heure. Appris sur les quarts d'heure depuis octobre 2025.",
+    ],
+    ck_rejeu: "Prévision recalculée après coup", ck_rejeu_d: "le site a été mis en ligne le {m} : ce jour a été rejoué avec exactement la méthode du service. Le détail des étapes n'est enregistré que depuis le {d}.",
+    prod_titre: "Bonus : notre prévision de production solaire et éolienne",
+    intro_prod: "Avant de prévoir le prix, nous prévoyons la production solaire et éolienne de chaque région à partir de la même météo GFS. C'est cette production qui alimente le modèle « GFS + gaz + production ». Elle est comparée ici à la production réellement mesurée par RTE.",
+    prod_details: "Détails des deux modèles de production (variables, apprentissage)",
+    prod_solaire: "Solaire : France, heure par heure (GW)", prod_eolien: "Éolien : France, heure par heure (GW)",
+    prod_heure: "Heure par heure (GW)", prod_regions: "Par région (GWh sur la journée)",
+    prod_historique: "Précision sur tout l'historique",
+    prod_hist_note: "Calculée sur les jours où la production réelle est connue toute la journée. Erreur journalière : écart entre le total prévu et le total réel de chaque jour ; erreur horaire : somme des écarts heure par heure ; les deux rapportées à la production réelle. Biais positif : on prévoit trop.",
+    prod_hist_sol: "Solaire : total de chaque jour (GWh)", prod_hist_eol: "Éolien : total de chaque jour (GWh)",
+    prod_note: "Nos modèles prévoient la production « potentielle » : ce que produiraient les installations sans écrêtement. Quand le prix devient négatif, une partie des parcs s'arrête volontairement : la production réelle est alors plus basse que la prévision (surtout le solaire en milieu de journée). Production réelle : éCO2mix temps réel de RTE, valeurs provisoires, mises à jour chaque matin.",
+    p_prevu: "prévu", p_reel: "réel (RTE)", sol_court: "Solaire", eol_court: "Éolien", total_court: "Total solaire + éolien", region: "Région", france: "France",
+    sol_prevu: "Solaire prévu", eol_prevu: "Éolien prévu", sol_reel: "Solaire réel", eol_reel: "Éolien réel",
+    reel_vs: "réel {r} GWh · écart {e} %", reel_partiel: "réel connu sur {h} h sur {n}", reel_absent: "réel pas encore publié (mis à jour chaque matin)",
+    perf_ligne: "erreur journalière {j} % · horaire {h} % · biais {b} %", perf_n: "{n} jours complets",
+    pas_de_prod: "Pas encore de prévision de production.",
+    pm_sol_titre: "Modèle de production solaire", pm_eol_titre: "Modèle de production éolienne",
+    pm_sol_cible: "La production potentielle de chaque région, heure par heure : taux de charge prévu × capacité solaire installée.",
+    pm_eol_cible: "La production potentielle de chaque région, heure par heure : taux de charge prévu × capacité éolienne installée.",
+    pm_sol_vars: [["Rayonnement théorique (4)", ["sur un panneau horizontal, incliné de 30° plein sud, orienté est 10°, orienté ouest 10° (moyennes des départements pondérées par la capacité)"]],
+                  ["Soleil et ciel (7)", ["azimut du soleil : sinus et cosinus (2)", "cosinus de l'angle zénithal", "indice de clarté du ciel", "indice de ciel clair", "part du rayonnement diffus", "couverture nuageuse"]],
+                  ["Température (1)", ["température prévue"]],
+                  ["Calendrier (7)", ["heure : sinus et cosinus (2)", "jour de l'année : sinus et cosinus (2)", "jour de la semaine", "week-end", "jour férié"]],
+                  ["Région (1)", ["l'une des 12 régions"]],
+                  ["Rendement observé (3)", ["production réelle ÷ production théorique prévue : la veille, sur 3 jours et sur 30 jours (données RTE jusqu'à l'avant-veille)"]],
+                  ["Indicateurs nationaux (4)", ["taux de charge théorique national (horizontal et 30° sud)", "solaire national prévu (GW)", "température nationale prévue"]]],
+    pm_eol_vars: [["Vent sur les parcs (7)", ["taux de charge théorique (vent à 100 m → courbe de puissance)", "vent à 100 m", "vent à 10 m", "densité de l'air", "direction du vent : sinus et cosinus (2)", "dispersion du taux de charge entre les points de la région"]],
+                  ["Heure (2)", ["heure : sinus et cosinus"]],
+                  ["Région (1)", ["l'une des 12 régions"]],
+                  ["Indicateurs nationaux (3)", ["éolien national prévu (GW)", "taux de charge éolien national", "solaire national prévu (GW)"]]],
+    pm_sol_appr: ["Appris une seule fois sur les prévisions GFS de 2020 au 31/08/2026 (343 691 lignes région × heure), sans météo observée.", "LightGBM : 63 feuilles par arbre, au moins 400 lignes par feuille, 200 arbres, moyenne de 3 graines.", "Appris en écartant les heures à prix négatif, où une partie des parcs s'arrête : il prévoit donc la production avant écrêtement.", "Pas réentraîné depuis : chaque matin, seules ses entrées changent (météo du jour, rendement observé et capacité mis à jour avec les données de RTE)."],
+    pm_eol_appr: ["Appris une seule fois sur les prévisions GFS de 2020 au 31/08/2026 (670 519 lignes région × heure), sans météo observée.", "LightGBM : 31 feuilles par arbre, au moins 400 lignes par feuille, 5 185 arbres, moyenne de 3 graines.", "Capacité éolienne de chaque région recalculée chaque mois avec les données temps réel de RTE.", "Pas réentraîné depuis le 31/08/2026."],
+    intro_sources: "Toutes les données utilisées sont publiques et gratuites. Voici d'où elles viennent, à quoi elles servent et où les retrouver.",
+    s_outils: "Outils",
+    s_utilise: "Utilisé pour : {u}",
+    src: [
+      ["prix", "Prix day-ahead de l'électricité en France", "EPEX SPOT, via Energy-Charts (Fraunhofer ISE)", "Prix de chaque heure, puis de chaque quart d'heure depuis octobre 2025, de 2020 à aujourd'hui : ce que les modèles apprennent et prévoient, et le « prix du marché » du site.", [["Energy-Charts", "https://www.energy-charts.info/"], ["API Energy-Charts", "https://api.energy-charts.info/"]]],
+      ["conso", "Consommation et prévision de consommation", "RTE, éCO2mix national (Open Data Réseaux Énergies)", "Consommation réelle et prévision de consommation de RTE pour le lendemain, publiée le matin, au quart d'heure.", [["éCO2mix national temps réel", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/"], ["éCO2mix national consolidé", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-cons-def/"]]],
+      ["gfs", "Prévisions météo GFS", "NOAA (États-Unis) ; archive NCAR / UCAR ; copie AWS Open Data", "Run de minuit, échéances de 27 à 48 h (prévision faite la veille pour le lendemain) : rayonnement, vent à 10 et 100 m, température, nuages, pression, sur la France. Archive 2020 → 18/10/2026 pour apprendre, run du jour pour prévoir (les deux sources donnent des valeurs identiques, vérifié).", [["Présentation de GFS (NOAA)", "https://www.ncei.noaa.gov/products/weather-climate-models/global-forecast"], ["Archive NCAR d084001", "https://gdex.ucar.edu/datasets/d084001/"], ["Runs du jour (AWS)", "https://registry.opendata.aws/noaa-gfs-bdp-pds/"]]],
+      ["gaz", "Prix du gaz TTF", "Yahoo Finance (contrat TTF=F) ; secours OilPriceAPI", "Clôture quotidienne du gaz naturel néerlandais, la référence européenne, en €/MWh, depuis décembre 2019.", [["TTF sur Yahoo Finance", "https://finance.yahoo.com/quote/TTF%3DF/"], ["OilPriceAPI", "https://www.oilpriceapi.com/"]]],
+      ["prod", "Production solaire et éolienne par région", "RTE, éCO2mix régional (Open Data Réseaux Énergies)", "Production réelle de chaque région (consolidée jusqu'au 31/08/2026, temps réel ensuite) : ce qu'apprennent les modèles de production, leur « rendement observé » et la courbe réelle de l'onglet Production.", [["éCO2mix régional temps réel", "https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-tr/"], ["éCO2mix régional consolidé", "https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-cons-def/"]]],
+      ["capa", "Capacité solaire installée", "SDES (ministère de la Transition écologique), tableau de bord solaire photovoltaïque, édition T2 2026", "Puissance installée par département et par trimestre, recalée sur le total national de RTE : elle pondère la météo de chaque département.", [["Site du SDES", "https://www.statistiques.developpement-durable.gouv.fr/"]]],
+      ["registre", "Registre national des installations", "Open Data Réseaux Énergies et data.gouv.fr (au 31/12/2025)", "Emplacement des parcs : chaque département a un point météo placé au centre de gravité de ses installations (94 points solaires, 55 points éoliens).", [["ODRÉ", "https://odre.opendatasoft.com/explore/dataset/registre-national-installation-production-stockage-electricite-agrege-311225/"], ["data.gouv.fr", "https://www.data.gouv.fr/datasets/registre-national-des-installations-de-production-et-de-stockage-delectricite-au-31-12-2025"]]],
+    ],
+    src_usage: { prix: "les 3 modèles de prix", conso: "les 3 modèles de prix", gfs: "les modèles de prix et de production", gaz: "les 3 modèles de prix", prod: "les modèles de production", capa: "les modèles de production", registre: "les modèles de production" },
+    outils: [["LightGBM (Microsoft) : l'algorithme de tous les modèles", "https://lightgbm.readthedocs.io/"], ["Python : pandas, NumPy, ecCodes pour lire les fichiers GFS", null], ["Chart.js : les graphiques de ce site", "https://www.chartjs.org/"], ["GitHub Pages : l'hébergement du site", null], ["Claude (Anthropic) : aide à l'écriture du code, des tests et de ce site", null]],
     chargement: "Impossible de charger les données.",
     unite: "€/MWh",
   },
@@ -147,7 +213,6 @@ const TXT = {
     ck_reel: "Actual electricity price received", nk_reel: "Actual electricity price", ck_reel_d: "{d}", ck_reel_fichier: "market price file",
     ck_reel_attente: "published around 12:45 on {d}, fetched around 13:45", ck_reel_cours: "auction published at 12:45: fetched around 13:45", ck_reel_retard: "not received yet",
     ck_ecarts: "Errors computed", nk_ecarts: "Error computation", ck_ecarts_d: "best: \"{m}\", {x} €/MWh mean error", ck_ecarts_att: "once the actual price is received",
-    ck_rejeu: "Day replayed afterwards", ck_rejeu_d: "before the site went live, with exactly the service's method (steps of the day not recorded)",
     ck_inconnu: "not recorded", ck_attente_d: "waiting (around 10:15)",
     prix_moyen: "average forecast price", prevu_erreur: "average forecast · mean error {x} €", erreur_biais: "mean error · bias {b} €",
     marche_moyen: "Average market price", veille: "Previous day's average",
@@ -225,6 +290,73 @@ const TXT = {
       "Student project (emlyon business school). The models and this site were built with the help of Claude (Anthropic). This is not investment advice.",
     ],
     pied: "Student project (emlyon business school), built with the help of Claude (Anthropic). These forecasts are not investment advice. Market prices: EPEX SPOT via Energy-Charts.info (Fraunhofer ISE).",
+    o_production: "Production (bonus)", o_sources: "Sources",
+    plus_details: "More details: variables, training, sources",
+    d_vars: "Input variables ({n})", d_cible: "What the model forecasts", d_appr: "Training", d_sources: "Data used", d_arbres: "Latest forecast (for {d}): {a} trees.",
+    v_cal: ["Calendar (7)", ["hour of day (Paris time)", "weekday", "weekend", "public holiday", "month", "season: sine and cosine of the day of the year (2)"]],
+    v_prix: ["Past prices (6)", ["price at the same hour the day before", "price at the same hour 7 days before", "average of the same hour over the last 7 days", "average, minimum and maximum price of the day before (3)"]],
+    v_prix_gaz: ["Past prices relative to the gas cost (6)", ["the same 6 past prices, each divided by a gas plant's fuel cost (TTF price ÷ 0.55)"]],
+    v_fond: ["Forecasts for the target day (5)", ["RTE load forecast", "solar: GFS national indicator (forecast radiation × installed capacity, GW)", "wind: GFS national indicator (forecast 100 m wind → power curve × installed capacity, GW)", "forecast temperature (GFS national average)", "residual load = load − 0.845 × solar − 0.9 × wind"]],
+    v_fond_prod: ["Forecasts for the target day (5)", ["RTE load forecast", "solar output forecast by our production model (12 regions, GW)", "wind output forecast by our production model (12 regions, GW)", "forecast temperature (GFS national average)", "residual load = load − forecast solar − forecast wind"]],
+    v_gaz: ["Gas (2)", ["TTF gas price: latest known close (two days before the target day)", "7-day change of the gas price"]],
+    cible_prix: "The price of each hour of the target day, €/MWh, then split into quarter-hours.",
+    cible_GT: "The price of each hour divided by the gas cost (TTF ÷ 0.55); the forecast is then multiplied back by that cost and split into quarter-hours.",
+    a_GR: "Every hour from 15/01/2020 up to midnight (Paris time) before the target day: about 59,000 hours.",
+    a_CR: "Every hour from January 2021 (the first year in which our production forecast exists without having been trained on those same days) up to midnight before the target day: about 51,000 hours.",
+    a_commun: [
+      "Retrained from scratch every morning around 10:15.",
+      "Algorithm: LightGBM, hundreds of small decision trees added one after another, each correcting the errors of the previous ones. L1 loss: the model targets the median, less sensitive to price spikes.",
+      "Settings: 31 leaves per tree, learning rate 0.06, at least 50 hours per leaf, 90% of variables and 80% of hours drawn at random for each tree.",
+      "Number of trees chosen automatically: training up to one year ago, validation on the last 12 months, stop when the error no longer falls, then 10% more trees.",
+      "Weights: recent hours count more (one-year half-life: an hour from a year ago weighs half as much as yesterday's).",
+      "Average of 3 models trained with 3 different random seeds, to smooth out chance.",
+      "Quarter-hour: a second LightGBM (22 variables: position of the quarter within the hour, calendar, past days' quarter-hour deviations, previous day's price, load, solar, wind, residual load and their hour-to-hour changes) forecasts each quarter-hour's gap to its hourly average. Trained on quarter-hours since October 2025.",
+    ],
+    ck_rejeu: "Forecast recomputed afterwards", ck_rejeu_d: "the site went live on {m}: this day was replayed with exactly the service's method. Step details are only recorded since {d}.",
+    prod_titre: "Bonus: our solar and wind production forecast",
+    intro_prod: "Before forecasting the price, we forecast each region's solar and wind output from the same GFS weather. This output feeds the \"GFS + gas + output\" model. Here it is compared with the output actually measured by RTE.",
+    prod_details: "Details of the two production models (variables, training)",
+    prod_solaire: "Solar: France, hour by hour (GW)", prod_eolien: "Wind: France, hour by hour (GW)",
+    prod_heure: "Hour by hour (GW)", prod_regions: "By region (GWh over the day)",
+    prod_historique: "Accuracy over the full history",
+    prod_hist_note: "Computed on days where actual output is known for the whole day. Daily error: gap between forecast and actual daily totals; hourly error: sum of hour-by-hour gaps; both relative to actual output. Positive bias: forecast too high.",
+    prod_hist_sol: "Solar: daily total (GWh)", prod_hist_eol: "Wind: daily total (GWh)",
+    prod_note: "Our models forecast \"potential\" output: what installations would produce without curtailment. When the price turns negative, some plants stop on purpose, so actual output is lower than forecast (mostly solar around midday). Actual output: RTE éCO2mix real-time data, provisional values, updated every morning.",
+    p_prevu: "forecast", p_reel: "actual (RTE)", sol_court: "Solar", eol_court: "Wind", total_court: "Solar + wind", region: "Region", france: "France",
+    sol_prevu: "Forecast solar", eol_prevu: "Forecast wind", sol_reel: "Actual solar", eol_reel: "Actual wind",
+    reel_vs: "actual {r} GWh · error {e}%", reel_partiel: "actual known for {h} h out of {n}", reel_absent: "actual not published yet (updated every morning)",
+    perf_ligne: "daily error {j}% · hourly {h}% · bias {b}%", perf_n: "{n} complete days",
+    pas_de_prod: "No production forecast yet.",
+    pm_sol_titre: "Solar production model", pm_eol_titre: "Wind production model",
+    pm_sol_cible: "Each region's potential output, hour by hour: forecast load factor × installed solar capacity.",
+    pm_eol_cible: "Each region's potential output, hour by hour: forecast load factor × installed wind capacity.",
+    pm_sol_vars: [["Theoretical radiation (4)", ["on a horizontal panel, tilted 30° due south, facing east 10°, facing west 10° (department averages weighted by capacity)"]],
+                  ["Sun and sky (7)", ["solar azimuth: sine and cosine (2)", "cosine of the zenith angle", "clearness index", "clear-sky index", "diffuse fraction", "cloud cover"]],
+                  ["Temperature (1)", ["forecast temperature"]],
+                  ["Calendar (7)", ["hour: sine and cosine (2)", "day of year: sine and cosine (2)", "weekday", "weekend", "public holiday"]],
+                  ["Region (1)", ["one of the 12 regions"]],
+                  ["Observed yield (3)", ["actual output ÷ forecast theoretical output: previous day, 3 days and 30 days (RTE data up to two days before)"]],
+                  ["National indicators (4)", ["national theoretical load factor (horizontal and 30° south)", "national forecast solar (GW)", "national forecast temperature"]]],
+    pm_eol_vars: [["Wind at the farms (7)", ["theoretical load factor (100 m wind → power curve)", "100 m wind", "10 m wind", "air density", "wind direction: sine and cosine (2)", "spread of the load factor across the region's points"]],
+                  ["Hour (2)", ["hour: sine and cosine"]],
+                  ["Region (1)", ["one of the 12 regions"]],
+                  ["National indicators (3)", ["national forecast wind (GW)", "national wind load factor", "national forecast solar (GW)"]]],
+    pm_sol_appr: ["Trained once on GFS forecasts from 2020 to 31/08/2026 (343,691 region × hour rows), with no observed weather.", "LightGBM: 63 leaves per tree, at least 400 rows per leaf, 200 trees, average of 3 seeds.", "Trained without negative-price hours, when some plants stop: it therefore forecasts output before curtailment.", "Not retrained since: every morning only its inputs change (today's weather, observed yield and capacity updated with RTE data)."],
+    pm_eol_appr: ["Trained once on GFS forecasts from 2020 to 31/08/2026 (670,519 region × hour rows), with no observed weather.", "LightGBM: 31 leaves per tree, at least 400 rows per leaf, 5,185 trees, average of 3 seeds.", "Each region's wind capacity recomputed every month from RTE real-time data.", "Not retrained since 31/08/2026."],
+    intro_sources: "All the data used is public and free. Here is where it comes from, what it is used for and where to find it.",
+    s_outils: "Tools",
+    s_utilise: "Used for: {u}",
+    src: [
+      ["prix", "French day-ahead electricity price", "EPEX SPOT, via Energy-Charts (Fraunhofer ISE)", "Price of each hour, then of each quarter-hour since October 2025, from 2020 to today: what the models learn and forecast, and the site's \"market price\".", [["Energy-Charts", "https://www.energy-charts.info/"], ["Energy-Charts API", "https://api.energy-charts.info/"]]],
+      ["conso", "Load and load forecast", "RTE, national éCO2mix (Open Data Réseaux Énergies)", "Actual load and RTE's next-day load forecast, published in the morning, per quarter-hour.", [["National éCO2mix real time", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/"], ["National éCO2mix consolidated", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-cons-def/"]]],
+      ["gfs", "GFS weather forecasts", "NOAA (United States); NCAR / UCAR archive; AWS Open Data copy", "Midnight run, lead times of 27 to 48 h (forecast made the day before for the next day): radiation, 10 and 100 m wind, temperature, clouds, pressure over France. Archive 2020 → 18/10/2026 for training, today's run for forecasting (both sources give identical values, checked).", [["About GFS (NOAA)", "https://www.ncei.noaa.gov/products/weather-climate-models/global-forecast"], ["NCAR archive d084001", "https://gdex.ucar.edu/datasets/d084001/"], ["Today's runs (AWS)", "https://registry.opendata.aws/noaa-gfs-bdp-pds/"]]],
+      ["gaz", "TTF gas price", "Yahoo Finance (TTF=F contract); OilPriceAPI as backup", "Daily close of Dutch natural gas, the European benchmark, €/MWh, since December 2019.", [["TTF on Yahoo Finance", "https://finance.yahoo.com/quote/TTF%3DF/"], ["OilPriceAPI", "https://www.oilpriceapi.com/"]]],
+      ["prod", "Solar and wind output by region", "RTE, regional éCO2mix (Open Data Réseaux Énergies)", "Actual output of each region (consolidated up to 31/08/2026, real time after): what the production models learn, their \"observed yield\" and the actual curve in the Production tab.", [["Regional éCO2mix real time", "https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-tr/"], ["Regional éCO2mix consolidated", "https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-cons-def/"]]],
+      ["capa", "Installed solar capacity", "SDES (French Ministry for the Ecological Transition), solar PV dashboard, Q2 2026 edition", "Installed capacity per department and quarter, aligned with RTE's national total: it weights each department's weather.", [["SDES website", "https://www.statistiques.developpement-durable.gouv.fr/"]]],
+      ["registre", "National installation register", "Open Data Réseaux Énergies and data.gouv.fr (as of 31/12/2025)", "Location of the plants: each department has a weather point at the centre of gravity of its installations (94 solar points, 55 wind points).", [["ODRÉ", "https://odre.opendatasoft.com/explore/dataset/registre-national-installation-production-stockage-electricite-agrege-311225/"], ["data.gouv.fr", "https://www.data.gouv.fr/datasets/registre-national-des-installations-de-production-et-de-stockage-delectricite-au-31-12-2025"]]],
+    ],
+    src_usage: { prix: "the 3 price models", conso: "the 3 price models", gfs: "the price and production models", gaz: "the 3 price models", prod: "the production models", capa: "the production models", registre: "the production models" },
+    outils: [["LightGBM (Microsoft): the algorithm of every model", "https://lightgbm.readthedocs.io/"], ["Python: pandas, NumPy, ecCodes to read GFS files", null], ["Chart.js: this site's charts", "https://www.chartjs.org/"], ["GitHub Pages: site hosting", null], ["Claude (Anthropic): help writing the code, the tests and this site", null]],
     chargement: "Could not load the data.",
     unite: "€/MWh",
   },
@@ -236,8 +368,8 @@ const MODELES = [
   { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: null },
 ];
 const etat = { d: null, langue: "fr", onglet: "prevision", jourHist: null, modeHist: "jour", plage: { preset: "7", debut: null, fin: null },
-               visibles: { GR: true, CR: true, GT: true, hier: false },          // cases à cocher, communes à tous les tableaux et graphiques
-               pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout",
+               visibles: { GR: true, CR: true, GT: true, hier: false, bande: true },          // cases à cocher, communes à tous les tableaux et graphiques
+               pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
 
 /* ---------------------------------------------------------------- outils */
@@ -328,10 +460,10 @@ function segments(id, liste, valeur, rappel) {
   el.innerHTML = liste.map(([k, lib]) => `<button type="button" data-v="${k}" aria-pressed="${k === valeur}">${lib}</button>`).join("");
   el.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => rappel(b.dataset.v)));
 }
-function choixModeles(id, codes, fixes = []) {                       // cases à cocher des modèles (+ légende des courbes toujours affichées)
+function choixModeles(id, codes, fixes = [], bande = false) {         // cases à cocher des modèles (+ fourchette si elle existe, + légende des courbes toujours affichées)
   const el = $(id);
-  const cases = codes.concat(["hier"]).map((c) => `<label class="choix-item"><input type="checkbox" id="${id}-${c}" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>`
-    + `${pastille(c)}<span>${nomModele(c)}</span></label>`);
+  const cases = codes.concat(["hier"], bande ? ["bande"] : []).map((c) => `<label class="choix-item"><input type="checkbox" id="${id}-${c}" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>`
+    + `${c === "bande" ? '<span class="pastille bande"></span>' : pastille(c)}<span>${c === "bande" ? t("fourchette") : nomModele(c)}</span></label>`);
   const leg = fixes.map(([c, lib]) => `<span class="choix-fixe">${c === "bande" ? '<span class="pastille bande"></span>' : pastille(c)}${lib}</span>`);
   el.innerHTML = `<span class="choix-titre">${t("afficher")}</span>${cases.join("")}${leg.length ? `<span class="choix-legende">${leg.join("")}</span>` : ""}`;
   el.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => {
@@ -399,7 +531,8 @@ function dsBande(bas, haut) {
   return [{ label: "_bas", data: bas, borderWidth: 0, pointRadius: 0, fill: false },
           { label: t("fourchette"), data: haut, borderWidth: 0, pointRadius: 0, backgroundColor: css("--bande"), borderColor: css("--bande"), fill: "-1" }];
 }
-const avecBande = (s) => Boolean(s.bas && s.haut && s.GR && etat.visibles.GR);       // la fourchette est construite autour du modèle principal
+const aBande = (s) => Boolean(s.bas && s.haut && s.GR);                              // la fourchette existe (jours publiés en direct), autour du modèle principal
+const avecBande = (s) => aBande(s) && etat.visibles.GR && etat.visibles.bande;
 function dsJour(s, j) {
   const ds = [];
   if (avecBande(s)) ds.push(...dsBande(s.bas, s.haut));
@@ -408,7 +541,7 @@ function dsJour(s, j) {
   if (etat.visibles.hier) ds.push(dsHier(s.hier));
   return ds;
 }
-const legendeJour = (s) => (s.reel ? [["reel", t("marche")]] : []).concat(avecBande(s) ? [["bande", t("fourchette")]] : []);
+const legendeJour = (s) => (s.reel ? [["reel", t("marche")]] : []);
 function dessiner(id, config) {
   if (etat.graphiques[id]) etat.graphiques[id].destroy();
   etat.graphiques[id] = new Chart($(id), config);
@@ -452,7 +585,7 @@ function groupesEtapes(G) {
 function etapesJour(j) {
   const G = { donnees: [], calculs: [], resultat: [] }, ajout = (g, cls, lib, det) => G[g].push([cls, lib, det]);
   const veille = ajouterJours(j.jour, -1), now = maintenantParis(), rejeu = j.source === "rejeu", c = j.controles || {};
-  if (rejeu) ajout("donnees", "info", t("ck_rejeu"), t("ck_rejeu_d"));
+  if (rejeu) ajout("donnees", "info", t("ck_rejeu"), t("ck_rejeu_d", { m: dateCourte(ajouterJours(etat.d.debut_direct, -1)), d: dateCourte(etat.d.debut_direct) }));
   else {
     if (c.prix_connus_jusqu) ajout("donnees", "ok", t("ck_prix"), t("ck_prix_d", { d: dateHeure(c.prix_connus_jusqu.replace(" ", "T")) }));
     else ajout("donnees", "info", t("nk_prix"), t("ck_inconnu"));
@@ -567,7 +700,7 @@ function rendreBloc(cote, iso, j, now) {
   if (det) det.addEventListener("toggle", () => { etat.etapesOuvertes = det.open; });
   segments(p + "-pas", [["quart", t("p_quart")], ["heure", t("p_heure")]], etat.pasPrev[cote], (v) => { etat.pasPrev[cote] = v; rendreBloc(cote, iso, j, maintenantParis()); });
   const s = series(j, etat.pasPrev[cote]);
-  choixModeles(p + "-choix", modelesDuJour(j).map((m) => m.code), legendeJour(s));
+  choixModeles(p + "-choix", modelesDuJour(j).map((m) => m.code), legendeJour(s), aBande(s));
   tablePrix(p + "-table", s, j);
   lier(dessiner(p + "-graphique", { type: "line", data: { labels: s.labels, datasets: dsJour(s, j) }, options: options(13), plugins: [curseur] }), p + "-table");
 }
@@ -753,7 +886,7 @@ function rendrePerformance() {
 /* ---------------------------------------------------------------- onglet Modèles */
 function rendreModeles() {
   const f = MODELES.map((m) => `<div class="fiche"><h4>${pastille(m.code)}${nomModele(m.code)}${etiquette(m)}</h4><p class="court">${t("nom_court", { c: courtModele(m.code) })}</p>`
-    + `${t("f_" + m.code).map((p, i) => `<p${i === 2 ? ' class="chiffre"' : ""}>${p}</p>`).join("")}</div>`);
+    + `${t("f_" + m.code).map((p, i) => `<p${i === 2 ? ' class="chiffre"' : ""}>${p}</p>`).join("")}${detailsModele(m.code)}</div>`);
   f.push(`<div class="fiche"><h4>${pastille("hier")}${t("hier")}</h4><p class="court">${t("nom_court", { c: t("hier_court") })}</p>${t("f_hier").map((p) => `<p>${p}</p>`).join("")}</div>`);
   $("m-fiches").innerHTML = f.join("");
   $("m-etapes").innerHTML = t("etapes").map(([a, b]) => `<li><div><b>${a}</b><span>${b}</span></div></li>`).join("");
@@ -761,13 +894,124 @@ function rendreModeles() {
   $("m-limites").innerHTML = t("limites").map((p) => `<li>${p.split("{d}").join(dateLongue(etat.d.debut_direct))}</li>`).join("");
 }
 
+/* ---------------------------------------------------------------- onglet Production (bonus) */
+const somme = (a) => (a ? a.reduce((s, x) => s + (x === null ? 0 : x), 0) : null);
+const nConnus = (a) => (a ? a.filter((x) => x !== null).length : 0);
+const ecartPc = (p, r) => (r ? (100 * (p - r)) / r : null);
+function optionsGW(maxTicks, unite) {
+  const o = options(maxTicks, true);
+  o.scales.y.title.text = unite;
+  o.plugins.tooltip.callbacks.label = (c) => ` ${c.dataset.label}${etat.langue === "fr" ? " : " : ": "}${nombre(c.parsed.y)} ${unite}`;
+  return o;
+}
+const dsProd = (lib, data, couleur, extra = {}) => ({ label: lib, data, borderColor: css(couleur), backgroundColor: css(couleur), fill: false, spanGaps: false, ...extra });
+const dsReel = (lib, data, extra = {}) => ({ label: lib, data, borderColor: css("--ink"), backgroundColor: css("--ink"), borderWidth: 2.5, fill: false, spanGaps: false, ...extra });
+function tuileProd(lib, prevu, reel, n, nTot) {
+  let det;
+  if (reel !== null && n === nTot) det = t("reel_vs", { r: nombre(reel), e: signe(ecartPc(prevu, reel), 0) });
+  else det = n ? t("reel_partiel", { h: n, n: nTot }) : t("reel_absent");
+  return tuile(lib, `${nombre(prevu)} <small>GWh</small>`, det);
+}
+function ficheProduction(cle) {
+  const groupes = t(`pm_${cle}_vars`), n = groupes.reduce((s, g) => s + Number(g[0].match(/\((\d+)\)/)[1]), 0);
+  return `<div class="fiche"><h4><span class="pastille" style="color:${css(cle === "sol" ? "--s-sol" : "--s-eol")}"></span>${t(`pm_${cle}_titre`)}</h4>`
+    + `<div class="detail-bloc"><h5>${t("d_cible")}</h5><ul><li>${t(`pm_${cle}_cible`)}</li></ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_vars", { n })}</h5><ul>${groupes.map(([g, l]) => `<li><b>${g}</b> : ${l.join(" ; ")}</li>`).join("")}</ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${t(`pm_${cle}_appr`).map((x) => `<li>${x}</li>`).join("")}</ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${["gfs", "prod", "capa", "registre"].map(lienSource).join("")}</ul></div></div>`;
+}
+function rendreProduction() {
+  $("prod-modeles").innerHTML = ficheProduction("sol") + ficheProduction("eol");
+  const js = jours().filter((j) => j.prod);
+  if (!js.length) { $("prod-tuiles").innerHTML = `<p class="note">${t("pas_de_prod")}</p>`; return; }
+  if (!etat.jourProd || !js.some((j) => j.jour === etat.jourProd)) { const A = joursAccueil(); etat.jourProd = (A.jHaut && A.jHaut.prod ? A.jHaut : js[js.length - 1]).jour; }
+  const i = js.findIndex((j) => j.jour === etat.jourProd), j = js[i], p = j.prod, now = maintenantParis();
+  const inp = $("prod-date");
+  inp.min = js[0].jour; inp.max = js[js.length - 1].jour; inp.value = j.jour;
+  $("prod-prec").disabled = i === 0; $("prod-suiv").disabled = i === js.length - 1;
+  $("prod-badge").textContent = `${dateLongue(j.jour)} · ${t(badgeJour(j.jour, now))}`;
+  const nT = p.heures.length, sp = somme(p.sol), ep = somme(p.eol), ns = nConnus(p.sol_reel), ne = nConnus(p.eol_reel);
+  const sr = ns === nT ? somme(p.sol_reel) : null, er = ne === nT ? somme(p.eol_reel) : null;
+  $("prod-tuiles").innerHTML = tuileProd(`<span class="pastille" style="color:${css("--s-sol")}"></span>${t("sol_prevu")}`, sp, sr, ns, nT)
+    + tuileProd(`<span class="pastille" style="color:${css("--s-eol")}"></span>${t("eol_prevu")}`, ep, er, ne, nT)
+    + tuileProd(t("total_court"), sp + ep, sr !== null && er !== null ? sr + er : null, Math.min(ns, ne), nT);
+  dessiner("prod-g-sol", { type: "line", data: { labels: p.heures, datasets: [dsProd(t("sol_court") + " " + t("p_prevu"), p.sol, "--s-sol"), ...(p.sol_reel ? [dsReel(t("sol_court") + " " + t("p_reel"), p.sol_reel)] : [])] }, options: optionsGW(12, "GW"), plugins: [curseur] });
+  dessiner("prod-g-eol", { type: "line", data: { labels: p.heures, datasets: [dsProd(t("eol_court") + " " + t("p_prevu"), p.eol, "--s-eol"), ...(p.eol_reel ? [dsReel(t("eol_court") + " " + t("p_reel"), p.eol_reel)] : [])] }, options: optionsGW(12, "GW"), plugins: [curseur] });
+  const v = (a, k) => (a ? nombre(a[k]) : "–");
+  let h = `<thead><tr><th>${t("heure")}</th><th class="modele">${t("sol_court")} ${t("p_prevu")}</th><th class="modele">${t("sol_court")} ${t("p_reel")}</th>`
+    + `<th class="modele groupe">${t("eol_court")} ${t("p_prevu")}</th><th class="modele">${t("eol_court")} ${t("p_reel")}</th></tr></thead><tbody>`;
+  p.heures.forEach((lab, k) => { h += `<tr><td>${lab}</td><td>${v(p.sol, k)}</td><td class="reel">${v(p.sol_reel, k)}</td><td class="groupe">${v(p.eol, k)}</td><td class="reel">${v(p.eol_reel, k)}</td></tr>`; });
+  h += `</tbody><tfoot><tr><td>GWh</td><td>${nombre(sp)}</td><td class="reel">${sr === null ? "–" : nombre(sr)}</td><td class="groupe">${nombre(ep)}</td><td class="reel">${er === null ? "–" : nombre(er)}</td></tr></tfoot>`;
+  $("prod-table").innerHTML = h;
+  const cellE = (pr, r) => (r === null ? "<td>–</td>" : `<td>${signe(ecartPc(pr, r), 0)} %</td>`);
+  let hr = `<thead><tr><th rowspan="2">${t("region")}</th><th colspan="3" class="groupe modele">${t("sol_court")}</th><th colspan="3" class="groupe modele">${t("eol_court")}</th></tr>`
+    + `<tr><th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th><th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th></tr></thead><tbody>`;
+  for (const [nom, a, b, c, d] of p.regions) hr += `<tr><td>${nom}</td><td class="groupe">${nombre(a)}</td><td class="reel">${b === null ? "–" : nombre(b)}</td>${cellE(a, b)}<td class="groupe">${nombre(c)}</td><td class="reel">${d === null ? "–" : nombre(d)}</td>${cellE(c, d)}</tr>`;
+  hr += `</tbody><tfoot><tr><td>${t("france")}</td><td class="groupe">${nombre(sp)}</td><td class="reel">${sr === null ? "–" : nombre(sr)}</td>${cellE(sp, sr)}<td class="groupe">${nombre(ep)}</td><td class="reel">${er === null ? "–" : nombre(er)}</td>${cellE(ep, er)}</tr></tfoot>`;
+  $("prod-regions").innerHTML = hr;
+  collerEntetes($("prod-regions"));
+  // précision sur tout l'historique (jours dont la production réelle est connue toute la journée)
+  const complets = js.filter((x) => x.prod.reel_complet);
+  const perf = (cs, cr) => {
+    let sj = 0, sh = 0, sb = 0, sr2 = 0;
+    for (const x of complets) {
+      const P = x.prod[cs], R = x.prod[cr];
+      sj += Math.abs(somme(P) - somme(R)); sb += somme(P) - somme(R); sr2 += somme(R);
+      P.forEach((y, k) => { sh += Math.abs(y - R[k]); });
+    }
+    return sr2 ? { j: (100 * sj) / sr2, h: (100 * sh) / sr2, b: (100 * sb) / sr2 } : null;
+  };
+  const pt = (() => {
+    let sj = 0, sh = 0, sb = 0, sr2 = 0;
+    for (const x of complets) {
+      const P = x.prod.sol.map((y, k) => y + x.prod.eol[k]), R = x.prod.sol_reel.map((y, k) => y + x.prod.eol_reel[k]);
+      sj += Math.abs(somme(P) - somme(R)); sb += somme(P) - somme(R); sr2 += somme(R);
+      P.forEach((y, k) => { sh += Math.abs(y - R[k]); });
+    }
+    return sr2 ? { j: (100 * sj) / sr2, h: (100 * sh) / sr2, b: (100 * sb) / sr2 } : null;
+  })();
+  const tp = (lib, q) => tuile(lib, q ? `${nombre(q.j)} <small>%</small>` : "–", q ? t("perf_ligne", { j: nombre(q.j), h: nombre(q.h), b: signe(q.b) }) + " · " + t("perf_n", { n: complets.length }) : "");
+  $("prod-perf").innerHTML = tp(`<span class="pastille" style="color:${css("--s-sol")}"></span>${t("sol_court")}`, perf("sol", "sol_reel"))
+    + tp(`<span class="pastille" style="color:${css("--s-eol")}"></span>${t("eol_court")}`, perf("eol", "eol_reel")) + tp(t("total_court"), pt);
+  const lab = js.map((x) => dateCourte(x.jour));
+  const tot = (x, k) => (x.prod[k] && nConnus(x.prod[k]) === x.prod.heures.length ? somme(x.prod[k]) : null);
+  dessiner("prod-h-sol", { type: "line", data: { labels: lab, datasets: [dsProd(t("sol_court") + " " + t("p_prevu"), js.map((x) => somme(x.prod.sol)), "--s-sol", { pointRadius: 2 }), dsReel(t("sol_court") + " " + t("p_reel"), js.map((x) => tot(x, "sol_reel")), { pointRadius: 2 })] }, options: optionsGW(8, "GWh"), plugins: [curseur] });
+  dessiner("prod-h-eol", { type: "line", data: { labels: lab, datasets: [dsProd(t("eol_court") + " " + t("p_prevu"), js.map((x) => somme(x.prod.eol)), "--s-eol", { pointRadius: 2 }), dsReel(t("eol_court") + " " + t("p_reel"), js.map((x) => tot(x, "eol_reel")), { pointRadius: 2 })] }, options: optionsGW(8, "GWh"), plugins: [curseur] });
+}
+function ouvrirProd(iso) { etat.jourProd = iso; location.hash = "#production/" + iso; }
+
+/* ---------------------------------------------------------------- détails des modèles et sources */
+function lienSource(id) {
+  const s = t("src").find((x) => x[0] === id);
+  return `<li><a href="#sources">${s[1]}</a> : ${s[2]}${s[4].length ? " · " + s[4].map(([lib, url]) => `<a href="${url}" target="_blank" rel="noopener">${lib}</a>`).join(" · ") : ""}</li>`;
+}
+function detailsModele(code) {
+  const groupes = [t("v_cal"), code === "GT" ? t("v_prix_gaz") : t("v_prix"), code === "CR" ? t("v_fond_prod") : t("v_fond"), t("v_gaz")];
+  const n = groupes.reduce((s, g) => s + Number(g[0].match(/\((\d+)\)/)[1]), 0);
+  const dir = [...jours()].reverse().find((j) => j.controles && j.controles.modeles && j.controles.modeles[code]);
+  const appr = [code === "CR" ? t("a_CR") : t("a_GR"), ...t("a_commun")];
+  if (dir) appr.push(t("d_arbres", { d: dateCourte(dir.jour), a: nombre(dir.controles.modeles[code].arbres, 0) }));
+  const src = ["prix", "conso", "gfs", "gaz"].concat(code === "CR" ? ["prod", "capa", "registre"] : []);
+  return `<details class="plus"><summary>${t("plus_details")}</summary>`
+    + `<div class="detail-bloc"><h5>${t("d_cible")}</h5><ul><li>${code === "GT" ? t("cible_GT") : t("cible_prix")}</li></ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_vars", { n })}</h5><ul>${groupes.map(([g, l]) => `<li><b>${g}</b> : ${l.join(" ; ")}</li>`).join("")}</ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${appr.map((x) => `<li>${x}</li>`).join("")}</ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${src.map(lienSource).join("")}</ul></div></details>`;
+}
+function rendreSources() {
+  $("s-liste").innerHTML = t("src").map(([id, titre, fournisseur, usage, liens]) => `<div class="source" id="source-${id}"><h4>${titre}</h4><p class="fournisseur">${fournisseur}</p><p>${usage}</p>`
+    + `<p class="fournisseur">${t("s_utilise", { u: t("src_usage")[id] })}</p><div class="liens">${liens.map(([lib, url]) => `<a href="${url}" target="_blank" rel="noopener">${lib} ↗</a>`).join("")}</div></div>`).join("");
+  $("s-outils").innerHTML = t("outils").map(([lib, url]) => `<li>${url ? `<a href="${url}" target="_blank" rel="noopener">${lib}</a>` : lib}</li>`).join("");
+}
+
 /* ---------------------------------------------------------------- navigation */
-const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, performance: rendrePerformance, modeles: rendreModeles };
+const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, performance: rendrePerformance, production: rendreProduction, modeles: rendreModeles, sources: rendreSources };
 function lireAncre() {
   const [o, jour] = location.hash.replace("#", "").split("/");
   etat.onglet = RENDUS[o] ? o : "prevision";
   if (etat.onglet === "historique" && jour === "plage") etat.modeHist = "plage";
   else if (etat.onglet === "historique" && jour && etat.d && jourDe(jour)) { etat.jourHist = jour; etat.modeHist = "jour"; }
+  else if (etat.onglet === "production" && jour && etat.d && jourDe(jour)) etat.jourProd = jour;
 }
 function afficher() {
   document.querySelectorAll("[role=tab]").forEach((b) => { const actif = b.dataset.onglet === etat.onglet; b.setAttribute("aria-selected", String(actif)); b.tabIndex = actif ? 0 : -1; });
@@ -818,6 +1062,10 @@ function demarrer() {
   const pas = (d) => { const js = jours(), i = js.findIndex((j) => j.jour === etat.jourHist) + d; if (js[i]) ouvrirJour(js[i].jour); };
   $("hist-prec").addEventListener("click", () => pas(-1));
   $("hist-suiv").addEventListener("click", () => pas(1));
+  $("prod-date").addEventListener("change", (e) => { if (jourDe(e.target.value)) ouvrirProd(e.target.value); });
+  const pasProd = (d) => { const js = jours().filter((j) => j.prod), i = js.findIndex((j) => j.jour === etat.jourProd) + d; if (js[i]) ouvrirProd(js[i].jour); };
+  $("prod-prec").addEventListener("click", () => pasProd(-1));
+  $("prod-suiv").addEventListener("click", () => pasProd(1));
   const perso = () => { const a = $("plage-debut").value, b = $("plage-fin").value; if (a && b && a <= b) { etat.plage = { preset: "perso", debut: a, fin: b }; rendrePlage(); } };
   $("plage-debut").addEventListener("change", perso);
   $("plage-fin").addEventListener("change", perso);
