@@ -54,9 +54,10 @@ const TXT = {
     clic_jour: "Cliquez sur une ligne pour ouvrir ce jour dans le détail.",
     date: "Date", source: "Source", rejeu: "rejeu", direct: "direct", meilleur: "meilleur",
     prevu_moyen: "prévu", erreur_court: "erreur", moyenne_periode: "Moyenne de la période",
-    intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Le gain se mesure contre le repère naïf « même quart d'heure la veille ».",
+    intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Le gain se mesure contre le repère naïf « même quart d'heure la veille ». La corrélation (de −1 à 1, 1 = parfait) dit si le modèle suit bien les hausses et les baisses du prix, sans tenir compte du niveau ; « dans la journée » = moyenne des corrélations de chaque jour sur ses quarts d'heure.",
     pf_tout: "Tout l'historique", pf_30: "30 derniers jours", pf_direct: "Depuis la mise en ligne",
     aucun_direct: "Pas encore de jour prévu en direct : les premières prévisions publiées commencent le {d}.",
+    c_corr: "Corrélation", c_corr_j: "Corrélation dans la journée", corr_court: "corrélation {r}",
     c_modele: "Modèle", c_mae: "Erreur moyenne", c_rel: "Erreur relative", c_biais: "Biais", c_rmse: "Erreur quadratique", c_meilleur: "Meilleur des 3", c_gain: "Gain contre la veille",
     jours_n: "{n} jours",
     perf_jours: "Erreur moyenne de chaque jour (€/MWh)",
@@ -246,9 +247,10 @@ const TXT = {
     clic_jour: "Click a row to open that day in detail.",
     date: "Date", source: "Source", rejeu: "replay", direct: "live", meilleur: "best",
     prevu_moyen: "forecast", erreur_court: "error", moyenne_periode: "Period average",
-    intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. The gain is measured against the naive \"same quarter-hour the day before\" benchmark.",
+    intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. The gain is measured against the naive \"same quarter-hour the day before\" benchmark. The correlation (−1 to 1, 1 = perfect) tells whether the model follows the price ups and downs, regardless of level; \"within-day\" = average of each day's correlation over its quarter-hours.",
     pf_tout: "Full history", pf_30: "Last 30 days", pf_direct: "Since going live",
     aucun_direct: "No live day yet: the first published forecasts start on {d}.",
+    c_corr: "Correlation", c_corr_j: "Within-day correlation", corr_court: "correlation {r}",
     c_modele: "Model", c_mae: "Mean error", c_rel: "Relative error", c_biais: "Bias", c_rmse: "Root mean square error", c_meilleur: "Best of the 3", c_gain: "Gain over the day before",
     jours_n: "{n} days",
     perf_jours: "Mean error of each day (€/MWh)",
@@ -469,6 +471,26 @@ function stats(listeJours, cle) {                                    // erreurs 
   }
   return n ? { mae: sa / n, biais: s / n, rmse: Math.sqrt(s2 / n), rel: (100 * sa) / sr, n } : null;
 }
+function correlation(a, b) {                                         // corrélation de Pearson entre deux séries (valeurs manquantes ignorées)
+  let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i], y = b[i];
+    if (x === null || y === null || x === undefined || y === undefined) continue;
+    n++; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y;
+  }
+  const v = (n * sxx - sx * sx) * (n * syy - sy * sy);
+  return n > 2 && v > 0 ? (n * sxy - sx * sy) / Math.sqrt(v) : null;
+}
+function correlations(listeJours, c) {                               // sur toute la période, et moyenne des corrélations de chaque journée
+  const P = [], R = [], parJour = [];
+  for (const j of listeJours) {
+    if (!j[c] || !j.reel) continue;
+    P.push(...j[c]); R.push(...j.reel);
+    const r = correlation(j[c], j.reel);
+    if (r !== null) parJour.push(r);
+  }
+  return { r: correlation(P, R), rj: moyenne(parJour) };
+}
 function celluleEcart(p, r) {                                        // écart prévu − marché, case d'autant plus foncée que l'écart est grand
   if (p === null || p === undefined || r === null || r === undefined) return "<td>–</td>";
   const a = Math.min(Math.abs(p - r) / 80, 1) * 0.22;
@@ -559,7 +581,7 @@ function dsBande(bas, haut) {
           { label: t("fourchette"), data: haut, borderWidth: 0, pointRadius: 0, backgroundColor: css("--bande"), borderColor: css("--bande"), fill: "-1" }];
 }
 const aBande = (s) => Boolean(s.bas && s.haut && s.GR);                              // la fourchette existe (jours publiés en direct), autour du modèle principal
-const avecBande = (s) => aBande(s) && etat.visibles.GR && etat.visibles.bande;
+const avecBande = () => false;                                       // fourchette retirée du site (demande de Julien, 27/10/2026)
 function dsJour(s, j) {
   const ds = [];
   if (avecBande(s)) ds.push(...dsBande(s.bas, s.haut));
@@ -731,7 +753,7 @@ function rendreBloc(cote, iso, j, now) {
   if (det) det.addEventListener("toggle", () => { etat.etapesOuvertes = det.open; });
   segments(p + "-pas", [["quart", t("p_quart")], ["heure", t("p_heure")]], etat.pasPrev[cote], (v) => { etat.pasPrev[cote] = v; rendreBloc(cote, iso, j, maintenantParis()); });
   const s = series(j, etat.pasPrev[cote]);
-  choixModeles(p + "-choix", modelesDuJour(j).map((m) => m.code), legendeJour(s), aBande(s));
+  choixModeles(p + "-choix", modelesDuJour(j).map((m) => m.code), legendeJour(s));
   tablePrix(p + "-table", s, j);
   lier(dessiner(p + "-graphique", { type: "line", data: { labels: s.labels, datasets: dsJour(s, j) }, options: options(13), plugins: [curseur] }), p + "-table");
 }
@@ -766,7 +788,7 @@ function rendreJour() {
   if (j.reel) T.push(tuile(pastille("reel") + t("marche_moyen"), enEuros(moyenne(j.reel)), dateCourte(j.jour)));
   for (const c of cols) {
     const m = MODELES.find((x) => x.code === c), e = j.erreurs && j.erreurs[c], lib = pastille(c) + courtModele(c) + (m ? etiquette(m) : "") + etiquetteMeilleur(c === b);
-    T.push(e ? tuile(lib, enEuros(e.mae), t("erreur_biais", { b: signe(e.biais) }), nomModele(c)) : tuile(lib, enEuros(moyenne(j[c])), t("prix_moyen"), nomModele(c)));
+    T.push(e ? tuile(lib, enEuros(e.mae), t("erreur_biais", { b: signe(e.biais) }) + " · " + t("corr_court", { r: nombre(correlation(j[c], j.reel), 2) }), nomModele(c)) : tuile(lib, enEuros(moyenne(j[c])), t("prix_moyen"), nomModele(c)));
   }
   $("hist-tuiles").innerHTML = T.join("");
   segments("hist-pas", [["quart", t("p_quart")], ["heure", t("p_heure")]], etat.pasHist, (v) => { etat.pasHist = v; rendreJour(); });
@@ -874,10 +896,10 @@ function rendrePerformance() {
   const vus = codes.filter((c) => etat.visibles[c]), sh = stats(js, "hier");
   const st = vus.map((c) => [c, stats(js, c)]).filter(([, s]) => s);
   const best = st.length ? st.reduce((a, b) => (b[1].mae < a[1].mae ? b : a))[0] : null;
-  let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
+  let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
   for (const [c, s] of st.concat(etat.visibles.hier ? [["hier", sh]] : [])) {
     const m = MODELES.find((x) => x.code === c);
-    h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele">${pastille(c)}${nomModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td>`
+    h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele">${pastille(c)}${nomModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(js, c).r, 2)}</td><td>${nombre(correlations(js, c).rj, 2)}</td>`
       + `<td>${c === "hier" ? "–" : nombre((100 * victoires[c]) / nj, 0) + " %"}</td><td>${c === "hier" ? "–" : `<span class="positif">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
   }
   resume.innerHTML = h + "</tbody>";
