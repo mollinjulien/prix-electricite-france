@@ -57,12 +57,12 @@ const TXT = {
     intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Le gain se mesure contre le repère naïf « même quart d'heure la veille ». La corrélation (de −1 à 1, 1 = parfait) dit si le modèle suit bien les hausses et les baisses du prix, sans tenir compte du niveau ; « dans la journée » = moyenne des corrélations de chaque jour sur ses quarts d'heure.",
     pf_tout: "Tout l'historique", pf_30: "30 derniers jours", pf_direct: "Depuis la mise en ligne",
     aucun_direct: "Pas encore de jour prévu en direct : les premières prévisions publiées commencent le {d}.",
-    c_corr: "Corrélation", c_corr_j: "Corrélation dans la journée", corr_court: "corrélation {r}",
+    c_corr: "Corrélation", c_corr_j: "Corrél. jour", corr_court: "corrélation {r}",
     c_modele: "Modèle", c_mae: "Erreur moyenne", c_rel: "Erreur relative", c_biais: "Biais", c_rmse: "Erreur quadratique", c_meilleur: "Meilleur des 3", c_gain: "Gain contre la veille",
     jours_n: "{n} jours",
     perf_jours: "Erreur moyenne de chaque jour (€/MWh)",
     perf_heures: "À quelle heure se trompe-t-on ? Erreur moyenne par heure de la journée (€/MWh)",
-    perf_difficiles: "Les jours les plus difficiles (modèle « GFS + gaz »)",
+    perf_difficiles: "Les jours les plus difficiles (modèle « GFS-G »)",
     mise_en_ligne: "mise en ligne",
     m_qui: "Les trois modèles et le repère",
     m_chaine: "Ce qui se passe chaque jour",
@@ -71,7 +71,7 @@ const TXT = {
     nom_GR: "Données prévisions météo GFS + données gaz",
     nom_CR: "Données prévisions météo GFS + gaz + modèle de prédiction de l'électricité solaire / éolienne",
     nom_GT: "Données prévisions météo GFS + prix rapporté au gaz",
-    court_GR: "GFS + gaz", court_CR: "GFS + gaz + production", court_GT: "GFS + prix/gaz",
+    court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     nom_court: "Dans les tableaux : « {c} »",
     tag_principal: "principal",
     f_GR: ["Le modèle principal. Il apprend le lien entre le prix et ce qu'on sait la veille : prévisions météo GFS (soleil, vent, température), consommation prévue par RTE, jour de la semaine et jours fériés, prix des jours passés et prix du gaz.",
@@ -87,7 +87,7 @@ const TXT = {
     etapes: [
       ["Vers 10 h 15, la veille", "Mise à jour des données : prix des jours passés, consommation et prévision de consommation de RTE, production régionale récente, prix du gaz."],
       ["Météo de demain", "Téléchargement du dernier run de minuit du modèle météo GFS (NOAA) : rayonnement, vent à 100 m, température, nuages, pression sur la France."],
-      ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région (utilisée par le modèle « GFS + gaz + production »)."],
+      ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région (utilisée par le modèle « GFS-G-P »)."],
       ["Prix horaire", "Les trois modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain."],
       ["Quart d'heure", "Un second modèle répartit chaque heure en quatre quarts d'heure (le prix varie dans l'heure, surtout matin et soir)."],
       ["Publication", "Le site est mis à jour vers 10 h 30, avant l'enchère de 12 h 45."],
@@ -98,6 +98,7 @@ const TXT = {
       ["€/MWh", "Euros par mégawattheure. 100 €/MWh = 10 centimes le kWh, avant taxes et acheminement."],
       ["GFS", "Global Forecast System, le modèle de prévision météo mondial de l'agence américaine NOAA, gratuit et archivé depuis 2015."],
       ["TTF", "Prix de référence du gaz naturel en Europe. Une centrale à gaz fixe souvent le prix de l'électricité : son coût de combustible ≈ prix du gaz ÷ 0,55."],
+      ["Noms courts", "GFS-G = météo GFS + gaz (modèle principal) · GFS-G-P = GFS + gaz + notre prévision de production (P) · GFS-RG = GFS + prix rapporté au gaz (RG = rapport gaz). Le nom complet s'affiche au survol."],
       ["Arbres", "Les modèles additionnent des centaines de petits arbres de décision ; leur nombre est choisi chaque jour automatiquement (on s'arrête quand l'erreur sur l'année précédente ne baisse plus)."],
       ["Écrêtement", "Quand le soleil et le vent produisent plus que ce que le pays consomme et peut exporter, le prix tombe près de 0, voire en dessous."],
       ["Erreur moyenne", "Moyenne des écarts absolus entre prix prévu et prix du marché. Une erreur de 20 €/MWh signifie qu'on se trompe en moyenne de 20 € par MWh."],
@@ -136,7 +137,7 @@ const TXT = {
     ],
     ck_rejeu: "Prévision recalculée après coup", ck_rejeu_d: "le site a été mis en ligne le {m} : ce jour a été rejoué avec exactement la méthode du service. Le détail des étapes n'est enregistré que depuis le {d}.",
     prod_titre: "Bonus : notre prévision de production solaire et éolienne",
-    intro_prod: "Avant de prévoir le prix, nous prévoyons la production solaire et éolienne de chaque région à partir de la même météo GFS. C'est cette production qui alimente le modèle « GFS + gaz + production ». Elle est comparée ici à la production réellement mesurée par RTE.",
+    intro_prod: "Avant de prévoir le prix, nous prévoyons la production solaire et éolienne de chaque région à partir de la même météo GFS. C'est cette production qui alimente le modèle « GFS-G-P ». Elle est comparée ici à la production réellement mesurée par RTE.",
     prod_details: "Détails des deux modèles de production (variables, apprentissage)",
     prod_demain: "Production prévue pour le {d} (France, GW)", prod_prevu_jour: "prévu sur la journée",
     prod_controle: "Prévu contre réel : notre modèle a-t-il bien prévu ?", prod_controle_note: "Production prévue la veille (pointillés) et production réellement mesurée par RTE (traits pleins), pour la France heure par heure. Changez de jour avec les flèches ou le calendrier ; par défaut, le dernier jour dont la production réelle est complète.",
@@ -250,12 +251,12 @@ const TXT = {
     intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. The gain is measured against the naive \"same quarter-hour the day before\" benchmark. The correlation (−1 to 1, 1 = perfect) tells whether the model follows the price ups and downs, regardless of level; \"within-day\" = average of each day's correlation over its quarter-hours.",
     pf_tout: "Full history", pf_30: "Last 30 days", pf_direct: "Since going live",
     aucun_direct: "No live day yet: the first published forecasts start on {d}.",
-    c_corr: "Correlation", c_corr_j: "Within-day correlation", corr_court: "correlation {r}",
+    c_corr: "Correlation", c_corr_j: "Daily correl.", corr_court: "correlation {r}",
     c_modele: "Model", c_mae: "Mean error", c_rel: "Relative error", c_biais: "Bias", c_rmse: "Root mean square error", c_meilleur: "Best of the 3", c_gain: "Gain over the day before",
     jours_n: "{n} days",
     perf_jours: "Mean error of each day (€/MWh)",
     perf_heures: "When are we wrong? Mean error by hour of the day (€/MWh)",
-    perf_difficiles: "The hardest days (\"GFS + gas\" model)",
+    perf_difficiles: "The hardest days (\"GFS-G\" model)",
     mise_en_ligne: "live",
     m_qui: "The three models and the benchmark",
     m_chaine: "What happens every day",
@@ -264,7 +265,7 @@ const TXT = {
     nom_GR: "GFS weather forecast data + gas data",
     nom_CR: "GFS weather forecast data + gas + solar / wind power prediction model",
     nom_GT: "GFS weather forecast data + gas-relative price",
-    court_GR: "GFS + gas", court_CR: "GFS + gas + output", court_GT: "GFS + price/gas",
+    court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     nom_court: "In tables: \"{c}\"",
     tag_principal: "main",
     f_GR: ["The main model. It learns the link between the price and what is known the day before: GFS weather forecasts (sun, wind, temperature), RTE load forecast, weekday and holidays, past prices and the gas price.",
@@ -280,7 +281,7 @@ const TXT = {
     etapes: [
       ["Around 10:15, the day before", "Data update: past prices, RTE load and load forecast, recent regional output, gas price."],
       ["Tomorrow's weather", "Download of the latest midnight run of the GFS weather model (NOAA): radiation, 100 m wind, temperature, clouds, pressure over France."],
-      ["Forecast output", "Our production models are retrained with RTE actual output up to yesterday, then turn the weather into solar and wind output per region (used by the \"GFS + gas + output\" model)."],
+      ["Forecast output", "Our production models are retrained with RTE actual output up to yesterday, then turn the weather into solar and wind output per region (used by the \"GFS-G-P\" model)."],
       ["Hourly price", "The three models are retrained on the full history up to midnight, then forecast the price of each hour of tomorrow."],
       ["Quarter-hour", "A second model splits each hour into four quarter-hours (prices move within the hour, especially morning and evening)."],
       ["Publication", "The site is updated around 10:30, before the 12:45 auction."],
@@ -291,6 +292,7 @@ const TXT = {
       ["€/MWh", "Euros per megawatt-hour. 100 €/MWh = 10 cents per kWh, before taxes and grid fees."],
       ["GFS", "Global Forecast System, the global weather model of the US agency NOAA, free and archived since 2015."],
       ["TTF", "Europe's benchmark natural gas price. A gas plant often sets the electricity price: its fuel cost ≈ gas price ÷ 0.55."],
+      ["Short names", "GFS-G = GFS weather + gas (main model) · GFS-G-P = GFS + gas + our production forecast (P) · GFS-RG = GFS + gas-relative price (RG = gas ratio). The full name appears on hover."],
       ["Trees", "The models add up hundreds of small decision trees; their number is chosen automatically every day (training stops when the error on the previous year no longer falls)."],
       ["Curtailment", "When sun and wind produce more than the country consumes and can export, the price drops close to 0 or even below."],
       ["Mean error", "Average absolute gap between forecast and market price. A 20 €/MWh error means being 20 € per MWh off on average."],
@@ -329,7 +331,7 @@ const TXT = {
     ],
     ck_rejeu: "Forecast recomputed afterwards", ck_rejeu_d: "the site went live on {m}: this day was replayed with exactly the service's method. Step details are only recorded since {d}.",
     prod_titre: "Bonus: our solar and wind production forecast",
-    intro_prod: "Before forecasting the price, we forecast each region's solar and wind output from the same GFS weather. This output feeds the \"GFS + gas + output\" model. Here it is compared with the output actually measured by RTE.",
+    intro_prod: "Before forecasting the price, we forecast each region's solar and wind output from the same GFS weather. This output feeds the \"GFS-G-P\" model. Here it is compared with the output actually measured by RTE.",
     prod_details: "Details of the two production models (variables, training)",
     prod_demain: "Forecast output for {d} (France, GW)", prod_prevu_jour: "forecast for the day",
     prod_controle: "Forecast versus actual: did our model get it right?", prod_controle_note: "Output forecast the day before (dashed) and output actually measured by RTE (solid), for France hour by hour. Change day with the arrows or the calendar; by default, the latest day whose actual output is complete.",
@@ -901,7 +903,7 @@ function rendrePerformance() {
   let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
   for (const [c, s] of st.concat(etat.visibles.hier ? [["hier", sh]] : [])) {
     const m = MODELES.find((x) => x.code === c);
-    h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele">${pastille(c)}${nomModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(js, c).r, 2)}</td><td>${nombre(correlations(js, c).rj, 2)}</td>`
+    h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(js, c).r, 2)}</td><td>${nombre(correlations(js, c).rj, 2)}</td>`
       + `<td>${c === "hier" ? "–" : nombre((100 * victoires[c]) / nj, 0) + " %"}</td><td>${c === "hier" ? "–" : `<span class="positif">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
   }
   resume.innerHTML = h + "</tbody>";
