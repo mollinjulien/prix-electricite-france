@@ -6,9 +6,9 @@
   <title>Prix de l'électricité de demain</title>
   <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=12" defer></script>
+  <script src="app.js?v=13" defer></script>
 </head>
 <body>
   <header class="entete">
@@ -25,10 +25,8 @@
     <nav class="onglets" role="tablist" aria-label="Sections">
       <button type="button" role="tab" id="tab-prevision" data-onglet="prevision" aria-controls="prevision" data-t="o_prevision"></button>
       <button type="button" role="tab" id="tab-historique" data-onglet="historique" aria-controls="historique" data-t="o_historique"></button>
-      <button type="button" role="tab" id="tab-performance" data-onglet="performance" aria-controls="performance" data-t="o_performance"></button>
       <button type="button" role="tab" id="tab-production" data-onglet="production" aria-controls="production" data-t="o_production"></button>
-      <button type="button" role="tab" id="tab-modeles" data-onglet="modeles" aria-controls="modeles" data-t="o_modeles"></button>
-      <button type="button" role="tab" id="tab-sources" data-onglet="sources" aria-controls="sources" data-t="o_sources"></button>
+      <button type="button" role="tab" id="tab-apropos" data-onglet="apropos" aria-controls="apropos" data-t="o_apropos"></button>
     </nav>
   </header>
 
@@ -92,10 +90,8 @@
           <div class="cadre-table libre"><table id="plage-table" class="table-donnees cliquable"></table></div>
         </div>
       </div>
-    </section>
 
-    <!-- ============================================================ PERFORMANCE -->
-    <section id="performance" role="tabpanel" aria-labelledby="tab-performance" class="panneau" hidden>
+      <div id="hist-perf" hidden>
       <div class="carte">
         <p class="intro" data-t="intro_perf"></p>
         <div class="segments" id="perf-periode" role="group"></div>
@@ -117,6 +113,7 @@
         <p class="note" data-t="clic_jour"></p>
         <div class="choix" id="perf-choix2"></div>
         <div class="cadre-table libre"><table id="perf-difficiles" class="table-donnees cliquable"></table></div>
+      </div>
       </div>
     </section>
 
@@ -164,7 +161,7 @@
     </section>
 
     <!-- ============================================================ MODÈLES -->
-    <section id="modeles" role="tabpanel" aria-labelledby="tab-modeles" class="panneau" hidden>
+    <section id="apropos" role="tabpanel" aria-labelledby="tab-apropos" class="panneau" hidden>
       <div class="carte">
         <h3 class="petit-titre" data-t="m_qui"></h3>
         <div class="fiches" id="m-fiches"></div>
@@ -183,10 +180,7 @@
           <ul class="points" id="m-limites"></ul>
         </div>
       </div>
-    </section>
-
-    <!-- ============================================================ SOURCES -->
-    <section id="sources" role="tabpanel" aria-labelledby="tab-sources" class="panneau" hidden>
+      <h2 class="titre-section" data-t="o_sources"></h2>
       <div class="carte">
         <p class="intro" data-t="intro_sources"></p>
         <div class="sources" id="s-liste"></div>

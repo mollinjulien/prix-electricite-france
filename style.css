@@ -224,3 +224,37 @@ a:hover { text-decoration-thickness: 2px; }
 .table-donnees.mini { width: auto; margin: 4px 0 6px; }
 .table-donnees.mini th, .table-donnees.mini td { text-align: left; }
 .deux-cartes.une { grid-template-columns: minmax(0, 1fr); }
+
+/* ---------------------------------------------------------------- aération (27/10/2026) */
+body { line-height: 1.6; }
+main { padding-bottom: 24px; }
+.carte { padding: 24px; margin-bottom: 24px; }
+.petit-titre { margin-bottom: 14px; }
+.titre-jour { margin-bottom: 22px; gap: 8px 14px; }
+.titre-jour h2 { font-size: 1.55rem; }
+.maj { margin: 0 0 20px; }
+.tuiles { gap: 14px; margin-bottom: 24px; }
+.tuile { padding: 14px 16px; }
+.barre-outils { margin-bottom: 18px; }
+.choix { margin: 0 0 20px; gap: 8px 10px; }
+.note { margin-top: 18px; }
+.duo { gap: 24px; }
+.graphique { height: 460px; }
+.etapes-jour { gap: 20px 32px; }
+.groupe-etapes .coches { gap: 12px; }
+.segments { gap: 6px; }
+.segments.grands { margin-bottom: 22px; }
+.navigation-jour { margin-bottom: 4px; gap: 10px; }
+.fiches { gap: 18px; }
+.fiche { padding: 16px 18px; }
+.titre-section { font-size: 1.35rem; margin: 44px 0 18px; }
+/* les deux jours de l'accueil : deux grandes zones bien séparées */
+.bloc-jour { background: var(--wash); border: 1px solid var(--border); border-radius: 18px; padding: 24px 24px 2px; }
+.bloc-jour.second { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); background: transparent; border-style: dashed; }
+.bloc-jour .carte { margin-bottom: 22px; }
+@media (max-width: 600px) {
+  .carte { padding: 16px; margin-bottom: 18px; }
+  .bloc-jour { padding: 14px 12px 0; border-radius: 14px; }
+  .bloc-jour.second { margin-top: 40px; }
+  .titre-jour h2 { font-size: 1.25rem; }
+}

@@ -5,7 +5,7 @@ const TXT = {
   fr: {
     titre: "Prix de l'électricité de demain en France",
     sous_titre: "Chaque matin, trois modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Ils sont ensuite comparés au prix fixé par le marché.",
-    o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles",
+    o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos",
     maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
@@ -198,7 +198,7 @@ const TXT = {
   en: {
     titre: "Tomorrow's electricity price in France",
     sous_titre: "Every morning, three machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. They are then compared with the price set by the market.",
-    o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models",
+    o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About",
     maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
@@ -770,10 +770,12 @@ function rendrePrevision() {
 
 /* ---------------------------------------------------------------- onglet Historique */
 function rendreHistorique() {
-  segments("hist-mode", [["jour", t("m_jour")], ["plage", t("m_plage")]], etat.modeHist, (v) => { location.hash = v === "plage" ? "#historique/plage" : "#historique/" + (etat.jourHist || ""); });
+  segments("hist-mode", [["jour", t("m_jour")], ["plage", t("m_plage")], ["perf", t("o_performance")]], etat.modeHist,
+    (v) => { location.hash = v === "plage" ? "#historique/plage" : v === "perf" ? "#historique/performance" : "#historique/" + (etat.jourHist || ""); });
   $("hist-jour").hidden = etat.modeHist !== "jour";
   $("hist-plage").hidden = etat.modeHist !== "plage";
-  if (etat.modeHist === "jour") rendreJour(); else rendrePlage();
+  $("hist-perf").hidden = etat.modeHist !== "perf";
+  if (etat.modeHist === "jour") rendreJour(); else if (etat.modeHist === "plage") rendrePlage(); else rendrePerformance();
 }
 
 function rendreJour() {
@@ -1090,11 +1092,14 @@ function rendreSources() {
 }
 
 /* ---------------------------------------------------------------- navigation */
-const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, performance: rendrePerformance, production: rendreProduction, modeles: rendreModeles, sources: rendreSources };
+const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, production: rendreProduction, apropos: () => { rendreModeles(); rendreSources(); } };
+const ANCIENS = { performance: ["historique", "performance"], modeles: ["apropos"], sources: ["apropos"] };       // anciens liens
 function lireAncre() {
-  const [o, jour] = location.hash.replace("#", "").split("/");
+  let [o, jour] = location.hash.replace("#", "").split("/");
+  if (ANCIENS[o]) [o, jour] = ANCIENS[o];
   etat.onglet = RENDUS[o] ? o : "prevision";
-  if (etat.onglet === "historique" && jour === "plage") etat.modeHist = "plage";
+  if (etat.onglet === "historique" && jour === "performance") etat.modeHist = "perf";
+  else if (etat.onglet === "historique" && jour === "plage") etat.modeHist = "plage";
   else if (etat.onglet === "historique" && jour && etat.d && jourDe(jour)) { etat.jourHist = jour; etat.modeHist = "jour"; }
   else if (etat.onglet === "production" && jour && etat.d && jourDe(jour)) etat.jourProd = jour;
 }
