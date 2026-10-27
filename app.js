@@ -62,7 +62,7 @@ const TXT = {
     jours_n: "{n} jours",
     perf_jours: "Erreur moyenne de chaque jour (€/MWh)",
     perf_heures: "À quelle heure se trompe-t-on ? Erreur moyenne par heure de la journée (€/MWh)",
-    perf_difficiles: "Les jours les plus difficiles (modèle « GFS-G »)",
+    perf_difficiles: "Les jours les plus difficiles pour nos modèles (classés selon l'erreur moyenne des trois)",
     mise_en_ligne: "mise en ligne",
     m_qui: "Les trois modèles et le repère",
     m_chaine: "Ce qui se passe chaque jour",
@@ -256,7 +256,7 @@ const TXT = {
     jours_n: "{n} days",
     perf_jours: "Mean error of each day (€/MWh)",
     perf_heures: "When are we wrong? Mean error by hour of the day (€/MWh)",
-    perf_difficiles: "The hardest days (\"GFS-G\" model)",
+    perf_difficiles: "The hardest days for our models (ranked by the average error of the three)",
     mise_en_ligne: "live",
     m_qui: "The three models and the benchmark",
     m_chaine: "What happens every day",
@@ -930,7 +930,8 @@ function rendrePerformance() {
   if (etat.visibles.hier) dh.push(dsHier(serieH("hier")));
   dessiner("perf-heures", { type: "line", data: { labels: hs.map((k) => k + (etat.langue === "fr" ? " h" : ":00")), datasets: dh }, options: options(12, true), plugins: [curseur] });
   const cols = vus.concat(etat.visibles.hier ? ["hier"] : []);
-  const dur = js.filter((j) => j.erreurs.GR).sort((a, b) => b.erreurs.GR.mae - a.erreurs.GR.mae).slice(0, 8);
+  const errMoy = (j) => moyenne(codes.filter((c) => j.erreurs[c]).map((c) => j.erreurs[c].mae));
+  const dur = js.filter((j) => errMoy(j) !== null).sort((a, b) => errMoy(b) - errMoy(a)).slice(0, 8);
   let hd = `<thead><tr><th>${t("date")}</th><th>${pastille("reel")} ${t("marche_moyen")}</th>`
     + cols.map((c) => `<th class="modele" title="${nomModele(c)}">${pastille(c)} ${courtModele(c)} · ${t("erreur_moy")}</th>`).join("") + "</tr></thead><tbody>";
   for (const j of dur) {
