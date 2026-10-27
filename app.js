@@ -704,11 +704,11 @@ function tuilesJour(j) {
   for (const m of visibles(j)) {
     const e = j.erreurs && j.erreurs[m.code];
     T.push(tuile(pastille(m.code) + courtModele(m.code) + etiquette(m) + etiquetteMeilleur(m.code === b), enEuros(moyenne(j[m.code])),
-                 e ? t("prevu_erreur", { x: nombre(e.mae) }) : t("prix_moyen"), nomModele(m.code)));
+                 e ? t("prevu_erreur", { x: nombre(e.mae) }) + " · " + t("corr_court", { r: nombre(correlation(j[m.code], j.reel), 2) }) : t("prix_moyen"), nomModele(m.code)));
   }
   if (etat.visibles.hier) {
     const e = j.erreurs && j.erreurs.hier;
-    T.push(tuile(pastille("hier") + t("veille"), enEuros(moyenne(j.hier)), e ? t("prevu_erreur", { x: nombre(e.mae) }) : t("hier")));
+    T.push(tuile(pastille("hier") + t("veille"), enEuros(moyenne(j.hier)), e ? t("prevu_erreur", { x: nombre(e.mae) }) + " · " + t("corr_court", { r: nombre(correlation(j.hier, j.reel), 2) }) : t("hier")));
   }
   const ref = j.reel ? "reel" : j.GR ? "GR" : modelesDuJour(j).length ? modelesDuJour(j)[0].code : null;
   if (ref) {
