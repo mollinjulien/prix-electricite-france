@@ -556,8 +556,8 @@ const jourDe = (iso) => jours().find((j) => j.jour === iso);
 const modelesDuJour = (j) => MODELES.filter((m) => j[m.code]);
 const visibles = (j) => modelesDuJour(j).filter((m) => etat.visibles[m.code]);
 const colonnes = (j) => visibles(j).map((m) => m.code).concat(etat.visibles.hier ? ["hier"] : []);   // séries cochées d'un jour, repère « veille » compris
-function meilleur(j) {                                               // modèle à la plus petite erreur moyenne du jour (parmi les trois)
-  const c = modelesDuJour(j).map((m) => m.code).filter((k) => j.erreurs && j.erreurs[k]);
+function meilleur(j, parmi) {                                        // modèle à la plus petite erreur moyenne du jour (parmi les modèles en service, ou la liste `parmi`)
+  const c = modelesDuJour(j).map((m) => m.code).filter((k) => j.erreurs && j.erreurs[k] && (!parmi || parmi.includes(k)));
   return c.length ? c.reduce((a, b) => (j.erreurs[b].mae < j.erreurs[a].mae ? b : a)) : null;
 }
 
@@ -1017,10 +1017,10 @@ function rendrePerformance() {
     $("perf-difficiles").innerHTML = "";
     return;
   }
+  const vus = codes.filter((c) => etat.visibles[c]), sh = stats(js, "hier");
   const victoires = Object.fromEntries(codes.map((c) => [c, 0]));
   let nj = 0;
-  for (const j of js) { const b = meilleur(j); if (b) { nj++; victoires[b]++; } }
-  const vus = codes.filter((c) => etat.visibles[c]), sh = stats(js, "hier");
+  for (const j of js) { const b = meilleur(j, vus); if (b) { nj++; victoires[b]++; } }          // « meilleur du jour » parmi les modèles cochés : le total fait 100 %
   const st = vus.map((c) => [c, stats(js, c)]).filter(([, s]) => s);
   const best = st.length ? st.reduce((a, b) => (b[1].mae < a[1].mae ? b : a))[0] : null;
   let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
