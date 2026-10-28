@@ -4,13 +4,13 @@
 const TXT = {
   fr: {
     titre: "Prix de l'électricité de demain en France",
-    sous_titre: "Chaque matin, trois modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Ils sont ensuite comparés au prix fixé par le marché.",
-    o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos",
+    sous_titre: "Chaque matin, nos modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Le modèle principal, « Europe », combine prévisions météo, gaz, marchés voisins, prix britannique et nucléaire disponible. Les prévisions sont ensuite comparées au prix fixé par le marché.",
+    o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
     maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
-    retard: "La prévision du {d} n'est pas encore publiée : elle est normalement calculée vers 10 h 15 et publiée vers 10 h 30.",
-    attente_d: "Le calcul démarre vers 10 h 15 et dure une dizaine de minutes. Cette page se met à jour toute seule.",
+    retard: "La prévision du {d} n'est pas encore publiée : elle est normalement calculée vers 11 h 30 et publiée vers 11 h 45.",
+    attente_d: "Le calcul démarre vers 11 h 30 (après la publication du prix britannique) et dure une quinzaine de minutes. Cette page se met à jour toute seule.",
     etapes_titre: "Étapes de la prévision",
     etapes_voir: "Étapes de la prévision de ce jour",
     g_donnees: "Données reçues", g_calculs: "Calculs", g_resultat: "Publication et vérification",
@@ -34,7 +34,7 @@ const TXT = {
     ck_reel: "Prix réel de l'électricité reçu", nk_reel: "Prix réel de l'électricité", ck_reel_d: "le {d}", ck_reel_fichier: "fichier des prix du marché",
     ck_reel_attente: "publié vers 12 h 45 le {d}, récupéré vers 13 h 45", ck_reel_cours: "enchère publiée à 12 h 45 : récupération vers 13 h 45", ck_reel_retard: "pas encore reçu",
     ck_ecarts: "Écarts calculés", nk_ecarts: "Calcul des écarts", ck_ecarts_d: "meilleur : « {m} », {x} €/MWh d'erreur moyenne", ck_ecarts_att: "dès que le prix réel est reçu",
-    ck_inconnu: "non enregistré", ck_attente_d: "en attente (vers 10 h 15)",
+    ck_inconnu: "non enregistré", ck_attente_d: "en attente (vers 11 h 30)",
     prix_moyen: "prix moyen prévu", prevu_erreur: "prix moyen prévu · erreur moyenne {x} €", erreur_biais: "erreur moyenne · biais {b} €",
     marche_moyen: "Prix moyen du marché", veille: "Prix moyen de la veille",
     moins_plus: "Heure la moins chère · la plus chère", selon: "selon « {m} »", selon_marche: "selon le marché",
@@ -58,13 +58,13 @@ const TXT = {
     pf_tout: "Tout l'historique", pf_30: "30 derniers jours", pf_direct: "Depuis la mise en ligne",
     aucun_direct: "Pas encore de jour prévu en direct : les premières prévisions publiées commencent le {d}.",
     c_corr: "Corrélation", c_corr_j: "Corrél. jour", corr_court: "corrélation {r}",
-    c_modele: "Modèle", c_mae: "Erreur moyenne", c_rel: "Erreur relative", c_biais: "Biais", c_rmse: "Erreur quadratique", c_meilleur: "Meilleur des 3", c_gain: "Gain contre la veille",
+    c_modele: "Modèle", c_mae: "Erreur moyenne", c_rel: "Erreur relative", c_biais: "Biais", c_rmse: "Erreur quadratique", c_meilleur: "Meilleur du jour", c_gain: "Gain contre la veille",
     jours_n: "{n} jours",
     perf_jours: "Erreur moyenne de chaque jour (€/MWh)",
     perf_heures: "À quelle heure se trompe-t-on ? Erreur moyenne par heure de la journée (€/MWh)",
-    perf_difficiles: "Les jours les plus difficiles pour nos modèles (classés selon l'erreur moyenne des trois)",
+    perf_difficiles: "Les jours les plus difficiles pour nos modèles (classés selon l'erreur moyenne des modèles en service)",
     mise_en_ligne: "mise en ligne",
-    m_qui: "Les trois modèles et le repère",
+    m_qui: "Les modèles en service et le repère",
     m_chaine: "Ce qui se passe chaque jour",
     m_lexique: "Petit lexique",
     m_limites: "Limites, sources et méthode",
@@ -74,9 +74,9 @@ const TXT = {
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     nom_court: "Dans les tableaux : « {c} »",
     tag_principal: "principal",
-    f_GR: ["Le modèle principal. Il apprend le lien entre le prix et ce qu'on sait la veille : prévisions météo GFS (soleil, vent, température), consommation prévue par RTE, jour de la semaine et jours fériés, prix des jours passés et prix du gaz.",
+    f_GR: ["Ancien modèle principal (22 au 28/10/2026), aujourd'hui dernier secours : il ne dépend que de la météo GFS, de RTE et du gaz, donc il tourne même si les sources européennes sont en panne. Il apprend le lien entre le prix et ce qu'on sait la veille : prévisions météo GFS (soleil, vent, température), consommation prévue par RTE, jour de la semaine et jours fériés, prix des jours passés et prix du gaz.",
            "Algorithme : LightGBM (arbres de décision en série). Réentraîné chaque matin sur toutes les heures depuis 2020, en donnant plus de poids aux années récentes.",
-           "Test sur 2026, réentraîné chaque jour : 18,5 €/MWh d'erreur moyenne, contre 27,9 pour « même heure la veille »."],
+           "Test sur 2026, réentraîné chaque jour : 19,2 €/MWh d'erreur moyenne à l'heure, contre 13,6 pour le modèle Europe et 27,9 pour « même heure la veille »."],
     f_CR: ["Comme le principal, mais le soleil et le vent bruts sont remplacés par la production solaire et éolienne prévue par nos propres modèles de production (appris eux aussi sur GFS).",
            "Idée : le prix dépend de la production renouvelable, autant la prévoir d'abord. En pratique, elle vient de la même météo et n'apporte pas d'information nouvelle.",
            "Test sur 2026 : 18,8 €/MWh, un peu moins bon que le principal (0,3 €/MWh d'écart, significatif)."],
@@ -85,12 +85,12 @@ const TXT = {
            "Septembre-octobre 2026, réentraîné chaque jour : 25,6 €/MWh contre 26,7 pour le principal (4 % de mieux ; écart pas encore démontré statistiquement)."],
     f_hier: ["Repère naïf, sans modèle : le prix de demain sera celui d'aujourd'hui au même quart d'heure. Un modèle utile doit faire mieux. Masqué par défaut : cochez « Veille » pour l'afficher."],
     etapes: [
-      ["Vers 10 h 15, la veille", "Mise à jour des données : prix des jours passés, consommation et prévision de consommation de RTE, production régionale récente, prix du gaz."],
+      ["Vers 11 h 30, la veille", "Mise à jour des données : prix des jours passés en France et chez les voisins, consommation et prévision de consommation de RTE, production régionale récente, prix du gaz, échanges aux frontières (JAO), consommation prévue des voisins et avis d'indisponibilité des réacteurs nucléaires (ENTSO-E), prix britannique de demain (Nord Pool, publié vers 11 h)."],
       ["Météo de demain", "Téléchargement du dernier run de minuit du modèle météo GFS (NOAA) : rayonnement, vent à 100 m, température, nuages, pression sur la France."],
       ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région (utilisée par le modèle « GFS-G-P »)."],
-      ["Prix horaire", "Les trois modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain."],
+      ["Prix horaire", "Tous les modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain. Le modèle Europe est publié comme principal ; s'il lui manque des données, c'est le premier secours disponible qui le remplace."],
       ["Quart d'heure", "Un second modèle répartit chaque heure en quatre quarts d'heure (le prix varie dans l'heure, surtout matin et soir)."],
-      ["Publication", "Le site est mis à jour vers 10 h 30, avant l'enchère de 12 h 45."],
+      ["Publication", "Le site est mis à jour vers 11 h 45, avant l'enchère de 12 h 45."],
       ["Vers 13 h 45", "Le prix fixé par le marché est récupéré : le site ajoute la courbe réelle et calcule les écarts."],
     ],
     lexique: [
@@ -107,7 +107,9 @@ const TXT = {
       "La prévision n'utilise que des données connues la veille au matin : prix passés, prévisions météo et prévision de consommation. Aucun prix du jour prévu n'entre dans les modèles.",
       "Les modèles n'ont appris que sur des prévisions météo archivées (GFS depuis 2020), jamais sur la météo observée : ce qu'ils voient à l'entraînement ressemble à ce qu'ils voient en service.",
       "Limite connue : les effondrements de prix par grand vent (prix proches de 0 pendant quelques heures) sont mal anticipés, surtout quand le marché est cher.",
-      "Non pris en compte : disponibilité du nucléaire, prix et météo des pays voisins, prix du CO₂ (testés : pas de gain mesurable).",
+      "Pris en compte depuis le 29/10/2026 (modèle Europe) : prix des voisins de la veille, échanges aux frontières, consommation prévue des voisins, prix britannique du jour et nucléaire disponible. Toujours absents : météo des voisins et prix du CO₂ (testés : pas de gain mesurable).",
+      "Le nucléaire indisponible de l'historique vient de la dernière version de chaque avis ENTSO-E : il peut contenir de petites corrections publiées après coup. En service, seuls les avis connus le matin sont utilisés.",
+      "Les modèles Europe sont en service depuis le 29/10/2026. Avant cette date, leurs prévisions sont rejouées a posteriori avec la même méthode (réappris chaque jour, uniquement avec les données publiées avant l'enchère), au pas horaire, avec la forme dans l'heure de GFS-G.",
       "Historique : avant le {d}, les jours sont rejoués a posteriori avec exactement la méthode du service ; à partir de cette date, ce sont les prévisions publiées en direct, la veille.",
       "Sources : prix EPEX SPOT (Bundesnetzagentur | SMARD.de, CC BY 4.0, via Energy-Charts / Fraunhofer ISE) ; consommation et production RTE (ODRÉ, éCO2mix) ; météo NOAA GFS ; gaz TTF (Yahoo Finance).",
       "Projet étudiant (emlyon business school). Les modèles et ce site ont été construits avec l'aide de Claude (Anthropic). Ce n'est pas un conseil d'investissement.",
@@ -175,6 +177,10 @@ const TXT = {
     s_outils: "Outils",
     s_utilise: "Utilisé pour : {u}",
     src: [
+      ["voisins", "Prix day-ahead des pays voisins", "Energy-Charts (Fraunhofer ISE), d'après les résultats des bourses européennes", "Prix de la veille en Allemagne-Luxembourg, Belgique, Espagne, Italie (Nord) et Suisse.", [["API Energy-Charts", "https://api.energy-charts.info/"]]],
+      ["jao", "Échanges aux frontières (couplage flow-based de la région Core)", "JAO, Joint Allocation Office (Publication Tool)", "Position nette de la France et échanges programmés de la veille, capacités maximales d'échange.", [["JAO Publication Tool", "https://publicationtool.jao.eu/core/"]]],
+      ["entsoe", "Consommation prévue des voisins, capacités d'échange, indisponibilités nucléaires", "ENTSO-E, plateforme de transparence (gratuite, avec inscription)", "Prévision de consommation de la veille pour le lendemain des pays voisins, capacités d'échange vers l'Espagne, l'Italie et la Suisse, avis d'indisponibilité des réacteurs français (pour le nucléaire disponible et le surplus).", [["Plateforme de transparence ENTSO-E", "https://transparency.entsoe.eu/"]]],
+      ["gb", "Prix day-ahead britannique", "Nord Pool, enchère N2EX (publiée vers 11 h, API publique non officielle) ; historique : Low Carbon Contracts Company", "Prix de chaque heure du jour visé en Grande-Bretagne, connu avant l'enchère française.", [["Nord Pool", "https://data.nordpoolgroup.com/"], ["Low Carbon Contracts Company", "https://www.lowcarboncontracts.uk/"]]],
       ["prix", "Prix day-ahead de l'électricité en France", "Enchère EPEX SPOT ; prix republiés par la Bundesnetzagentur / SMARD.de (licence CC BY 4.0) et récupérés via l'API Energy-Charts (Fraunhofer ISE)", "Prix de chaque heure, puis de chaque quart d'heure depuis octobre 2025, de 2020 à aujourd'hui : ce que les modèles apprennent et prévoient, et le « prix du marché » du site (onglet Historique, colonne Marché).", [["Résultats officiels EPEX SPOT (France, quarts d'heure)", "https://www.epexspot.com/en/market-results?market_area=FR&auction=MRC&modality=Auction&sub_modality=DayAhead&data_mode=table&product=15"], ["Graphique Energy-Charts (France)", "https://www.energy-charts.info/charts/price_spot_market/chart.htm?l=fr&c=FR"], ["API Energy-Charts (exemple : 23/10/2026)", "https://api.energy-charts.info/price?bzn=FR&start=2026-10-23&end=2026-10-23"], ["SMARD.de", "https://www.smard.de/"]]],
       ["conso", "Consommation et prévision de consommation", "RTE, éCO2mix national (Open Data Réseaux Énergies)", "Consommation réelle et prévision de consommation de RTE pour le lendemain, publiée le matin, au quart d'heure.", [["éCO2mix national temps réel", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/"], ["éCO2mix national consolidé", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-cons-def/"]]],
       ["gfs", "Prévisions météo GFS", "NOAA (États-Unis) ; archive NCAR / UCAR ; copie AWS Open Data", "Run de minuit, échéances de 27 à 48 h (prévision faite la veille pour le lendemain) : rayonnement, vent à 10 et 100 m, température, nuages, pression, sur la France. Archive 2020 → 18/10/2026 pour apprendre, run du jour pour prévoir (les deux sources donnent des valeurs identiques, vérifié).", [["Présentation de GFS (NOAA)", "https://www.ncei.noaa.gov/products/weather-climate-models/global-forecast"], ["Archive NCAR d084001", "https://gdex.ucar.edu/datasets/d084001/"], ["Runs du jour (AWS)", "https://registry.opendata.aws/noaa-gfs-bdp-pds/"]]],
@@ -183,7 +189,7 @@ const TXT = {
       ["capa", "Capacité solaire installée", "SDES (ministère de la Transition écologique), tableau de bord solaire photovoltaïque, édition T2 2026", "Puissance installée par département et par trimestre, recalée sur le total national de RTE : elle pondère la météo de chaque département.", [["Site du SDES", "https://www.statistiques.developpement-durable.gouv.fr/"]]],
       ["registre", "Registre national des installations", "Open Data Réseaux Énergies et data.gouv.fr (au 31/12/2025)", "Emplacement des parcs : chaque département a un point météo placé au centre de gravité de ses installations (94 points solaires, 55 points éoliens).", [["ODRÉ", "https://odre.opendatasoft.com/explore/dataset/registre-national-installation-production-stockage-electricite-agrege-311225/"], ["data.gouv.fr", "https://www.data.gouv.fr/datasets/registre-national-des-installations-de-production-et-de-stockage-delectricite-au-31-12-2025"]]],
     ],
-    src_usage: { prix: "les 3 modèles de prix", conso: "les 3 modèles de prix", gfs: "les modèles de prix et de production", gaz: "les 3 modèles de prix", prod: "les modèles de production", capa: "les modèles de production", registre: "les modèles de production" },
+    src_usage: { voisins: "les modèles Europe", jao: "les modèles Europe", entsoe: "les modèles Europe (consommation des voisins, surplus)", gb: "les modèles Europe", prix: "tous les modèles de prix", conso: "tous les modèles de prix", gfs: "les modèles de prix et de production", gaz: "tous les modèles de prix", prod: "les modèles de production", capa: "les modèles de production", registre: "les modèles de production" },
     outils: [["LightGBM (Microsoft) : l'algorithme de tous les modèles", "https://lightgbm.readthedocs.io/"], ["Python : pandas, NumPy, ecCodes pour lire les fichiers GFS", null], ["Chart.js : les graphiques de ce site", "https://www.chartjs.org/"], ["GitHub Pages : l'hébergement du site", null], ["Claude (Anthropic) : aide à l'écriture du code, des tests et de ce site", null]],
     gt_pourquoi_titre: "Pourquoi rapporter le prix au coût du gaz ?",
     gt_pourquoi: [
@@ -193,18 +199,66 @@ const TXT = {
       "Ce qu'il a appris quand le gaz était bon marché reste ainsi valable quand il est cher : les effets du vent ou du soleil deviennent des pourcentages du prix. Conséquence : il réagit plus fort au vent. Très bon le 23/10/2026, quand le prix s'est effondré toute la journée ; moins bon le 21/10, quand seul l'après-midi s'est effondré.",
     ],
     gt_table: [["Prix du gaz TTF", "Coût de l'électricité d'une centrale à gaz"], ["10 €/MWh (2020)", "18 €/MWh"], ["35 €/MWh (2025)", "64 €/MWh"], ["90 €/MWh (octobre 2026)", "164 €/MWh"]],
+    nom_EU: "Modèle Europe : prévisions GFS + gaz + marchés voisins + prix britannique + surplus d'électricité",
+    nom_EUC: "Modèle Europe complet : Europe + capacités d'échange du jour + nucléaire indisponible",
+    nom_GB: "Prévisions GFS + gaz + prix des voisins de la veille + prix britannique",
+    court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
+    tag_s1: "secours n°1", tag_s2: "secours n°2", tag_s3: "secours n°3", tag_ancien: "ancien",
+    f_EU: ["Le modèle principal depuis le 29/10/2026. Il part de « GFS + gaz » (météo GFS, consommation RTE, calendrier, prix passés, gaz) et regarde aussi chez les voisins : leurs prix de la veille (Allemagne, Belgique, Espagne, Italie, Suisse), les échanges aux frontières (JAO), leur consommation prévue (ENTSO-E) et le prix britannique du jour visé, fixé vers 11 h par une enchère qui a lieu avant la nôtre.",
+           "Variable clé : le « surplus » = nucléaire disponible (avis d'indisponibilité connus la veille à 11 h) + vent + soleil prévus − consommation prévue. Quand il est grand, la France doit exporter beaucoup et le prix s'effondre. Comme GFS-RG, le prix est appris rapporté au coût du gaz.",
+           "Test sur 2026 (301 jours, réappris chaque jour) : 13,6 €/MWh d'erreur moyenne à l'heure, contre 19,2 pour « GFS + gaz » et 27,9 pour la veille. Sur les 48 jours où OpenWindCast publie ses erreurs : 17,8 contre 17,6 (égalité, écart non significatif)."],
+    f_EUC: ["La version complète du modèle Europe : 13 variables de plus (capacités d'échange maximales du jour visé publiées par JAO, capacités vers l'Espagne, l'Italie et la Suisse, nucléaire indisponible seul).",
+            "Ces variables n'ont rien apporté au test : la version allégée (le modèle principal) fait aussi bien avec 54 variables au lieu de 67. On garde la version complète en secours et on la suit chaque jour pour voir si elle devient meilleure avec le temps.",
+            "Test sur 2026 : 13,6 €/MWh (écart avec le principal +0,07, non significatif)."],
+    f_GB: ["Secours si les données ENTSO-E (consommation des voisins, nucléaire) manquent le matin : « GFS + gaz » + prix des voisins de la veille + échanges JAO de la veille + prix britannique du jour.",
+           "Il ne connaît pas le surplus : il se trompe davantage les jours où le prix s'effondre.",
+           "Test sur 2026 : 15,3 €/MWh."],
+    v_vois: ["Prix des voisins la veille (10)", ["prix de la même heure la veille et prix moyen de la veille, en Allemagne-Luxembourg, Belgique, Espagne, Italie (Nord) et Suisse, rapportés au coût du gaz"]],
+    v_jao: ["Échanges aux frontières la veille (11)", ["position nette de la France (heure et moyenne du jour)", "échanges programmés avec l'Allemagne, la Belgique et l'Espagne", "position nette minimale et maximale possible, échanges maximaux France ↔ Allemagne et France ↔ Belgique (JAO, flow-based)"]],
+    v_charge: ["Consommation prévue des voisins (7)", ["Allemagne, Belgique, Pays-Bas, Espagne, Italie (Nord), Suisse et leur total (ENTSO-E, en GW)"]],
+    v_gb: ["Prix britannique du jour visé (3)", ["prix de l'heure, moyenne de la journée, variation par rapport à la veille (Nord Pool N2EX, en £/MWh, rapportés au coût du gaz)"]],
+    v_surplus: ["Surplus d'électricité (3)", ["surplus de l'heure = nucléaire disponible + vent + soleil prévus − consommation prévue (GW)", "surplus maximal et minimal de la journée"]],
+    v_jaoa: ["Échanges possibles le jour visé (6)", ["position nette minimale et maximale, échanges maximaux France ↔ Allemagne et France ↔ Belgique (JAO, publiés vers 9 h 45 la veille)"]],
+    v_ntc: ["Capacités d'échange du jour visé (6)", ["France → Espagne, Espagne → France, France → Italie, Italie → France, France → Suisse, Suisse → France (ENTSO-E)"]],
+    v_nuc: ["Nucléaire (1)", ["puissance nucléaire indisponible d'après les avis connus la veille à 11 h (GW)"]],
+    a_EU: "Toutes les heures depuis le 15/01/2020 jusqu'à minuit (heure de Paris) la veille du jour visé : environ 59 000 heures. Les données des voisins absentes au début (JAO n'existe que depuis juin 2022) restent vides : LightGBM sait faire avec.",
+    a_arbres_EU: "Nombre d'arbres fixé une fois pour toutes ({a}) : appris jusqu'à fin 2024, arrêt quand l'erreur sur 2025 ne baisse plus, puis 10 % d'arbres en plus.",
+    ck_europe: "Marchés voisins, échanges, nucléaire et prix britannique", nk_europe: "Marchés voisins et prix britannique",
+    ck_europe_d: "prix britannique de demain publié le {d}", ck_europe_echec: "en panne : {l}", ck_europe_avant: "pas encore utilisés ce jour-là (modèle Europe en service depuis le 29/10/2026)",
+    ck_modele_rejeu_eu: "recalculé a posteriori (modèle mis en service le 29/10/2026)", ck_modele_manque: "non calculé : données manquantes ({l})",
+    an_intro: "Avant d'arriver au modèle Europe, nous avons construit et testé une trentaine de modèles. Les trois anciens modèles du site tournent toujours chaque jour, pour comparaison. Le tableau ci-dessous raconte le chemin parcouru : chaque ligne ajoute une idée, et l'erreur est mesurée de la même façon (2026, réappris chaque jour avant chaque prévision, uniquement avec des données publiées avant l'enchère).",
+    an_parcours: "Le chemin parcouru (erreur moyenne à l'heure sur 2026, €/MWh)",
+    an_cols: ["Date", "Modèle", "Ce qu'on a ajouté ou essayé", "Erreur 2026", "Verdict"],
+    an_lignes: [
+      ["16/10", "Repère « même heure la veille »", "aucun modèle", "27,9", "à battre"],
+      ["16-21/10", "22 premières recettes LightGBM", "météo observée (ERA5) ou prévue (Open-Meteo, GFS), consommation, gaz, CO₂, nucléaire de l'avant-veille, notre production prévue", "19,7 à 26,8*", "le gaz et le réapprentissage aident ; CO₂ et nucléaire J-2 : rien"],
+      ["22/10", "GFS-G : tout GFS + gaz", "une seule source météo, réapprise chaque jour", "19,1", "principal du 22 au 28/10"],
+      ["22/10", "GFS-G-P : + notre production prévue", "la chaîne production → prix", "18,8**", "pas mieux que la météo seule"],
+      ["23/10", "GFS-RG : prix rapporté au gaz", "le prix appris en multiple du coût du gaz", "18,5", "un peu mieux"],
+      ["27/10", "+ prix des voisins et échanges de la veille", "Allemagne, Belgique, Espagne, Italie, Suisse ; JAO", "18,1", "un peu mieux"],
+      ["27/10", "+ prévisions de vent et de soleil ENTSO-E", "prévisions officielles des voisins", "16,7", "écarté : publiées après l'enchère"],
+      ["28/10", "+ prix britannique du jour", "l'enchère britannique a lieu vers 11 h, avant la nôtre", "15,4", "gros gain → secours n°2"],
+      ["28/10", "+ consommation des voisins, échanges possibles, capacités", "ENTSO-E et JAO du jour", "15,1", "un peu mieux"],
+      ["28/10", "+ nucléaire disponible et surplus", "avis d'indisponibilité connus la veille à 11 h", "13,7", "gros gain → secours n°1"],
+      ["28/10", "Météo de l'Allemagne et du Benelux", "vent et soleil GFS, même la prévision officielle", "≈ 13,7", "aucun gain : abandonnée"],
+      ["28/10", "Élagage fort (29 variables)", "retirer tous les groupes qui semblaient inutiles", "14,5", "pire : abandonné"],
+      ["28/10", "Élagage léger (54 variables)", "retirer les données du jour inutiles", "13,6", "aussi bon et plus simple → principal"],
+    ],
+    an_notes: "* réappris chaque mois (22 recettes, test du 21/10/2026). ** autre série de test (291 jours, 21/10/2026). Tous les autres chiffres : même test de 300 jours (01/01 → 28/10/2026).",
+    an_perf: "Tous les modèles sur l'historique du site (erreur au quart d'heure, jours où le prix du marché est connu)",
+    an_fiches: "Les anciens modèles, toujours calculés chaque jour",
     chargement: "Impossible de charger les données.",
     unite: "€/MWh",
   },
   en: {
     titre: "Tomorrow's electricity price in France",
-    sous_titre: "Every morning, three machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. They are then compared with the price set by the market.",
-    o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About",
+    sous_titre: "Every morning, our machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. The main model, \"Europe\", combines weather forecasts, gas, neighbouring markets, the British price and available nuclear capacity. Forecasts are then compared with the price set by the market.",
+    o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
     maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
-    retard: "The forecast for {d} is not published yet: it is normally computed around 10:15 and published around 10:30.",
-    attente_d: "The computation starts around 10:15 and takes about ten minutes. This page updates by itself.",
+    retard: "The forecast for {d} is not published yet: it is normally computed around 11:30 and published around 11:45.",
+    attente_d: "The computation starts around 11:30 (after the British price is published) and takes about fifteen minutes. This page updates by itself.",
     etapes_titre: "Forecast steps",
     etapes_voir: "Forecast steps for this day",
     g_donnees: "Data received", g_calculs: "Computations", g_resultat: "Publication and check",
@@ -228,7 +282,7 @@ const TXT = {
     ck_reel: "Actual electricity price received", nk_reel: "Actual electricity price", ck_reel_d: "{d}", ck_reel_fichier: "market price file",
     ck_reel_attente: "published around 12:45 on {d}, fetched around 13:45", ck_reel_cours: "auction published at 12:45: fetched around 13:45", ck_reel_retard: "not received yet",
     ck_ecarts: "Errors computed", nk_ecarts: "Error computation", ck_ecarts_d: "best: \"{m}\", {x} €/MWh mean error", ck_ecarts_att: "once the actual price is received",
-    ck_inconnu: "not recorded", ck_attente_d: "waiting (around 10:15)",
+    ck_inconnu: "not recorded", ck_attente_d: "waiting (around 11:30)",
     prix_moyen: "average forecast price", prevu_erreur: "average forecast · mean error {x} €", erreur_biais: "mean error · bias {b} €",
     marche_moyen: "Average market price", veille: "Previous day's average",
     moins_plus: "Cheapest · most expensive hour", selon: "according to \"{m}\"", selon_marche: "according to the market",
@@ -252,13 +306,13 @@ const TXT = {
     pf_tout: "Full history", pf_30: "Last 30 days", pf_direct: "Since going live",
     aucun_direct: "No live day yet: the first published forecasts start on {d}.",
     c_corr: "Correlation", c_corr_j: "Daily correl.", corr_court: "correlation {r}",
-    c_modele: "Model", c_mae: "Mean error", c_rel: "Relative error", c_biais: "Bias", c_rmse: "Root mean square error", c_meilleur: "Best of the 3", c_gain: "Gain over the day before",
+    c_modele: "Model", c_mae: "Mean error", c_rel: "Relative error", c_biais: "Bias", c_rmse: "Root mean square error", c_meilleur: "Best of the day", c_gain: "Gain over the day before",
     jours_n: "{n} days",
     perf_jours: "Mean error of each day (€/MWh)",
     perf_heures: "When are we wrong? Mean error by hour of the day (€/MWh)",
-    perf_difficiles: "The hardest days for our models (ranked by the average error of the three)",
+    perf_difficiles: "The hardest days for our models (ranked by the average error of the models in service)",
     mise_en_ligne: "live",
-    m_qui: "The three models and the benchmark",
+    m_qui: "The models in service and the benchmark",
     m_chaine: "What happens every day",
     m_lexique: "Glossary",
     m_limites: "Limitations, sources and method",
@@ -268,9 +322,9 @@ const TXT = {
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     nom_court: "In tables: \"{c}\"",
     tag_principal: "main",
-    f_GR: ["The main model. It learns the link between the price and what is known the day before: GFS weather forecasts (sun, wind, temperature), RTE load forecast, weekday and holidays, past prices and the gas price.",
+    f_GR: ["Former main model (22 to 28/10/2026), now the last fallback: it only needs GFS weather, RTE and gas, so it runs even when the European sources are down. It learns the link between the price and what is known the day before: GFS weather forecasts (sun, wind, temperature), RTE load forecast, weekday and holidays, past prices and the gas price.",
            "Algorithm: LightGBM (boosted decision trees). Retrained every morning on every hour since 2020, with more weight on recent years.",
-           "2026 test, retrained daily: 18.5 €/MWh mean error, versus 27.9 for \"same hour the day before\"."],
+           "2026 test, retrained daily: 19.2 €/MWh mean hourly error, versus 13.6 for the Europe model and 27.9 for \"same hour the day before\"."],
     f_CR: ["Like the main model, but raw sun and wind are replaced by the solar and wind output forecast by our own production models (also trained on GFS).",
            "Idea: the price depends on renewable output, so forecast it first. In practice it comes from the same weather and adds no new information.",
            "2026 test: 18.8 €/MWh, slightly worse than the main model (0.3 €/MWh, significant)."],
@@ -279,12 +333,12 @@ const TXT = {
            "September-October 2026, retrained daily: 25.6 €/MWh versus 26.7 for the main model (4% better; gap not yet statistically proven)."],
     f_hier: ["Naive benchmark, no model: tomorrow's price equals today's at the same quarter-hour. A useful model must beat it. Hidden by default: tick \"Day before\" to show it."],
     etapes: [
-      ["Around 10:15, the day before", "Data update: past prices, RTE load and load forecast, recent regional output, gas price."],
+      ["Around 11:30, the day before", "Data update: past prices in France and next door, RTE load and load forecast, recent regional output, gas price, cross-border flows (JAO), neighbours' load forecasts and nuclear outage notices (ENTSO-E), tomorrow's British price (Nord Pool, published around 11:00)."],
       ["Tomorrow's weather", "Download of the latest midnight run of the GFS weather model (NOAA): radiation, 100 m wind, temperature, clouds, pressure over France."],
       ["Forecast output", "Our production models are retrained with RTE actual output up to yesterday, then turn the weather into solar and wind output per region (used by the \"GFS-G-P\" model)."],
-      ["Hourly price", "The three models are retrained on the full history up to midnight, then forecast the price of each hour of tomorrow."],
+      ["Hourly price", "All models are retrained on the full history up to midnight, then forecast the price of each hour of tomorrow. The Europe model is published as the main one; if it lacks data, the first available fallback replaces it."],
       ["Quarter-hour", "A second model splits each hour into four quarter-hours (prices move within the hour, especially morning and evening)."],
-      ["Publication", "The site is updated around 10:30, before the 12:45 auction."],
+      ["Publication", "The site is updated around 11:45, before the 12:45 auction."],
       ["Around 13:45", "The market price is fetched: the site adds the actual curve and computes the errors."],
     ],
     lexique: [
@@ -301,7 +355,9 @@ const TXT = {
       "The forecast only uses data known on the morning before: past prices, weather forecasts and load forecast. No price of the forecast day enters the models.",
       "The models were trained only on archived weather forecasts (GFS since 2020), never on observed weather: what they see in training matches what they see in service.",
       "Known limitation: price collapses during very windy periods (prices near 0 for a few hours) are poorly anticipated, especially when the market is expensive.",
-      "Not included: nuclear availability, neighbouring countries' prices and weather, CO₂ price (tested: no measurable gain).",
+      "Included since 29/10/2026 (Europe model): neighbours' prices of the day before, cross-border flows, neighbours' load forecasts, the British price of the day and available nuclear capacity. Still missing: neighbours' weather and the CO₂ price (tested: no measurable gain).",
+      "Historical nuclear outages come from the latest version of each ENTSO-E notice: they may include small corrections published later. In service, only notices known in the morning are used.",
+      "The Europe models have been in service since 29/10/2026. Before that date, their forecasts are replayed afterwards with the same method (retrained daily, using only data published before the auction), hourly, with the within-hour shape of GFS-G.",
       "History: before {d}, days are replayed afterwards with exactly the service's method; from that date on, they are the forecasts published live, the day before.",
       "Sources: EPEX SPOT prices (Bundesnetzagentur | SMARD.de, CC BY 4.0, via Energy-Charts / Fraunhofer ISE); RTE load and output (ODRÉ, éCO2mix); NOAA GFS weather; TTF gas (Yahoo Finance).",
       "Student project (emlyon business school). The models and this site were built with the help of Claude (Anthropic). This is not investment advice.",
@@ -369,6 +425,10 @@ const TXT = {
     s_outils: "Tools",
     s_utilise: "Used for: {u}",
     src: [
+      ["voisins", "Day-ahead prices of neighbouring countries", "Energy-Charts (Fraunhofer ISE), from European power exchange results", "Prices of the day before in Germany-Luxembourg, Belgium, Spain, Italy (North) and Switzerland.", [["Energy-Charts API", "https://api.energy-charts.info/"]]],
+      ["jao", "Cross-border flows (Core flow-based coupling)", "JAO, Joint Allocation Office (Publication Tool)", "France's net position and scheduled exchanges of the day before, maximum exchanges.", [["JAO Publication Tool", "https://publicationtool.jao.eu/core/"]]],
+      ["entsoe", "Neighbours' load forecasts, transfer capacities, nuclear outages", "ENTSO-E Transparency Platform (free, registration required)", "Day-ahead load forecasts of neighbouring countries, transfer capacities to Spain, Italy and Switzerland, outage notices of French reactors (for available nuclear capacity and the surplus).", [["ENTSO-E Transparency Platform", "https://transparency.entsoe.eu/"]]],
+      ["gb", "British day-ahead price", "Nord Pool, N2EX auction (published around 11:00, public but unofficial API); history: Low Carbon Contracts Company", "Price of each hour of the target day in Great Britain, known before the French auction.", [["Nord Pool", "https://data.nordpoolgroup.com/"], ["Low Carbon Contracts Company", "https://www.lowcarboncontracts.uk/"]]],
       ["prix", "French day-ahead electricity price", "EPEX SPOT auction; prices republished by Bundesnetzagentur / SMARD.de (CC BY 4.0 licence) and fetched through the Energy-Charts API (Fraunhofer ISE)", "Price of each hour, then of each quarter-hour since October 2025, from 2020 to today: what the models learn and forecast, and the site's \"market price\" (History tab, Market column).", [["Official EPEX SPOT results (France, quarter-hours)", "https://www.epexspot.com/en/market-results?market_area=FR&auction=MRC&modality=Auction&sub_modality=DayAhead&data_mode=table&product=15"], ["Energy-Charts chart (France)", "https://www.energy-charts.info/charts/price_spot_market/chart.htm?l=fr&c=FR"], ["Energy-Charts API (example: 23/10/2026)", "https://api.energy-charts.info/price?bzn=FR&start=2026-10-23&end=2026-10-23"], ["SMARD.de", "https://www.smard.de/"]]],
       ["conso", "Load and load forecast", "RTE, national éCO2mix (Open Data Réseaux Énergies)", "Actual load and RTE's next-day load forecast, published in the morning, per quarter-hour.", [["National éCO2mix real time", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/"], ["National éCO2mix consolidated", "https://odre.opendatasoft.com/explore/dataset/eco2mix-national-cons-def/"]]],
       ["gfs", "GFS weather forecasts", "NOAA (United States); NCAR / UCAR archive; AWS Open Data copy", "Midnight run, lead times of 27 to 48 h (forecast made the day before for the next day): radiation, 10 and 100 m wind, temperature, clouds, pressure over France. Archive 2020 → 18/10/2026 for training, today's run for forecasting (both sources give identical values, checked).", [["About GFS (NOAA)", "https://www.ncei.noaa.gov/products/weather-climate-models/global-forecast"], ["NCAR archive d084001", "https://gdex.ucar.edu/datasets/d084001/"], ["Today's runs (AWS)", "https://registry.opendata.aws/noaa-gfs-bdp-pds/"]]],
@@ -377,7 +437,7 @@ const TXT = {
       ["capa", "Installed solar capacity", "SDES (French Ministry for the Ecological Transition), solar PV dashboard, Q2 2026 edition", "Installed capacity per department and quarter, aligned with RTE's national total: it weights each department's weather.", [["SDES website", "https://www.statistiques.developpement-durable.gouv.fr/"]]],
       ["registre", "National installation register", "Open Data Réseaux Énergies and data.gouv.fr (as of 31/12/2025)", "Location of the plants: each department has a weather point at the centre of gravity of its installations (94 solar points, 55 wind points).", [["ODRÉ", "https://odre.opendatasoft.com/explore/dataset/registre-national-installation-production-stockage-electricite-agrege-311225/"], ["data.gouv.fr", "https://www.data.gouv.fr/datasets/registre-national-des-installations-de-production-et-de-stockage-delectricite-au-31-12-2025"]]],
     ],
-    src_usage: { prix: "the 3 price models", conso: "the 3 price models", gfs: "the price and production models", gaz: "the 3 price models", prod: "the production models", capa: "the production models", registre: "the production models" },
+    src_usage: { voisins: "the Europe models", jao: "the Europe models", entsoe: "the Europe models (neighbours' load, surplus)", gb: "the Europe models", prix: "all price models", conso: "all price models", gfs: "the price and production models", gaz: "all price models", prod: "the production models", capa: "the production models", registre: "the production models" },
     outils: [["LightGBM (Microsoft): the algorithm of every model", "https://lightgbm.readthedocs.io/"], ["Python: pandas, NumPy, ecCodes to read GFS files", null], ["Chart.js: this site's charts", "https://www.chartjs.org/"], ["GitHub Pages: site hosting", null], ["Claude (Anthropic): help writing the code, the tests and this site", null]],
     gt_pourquoi_titre: "Why divide the price by the gas cost?",
     gt_pourquoi: [
@@ -387,18 +447,72 @@ const TXT = {
       "What it learned when gas was cheap thus still applies when gas is expensive: the effects of wind or sun become percentages of the price. As a result it reacts more strongly to wind. Very good on 23/10/2026, when the price collapsed all day; worse on 21/10, when only the afternoon collapsed.",
     ],
     gt_table: [["TTF gas price", "Electricity cost of a gas plant"], ["10 €/MWh (2020)", "18 €/MWh"], ["35 €/MWh (2025)", "64 €/MWh"], ["90 €/MWh (October 2026)", "164 €/MWh"]],
+    nom_EU: "Europe model: GFS forecasts + gas + neighbouring markets + British price + power surplus",
+    nom_EUC: "Full Europe model: Europe + transfer capacities of the day + unavailable nuclear",
+    nom_GB: "GFS forecasts + gas + neighbours' prices of the day before + British price",
+    court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
+    tag_s1: "fallback 1", tag_s2: "fallback 2", tag_s3: "fallback 3", tag_ancien: "past",
+    f_EU: ["The main model since 29/10/2026. It starts from \"GFS + gas\" (GFS weather, RTE load, calendar, past prices, gas) and also looks next door: neighbours' prices of the day before (Germany, Belgium, Spain, Italy, Switzerland), cross-border flows (JAO), their load forecasts (ENTSO-E) and the British price of the target day, set around 11:00 by an auction held before ours.",
+           "Key variable: the \"surplus\" = available nuclear (outage notices known at 11:00 the day before) + forecast wind + sun − forecast load. When it is large, France must export a lot and the price collapses. Like GFS-RG, the price is learnt relative to the cost of gas.",
+           "2026 test (301 days, retrained daily): 13.6 €/MWh mean hourly error, versus 19.2 for \"GFS + gas\" and 27.9 for the day before. On the 48 days for which OpenWindCast publishes its errors: 17.8 versus 17.6 (a tie, not significant)."],
+    f_EUC: ["The full version of the Europe model: 13 more variables (maximum exchanges of the target day published by JAO, transfer capacities to Spain, Italy and Switzerland, unavailable nuclear on its own).",
+            "These variables brought nothing in the test: the lighter version (the main model) does as well with 54 variables instead of 67. We keep the full version as a fallback and track it every day to see whether it improves over time.",
+            "2026 test: 13.6 €/MWh (gap with the main model +0.07, not significant)."],
+    f_GB: ["Fallback when ENTSO-E data (neighbours' load, nuclear) are missing in the morning: \"GFS + gas\" + neighbours' prices of the day before + JAO flows of the day before + British price of the day.",
+           "It does not know the surplus: it errs more on days when the price collapses.",
+           "2026 test: 15.3 €/MWh."],
+    v_vois: ["Neighbours' prices the day before (10)", ["price of the same hour the day before and average price of the day before, in Germany-Luxembourg, Belgium, Spain, Italy (North) and Switzerland, relative to the cost of gas"]],
+    v_jao: ["Cross-border flows the day before (11)", ["France's net position (hour and daily mean)", "scheduled exchanges with Germany, Belgium and Spain", "minimum and maximum possible net position, maximum exchanges France ↔ Germany and France ↔ Belgium (JAO, flow-based)"]],
+    v_charge: ["Neighbours' load forecasts (7)", ["Germany, Belgium, Netherlands, Spain, Italy (North), Switzerland and their total (ENTSO-E, GW)"]],
+    v_gb: ["British price of the target day (3)", ["price of the hour, daily mean, change from the day before (Nord Pool N2EX, £/MWh, relative to the cost of gas)"]],
+    v_surplus: ["Power surplus (3)", ["surplus of the hour = available nuclear + forecast wind + sun − forecast load (GW)", "maximum and minimum surplus of the day"]],
+    v_jaoa: ["Possible exchanges on the target day (6)", ["minimum and maximum net position, maximum exchanges France ↔ Germany and France ↔ Belgium (JAO, published around 9:45 the day before)"]],
+    v_ntc: ["Transfer capacities of the target day (6)", ["France → Spain, Spain → France, France → Italy, Italy → France, France → Switzerland, Switzerland → France (ENTSO-E)"]],
+    v_nuc: ["Nuclear (1)", ["unavailable nuclear capacity according to notices known at 11:00 the day before (GW)"]],
+    a_EU: "Every hour from 15/01/2020 up to midnight (Paris time) before the target day: about 59,000 hours. Neighbour data missing in the early years (JAO only exists since June 2022) are left empty: LightGBM handles it.",
+    a_arbres_EU: "Number of trees fixed once and for all ({a}): trained up to end-2024, stopped when the 2025 error no longer falls, then 10% more trees.",
+    ck_europe: "Neighbouring markets, flows, nuclear and British price", nk_europe: "Neighbouring markets and British price",
+    ck_europe_d: "tomorrow's British price published on {d}", ck_europe_echec: "down: {l}", ck_europe_avant: "not used yet on that day (Europe model in service since 29/10/2026)",
+    ck_modele_rejeu_eu: "computed afterwards (model in service since 29/10/2026)", ck_modele_manque: "not computed: missing data ({l})",
+    an_intro: "Before reaching the Europe model, we built and tested about thirty models. The site's three past models still run every day, for comparison. The table below tells the story: each row adds one idea, and the error is measured the same way (2026, retrained before each forecast, using only data published before the auction).",
+    an_parcours: "How we got here (mean hourly error over 2026, €/MWh)",
+    an_cols: ["Date", "Model", "What was added or tried", "2026 error", "Verdict"],
+    an_lignes: [
+      ["16/10", "Benchmark \"same hour the day before\"", "no model", "27.9", "to beat"],
+      ["16-21/10", "First 22 LightGBM recipes", "observed (ERA5) or forecast (Open-Meteo, GFS) weather, load, gas, CO₂, nuclear two days before, our production forecast", "19.7 to 26.8*", "gas and retraining help; CO₂ and nuclear D-2: nothing"],
+      ["22/10", "GFS-G: all GFS + gas", "a single weather source, retrained daily", "19.1", "main model 22-28/10"],
+      ["22/10", "GFS-G-P: + our production forecast", "the production → price chain", "18.8**", "no better than weather alone"],
+      ["23/10", "GFS-RG: price relative to gas", "price learnt as a multiple of the gas cost", "18.5", "slightly better"],
+      ["27/10", "+ neighbours' prices and flows of the day before", "Germany, Belgium, Spain, Italy, Switzerland; JAO", "18.1", "slightly better"],
+      ["27/10", "+ ENTSO-E wind and solar forecasts", "official forecasts of the neighbours", "16.7", "rejected: published after the auction"],
+      ["28/10", "+ British price of the day", "the British auction runs around 11:00, before ours", "15.4", "big gain → fallback 2"],
+      ["28/10", "+ neighbours' load, possible exchanges, capacities", "ENTSO-E and JAO of the day", "15.1", "slightly better"],
+      ["28/10", "+ available nuclear and surplus", "outage notices known at 11:00 the day before", "13.7", "big gain → fallback 1"],
+      ["28/10", "Weather of Germany and Benelux", "GFS wind and sun, even the official forecast", "≈ 13.7", "no gain: dropped"],
+      ["28/10", "Strong pruning (29 variables)", "remove every group that looked useless", "14.5", "worse: dropped"],
+      ["28/10", "Light pruning (54 variables)", "remove the useless same-day data", "13.6", "as good and simpler → main model"],
+    ],
+    an_notes: "* retrained monthly (22 recipes, test of 21/10/2026). ** another test series (291 days, 21/10/2026). All other figures: the same 300-day test (01/01 → 28/10/2026).",
+    an_perf: "All models over the site's history (quarter-hour error, days when the market price is known)",
+    an_fiches: "The past models, still computed every day",
     chargement: "Could not load the data.",
     unite: "€/MWh",
   },
 };
 
-const MODELES = [
-  { code: "GR", couleur: "--s-gr", tirets: null, tag: "tag_principal" },
-  { code: "CR", couleur: "--s-cr", tirets: null, tag: null },
-  { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: null },
+const MODELES = [                                                     // modèles en service depuis le 29/10/2026 : principal puis secours
+  { code: "EU", couleur: "--s-eu", tirets: null, tag: "tag_principal" },
+  { code: "EUC", couleur: "--s-euc", tirets: [6, 4], tag: "tag_s1" },
+  { code: "GB", couleur: "--s-gb", tirets: [2, 3], tag: "tag_s2" },
+  { code: "GR", couleur: "--s-gr", tirets: null, tag: "tag_s3" },
 ];
+const MODELES_ANCIENS = [                                             // toujours calculés, montrés dans l'onglet « Anciens modèles »
+  { code: "CR", couleur: "--s-cr", tirets: null, tag: "tag_ancien" },
+  { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: "tag_ancien" },
+];
+const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourHist: null, modeHist: "jour", plage: { preset: "7", debut: null, fin: null },
-               visibles: { GR: true, CR: true, GT: true, hier: false, bande: true },
+               visibles: { EU: true, EUC: true, GB: false, GR: false, CR: true, GT: true, hier: false, bande: true },
                prodVisibles: { sol: true, eol: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
@@ -455,7 +569,7 @@ function parHeure(serie, heures) {                                   // moyenne 
 }
 function heuresLabels(heures) { return [...new Set(heures.map((h) => h.slice(0, 2)))].map((h) => h + (etat.langue === "fr" ? " h" : ":00")); }
 function series(j, pas) {                                           // séries d'un jour, au quart d'heure ou à l'heure
-  const cles = ["reel", "hier", "bas", "haut", ...MODELES.map((m) => m.code)];
+  const cles = ["reel", "hier", "bas", "haut", ...TOUS.map((m) => m.code)];
   if (pas === "quart") return { labels: j.heures, ...Object.fromEntries(cles.map((k) => [k, j[k] || null])) };
   return { labels: heuresLabels(j.heures), ...Object.fromEntries(cles.map((k) => [k, parHeure(j[k], j.heures)])) };
 }
@@ -501,7 +615,7 @@ function celluleEcart(p, r) {                                        // écart p
 function pastille(code) {
   if (code === "reel") return `<span class="pastille" style="color:${css("--ink")}"></span>`;
   if (code === "hier") return `<span class="pastille points" style="color:${css("--muted")}"></span>`;
-  const m = MODELES.find((x) => x.code === code);
+  const m = TOUS.find((x) => x.code === code);
   return `<span class="pastille${m.tirets ? " tirets" : ""}" style="color:${css(m.couleur)}"></span>`;
 }
 const etiquette = (m) => (m.tag ? ` <span class="etiquette">${t(m.tag)}</span>` : "");
@@ -582,7 +696,7 @@ function dsBande(bas, haut) {
   return [{ label: "_bas", data: bas, borderWidth: 0, pointRadius: 0, fill: false },
           { label: t("fourchette"), data: haut, borderWidth: 0, pointRadius: 0, backgroundColor: css("--bande"), borderColor: css("--bande"), fill: "-1" }];
 }
-const aBande = (s) => Boolean(s.bas && s.haut && s.GR);                              // la fourchette existe (jours publiés en direct), autour du modèle principal
+const aBande = (s) => Boolean(s.bas && s.haut);                              // la fourchette existe (jours publiés en direct), autour du modèle principal
 const avecBande = () => false;                                       // fourchette retirée du site (demande de Julien, 27/10/2026)
 function dsJour(s, j) {
   const ds = [];
@@ -655,13 +769,22 @@ function etapesJour(j) {
     if (pm && pm.reappris) ajout("calculs", "ok", t("ck_prod_modeles"), t("ck_prod_modeles_d", { d: dateCourte(ajouterJours(j.jour, -2)), s: nombre(pm.arbres.solaire, 0), e: nombre(pm.arbres.eolien, 0) }));
     else if (pm) ajout("calculs", "alerte", t("nk_prod_modeles"), t("ck_prod_modeles_echec"));
     else ajout("calculs", "info", t("nk_prod_modeles"), t("ck_prod_modeles_fige"));
+    const ed = c.europe_donnees;
+    if (ed && !ed.sans_maj) {
+      const panne = [["prix_voisins", "Energy-Charts"], ["jao", "JAO"], ["entsoe", "ENTSO-E"], ["gb", "Nord Pool"]].filter(([k]) => !(ed[k] && ed[k].ok)).map(([, n]) => n);
+      ajout("donnees", panne.length ? "alerte" : "ok", t("ck_europe"), panne.length ? t("ck_europe_echec", { l: panne.join(", ") })
+            : ed.gb && ed.gb.publie ? t("ck_europe_d", { d: dateHeure(ed.gb.publie.replace(" ", "T")) }) : "");
+    } else if (!ed) ajout("donnees", "info", t("nk_europe"), t("ck_europe_avant"));
     const p = c.production_GWh;
     if (p) ajout("calculs", "ok", t("ck_prod"), t("ck_prod_d", { s: nombre(p.solaire, 0), e: nombre(p.eolien, 0) }));
     else ajout("calculs", "info", t("nk_prod"), t("ck_inconnu"));
   }
   for (const m of MODELES) {
     const nom = courtModele(m.code), cm = (c.modeles || {})[m.code];
-    if (j[m.code]) ajout("calculs", "ok", t("ck_modele", { m: nom }), rejeu ? t("ck_modele_rejeu") : cm ? t("ck_modele_d", { v: dateCourte(veille), h: cm.heures, a: nombre(cm.arbres, 0) }) : t("ck_modele_d_simple", { v: dateCourte(veille) }));
+    const ce = (c.europe || {})[m.code];
+    if (j[m.code] && (j.rejeu_modeles || []).includes(m.code)) ajout("calculs", "info", t("ck_modele", { m: nom }), t("ck_modele_rejeu_eu"));
+    else if (!j[m.code] && ce && ce.donnees_manquantes) ajout("calculs", "alerte", t("ck_modele_absent", { m: nom }), t("ck_modele_manque", { l: Object.keys(ce.donnees_manquantes).join(", ") }));
+    else if (j[m.code]) ajout("calculs", "ok", t("ck_modele", { m: nom }), rejeu ? t("ck_modele_rejeu") : cm ? t("ck_modele_d", { v: dateCourte(veille), h: cm.heures, a: nombre(cm.arbres, 0) }) : t("ck_modele_d_simple", { v: dateCourte(veille) }));
     else ajout("calculs", rejeu ? "info" : "echec", t("ck_modele_absent", { m: nom }),
                m.code === "GT" && j.gaz && j.gaz.niveau === "rouge" ? t("ck_modele_sans_gaz") : t("ck_modele_absent_d"));
   }
@@ -689,8 +812,8 @@ function etapesAttente(veille) {                                    // prévisio
 }
 
 /* ---------------------------------------------------------------- onglet Prévision : deux jours */
-function joursAccueil() {                                           // après 10 h : demain en haut, aujourd'hui en bas ; avant 10 h : aujourd'hui, puis hier
-  const now = maintenantParis(), haut = now.hm >= "10:00" ? ajouterJours(now.date, 1) : now.date, bas = ajouterJours(haut, -1);
+function joursAccueil() {                                           // après 11 h 30 : demain en haut, aujourd'hui en bas ; avant : aujourd'hui, puis hier
+  const now = maintenantParis(), haut = now.hm >= "11:30" ? ajouterJours(now.date, 1) : now.date, bas = ajouterJours(haut, -1);
   const avant = jours().filter((j) => j.jour < haut);
   return { now, haut, jHaut: jourDe(haut), jBas: jourDe(bas) || avant[avant.length - 1] };
 }
@@ -712,7 +835,7 @@ function tuilesJour(j) {
     const e = j.erreurs && j.erreurs.hier;
     T.push(tuile(pastille("hier") + t("veille"), enEuros(moyenne(j.hier)), e ? t("prevu_erreur", { x: nombre(e.mae) }) + " · " + t("corr_court", { r: nombre(correlation(j.hier, j.reel), 2) }) : t("hier")));
   }
-  const ref = j.reel ? "reel" : j.GR ? "GR" : modelesDuJour(j).length ? modelesDuJour(j)[0].code : null;
+  const ref = j.reel ? "reel" : j.principal && j[j.principal] ? j.principal : modelesDuJour(j).length ? modelesDuJour(j)[0].code : null;
   if (ref) {
     const h = parHeure(j[ref], j.heures), lab = heuresLabels(j.heures), v = h.filter((x) => x !== null);
     const iMin = h.indexOf(Math.min(...v)), iMax = h.indexOf(Math.max(...v));
@@ -763,7 +886,7 @@ function rendrePrevision() {
   const A = joursAccueil();
   etat.cleAccueil = A.haut + (A.jHaut ? "+" : "-");
   const bandeau = $("bandeau-retard");
-  bandeau.hidden = Boolean(A.jHaut) || (A.haut !== A.now.date && A.now.hm < "11:00");
+  bandeau.hidden = Boolean(A.jHaut) || (A.haut !== A.now.date && A.now.hm < "12:15");
   if (!bandeau.hidden) bandeau.textContent = "⚠ " + t("retard", { d: dateLongue(A.haut) });
   $("maj").textContent = t("maj", { d: new Date(etat.d.maj).toLocaleString(loc(), { dateStyle: "long", timeStyle: "short" }) });
   rendreBloc("haut", A.haut, A.jHaut, A.now);
@@ -942,14 +1065,38 @@ function rendrePerformance() {
 }
 
 /* ---------------------------------------------------------------- onglet Modèles */
+function fiche(m) {
+  return `<div class="fiche"><h4>${pastille(m.code)}${nomModele(m.code)}${etiquette(m)}</h4><p class="court">${t("nom_court", { c: courtModele(m.code) })}</p>`
+    + `${t("f_" + m.code).map((p, i) => `<p${i === 2 ? ' class="chiffre"' : ""}>${p}</p>`).join("")}${m.code === "GT" ? pourquoiGaz() : ""}${detailsModele(m.code)}</div>`;
+}
 function rendreModeles() {
-  const f = MODELES.map((m) => `<div class="fiche"><h4>${pastille(m.code)}${nomModele(m.code)}${etiquette(m)}</h4><p class="court">${t("nom_court", { c: courtModele(m.code) })}</p>`
-    + `${t("f_" + m.code).map((p, i) => `<p${i === 2 ? ' class="chiffre"' : ""}>${p}</p>`).join("")}${m.code === "GT" ? pourquoiGaz() : ""}${detailsModele(m.code)}</div>`);
+  const f = MODELES.map(fiche);
   f.push(`<div class="fiche"><h4>${pastille("hier")}${t("hier")}</h4><p class="court">${t("nom_court", { c: t("hier_court") })}</p>${t("f_hier").map((p) => `<p>${p}</p>`).join("")}</div>`);
   $("m-fiches").innerHTML = f.join("");
   $("m-etapes").innerHTML = t("etapes").map(([a, b]) => `<li><div><b>${a}</b><span>${b}</span></div></li>`).join("");
   $("m-lexique").innerHTML = t("lexique").map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   $("m-limites").innerHTML = t("limites").map((p) => `<li>${p.split("{d}").join(dateLongue(etat.d.debut_direct))}</li>`).join("");
+}
+
+/* ---------------------------------------------------------------- onglet Anciens modèles */
+function rendreAnciens() {
+  $("an-intro").textContent = t("an_intro");
+  $("an-titre").textContent = t("an_parcours");
+  $("an-parcours").innerHTML = `<thead><tr>${t("an_cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>`
+    + t("an_lignes").map((l) => `<tr>${l.map((c, i) => `<td${i === 3 ? ' class="reel"' : ""}>${c}</td>`).join("")}</tr>`).join("") + "</tbody>";
+  $("an-notes").textContent = t("an_notes");
+  $("an-perf-titre").textContent = t("an_perf");
+  const js = joursAvecPrix(), sh = stats(js, "hier");
+  const st = TOUS.map((m) => [m.code, stats(js, m.code)]).filter(([, x]) => x).sort((a, b) => a[1].mae - b[1].mae);
+  let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
+  for (const [c, x] of st.concat(sh ? [["hier", sh]] : [])) {
+    const m = TOUS.find((y) => y.code === c);
+    h += `<tr><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(x.mae)} ${t("unite")}</td><td>${nombre(x.rel, 0)} %</td>`
+      + `<td>${signe(x.biais)}</td><td>${nombre(x.rmse)}</td><td>${c === "hier" ? "–" : `<span class="positif">${signe((100 * (sh.mae - x.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
+  }
+  $("an-perf").innerHTML = h + "</tbody>";
+  $("an-fiches-titre").textContent = t("an_fiches");
+  $("an-fiches").innerHTML = MODELES_ANCIENS.map(fiche).join("");
 }
 
 /* ---------------------------------------------------------------- onglet Production (bonus) */
@@ -1070,15 +1217,20 @@ function lienSource(id) {
   const s = t("src").find((x) => x[0] === id);
   return `<li><a href="#sources">${s[1]}</a> : ${s[2]}${s[4].length ? " · " + s[4].map(([lib, url]) => `<a href="${url}" target="_blank" rel="noopener">${lib}</a>`).join(" · ") : ""}</li>`;
 }
+const ARBRES_EUROPE = { EU: 721, EUC: 228, GB: 1064 };
 function detailsModele(code) {
-  const groupes = [t("v_cal"), code === "GT" ? t("v_prix_gaz") : t("v_prix"), code === "CR" ? t("v_fond_prod") : t("v_fond"), t("v_gaz")];
+  const europe = code in ARBRES_EUROPE, relatif = europe || code === "GT";
+  const groupes = [t("v_cal"), relatif ? t("v_prix_gaz") : t("v_prix"), code === "CR" ? t("v_fond_prod") : t("v_fond"), t("v_gaz")];
+  if (europe) groupes.push(t("v_vois"), t("v_jao"), ...(code === "GB" ? [] : [t("v_charge")]), t("v_gb"), ...(code === "GB" ? [] : [t("v_surplus")]),
+                           ...(code === "EUC" ? [t("v_jaoa"), t("v_ntc"), t("v_nuc")] : []));
   const n = groupes.reduce((s, g) => s + Number(g[0].match(/\((\d+)\)/)[1]), 0);
   const dir = [...jours()].reverse().find((j) => j.controles && j.controles.modeles && j.controles.modeles[code]);
-  const appr = [code === "CR" ? t("a_CR") : t("a_GR"), ...t("a_commun")];
+  const appr = europe ? [t("a_EU"), ...t("a_commun").filter((x, i) => i !== 3), t("a_arbres_EU", { a: nombre(ARBRES_EUROPE[code], 0) })]
+                      : [code === "CR" ? t("a_CR") : t("a_GR"), ...t("a_commun")];
   if (dir) appr.push(t("d_arbres", { d: dateCourte(dir.jour), a: nombre(dir.controles.modeles[code].arbres, 0) }));
-  const src = ["prix", "conso", "gfs", "gaz"].concat(code === "CR" ? ["prod", "capa", "registre"] : []);
+  const src = ["prix", "conso", "gfs", "gaz"].concat(code === "CR" ? ["prod", "capa", "registre"] : [], europe ? ["voisins", "jao", ...(code === "GB" ? [] : ["entsoe"]), "gb"] : []);
   return `<details class="plus"><summary>${t("plus_details")}</summary>`
-    + `<div class="detail-bloc"><h5>${t("d_cible")}</h5><ul><li>${code === "GT" ? t("cible_GT") : t("cible_prix")}</li></ul></div>`
+    + `<div class="detail-bloc"><h5>${t("d_cible")}</h5><ul><li>${relatif ? t("cible_GT") : t("cible_prix")}</li></ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_vars", { n })}</h5><ul>${groupes.map(([g, l]) => `<li><b>${g}</b> : ${l.join(" ; ")}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${appr.map((x) => `<li>${x}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${src.map(lienSource).join("")}</ul></div></details>`;
@@ -1095,7 +1247,7 @@ function rendreSources() {
 }
 
 /* ---------------------------------------------------------------- navigation */
-const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, production: rendreProduction, apropos: () => { rendreModeles(); rendreSources(); } };
+const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, production: rendreProduction, anciens: rendreAnciens, apropos: () => { rendreModeles(); rendreSources(); } };
 const ANCIENS = { performance: ["historique", "performance"], modeles: ["apropos"], sources: ["apropos"] };       // anciens liens
 function lireAncre() {
   let [o, jour] = location.hash.replace("#", "").split("/");

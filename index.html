@@ -6,9 +6,9 @@
   <title>Prix de l'électricité de demain</title>
   <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=16">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=15" defer></script>
+  <script src="app.js?v=16" defer></script>
 </head>
 <body>
   <header class="entete">
@@ -26,6 +26,7 @@
       <button type="button" role="tab" id="tab-prevision" data-onglet="prevision" aria-controls="prevision" data-t="o_prevision"></button>
       <button type="button" role="tab" id="tab-historique" data-onglet="historique" aria-controls="historique" data-t="o_historique"></button>
       <button type="button" role="tab" id="tab-production" data-onglet="production" aria-controls="production" data-t="o_production"></button>
+      <button type="button" role="tab" id="tab-anciens" data-onglet="anciens" aria-controls="anciens" data-t="o_anciens"></button>
       <button type="button" role="tab" id="tab-apropos" data-onglet="apropos" aria-controls="apropos" data-t="o_apropos"></button>
     </nav>
   </header>
@@ -158,6 +159,24 @@
         <div class="carte" id="prod-carte-h-eol"><h3 class="petit-titre" data-t="prod_hist_eol"></h3><div class="graphique moyen"><canvas id="prod-h-eol" role="img"></canvas></div></div>
       </div>
       <p class="note" data-t="prod_note"></p>
+    </section>
+
+    <!-- ============================================================ ANCIENS MODÈLES -->
+    <section id="anciens" role="tabpanel" aria-labelledby="tab-anciens" class="panneau" hidden>
+      <div class="carte">
+        <p class="intro" id="an-intro"></p>
+        <h3 class="petit-titre" id="an-titre"></h3>
+        <div class="cadre-table libre"><table id="an-parcours" class="table-donnees texte"></table></div>
+        <p class="note" id="an-notes"></p>
+      </div>
+      <div class="carte">
+        <h3 class="petit-titre" id="an-perf-titre"></h3>
+        <div class="cadre-table libre"><table id="an-perf" class="table-donnees"></table></div>
+      </div>
+      <div class="carte">
+        <h3 class="petit-titre" id="an-fiches-titre"></h3>
+        <div class="fiches" id="an-fiches"></div>
+      </div>
     </section>
 
     <!-- ============================================================ MODÈLES -->

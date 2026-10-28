@@ -10,7 +10,10 @@
   --border: rgba(11, 11, 11, 0.10);
   --wash: rgba(11, 11, 11, 0.04);
   --surbrillance: rgba(42, 120, 214, 0.10);
-  --s-gr: #2a78d6;
+  --s-eu: #2a78d6;
+  --s-euc: #8a4fd1;
+  --s-gb: #b8860b;
+  --s-gr: #6b7a8f;
   --s-cr: #eb6834;
   --s-gt: #1baf7a;
   --s-sol: #c28a00;
@@ -31,7 +34,7 @@
     --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
     --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10); --wash: rgba(255, 255, 255, 0.05);
     --surbrillance: rgba(57, 135, 229, 0.18);
-    --s-gr: #3987e5; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
+    --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
     --s-sol: #c08a0c; --s-eol: #9479e6;
     --ok-texte: #0ca30c;
     --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
@@ -43,7 +46,7 @@
   --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
   --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10); --wash: rgba(255, 255, 255, 0.05);
   --surbrillance: rgba(57, 135, 229, 0.18);
-  --s-gr: #3987e5; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
+  --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
   --s-sol: #c08a0c; --s-eol: #9479e6;
   --ok-texte: #0ca30c;
   --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
@@ -68,7 +71,7 @@ h2 { font-size: 1.3rem; margin: 0; }
   padding: 10px 14px; cursor: pointer; white-space: nowrap; margin-bottom: -1px;
 }
 .onglets button:hover { color: var(--ink); background: var(--wash); }
-.onglets button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--s-gr); }
+.onglets button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--s-eu); }
 
 /* ---------------------------------------------------------------- blocs */
 .carte { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rayon); padding: 18px; margin-bottom: 16px; }
@@ -146,6 +149,8 @@ details.replie[open] summary { margin-bottom: 14px; }
 .table-donnees th.modele { white-space: normal; min-width: 76px; line-height: 1.3; }
 .table-donnees tfoot { position: sticky; bottom: 0; z-index: 1; }
 .table-donnees tfoot td { background: var(--surface); font-weight: 600; border-bottom: 0; box-shadow: inset 0 1px 0 var(--axis); }
+.table-donnees.texte th, .table-donnees.texte td { text-align: left; white-space: normal; vertical-align: top; }
+.table-donnees.texte td:nth-child(4) { text-align: right; white-space: nowrap; }
 .table-donnees td.fort { font-weight: 700; }
 .table-donnees tr.meilleur td { font-weight: 600; }
 .nom-modele { display: inline-flex; align-items: center; gap: 8px; }
@@ -174,7 +179,7 @@ input[type="date"] { cursor: text; }
 .choix-item:hover { background: var(--wash); }
 .choix-item:has(input:checked) { color: var(--ink); border-color: var(--axis); }
 .choix-item input { margin: 0; accent-color: var(--ink); width: 15px; height: 15px; flex-shrink: 0; }
-.choix-item:has(input:focus-visible) { outline: 2px solid var(--s-gr); outline-offset: 2px; }
+.choix-item:has(input:focus-visible) { outline: 2px solid var(--s-eu); outline-offset: 2px; }
 .choix-legende { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; margin-left: 6px; color: var(--ink-2); }
 .choix-fixe { display: inline-flex; align-items: center; gap: 7px; }
 .pastille.bande { height: 10px; border-top: 0; background: var(--bande); }
@@ -215,7 +220,7 @@ details.plus[open] > summary { margin-bottom: 10px; }
 .source .fournisseur { color: var(--muted); font-size: 0.8rem; margin: 0 0 6px; }
 .source p { margin: 0 0 6px; color: var(--ink-2); font-size: 0.86rem; }
 .source .liens { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.84rem; }
-a { color: var(--s-gr); text-underline-offset: 2px; }
+a { color: var(--s-eu); text-underline-offset: 2px; }
 a:hover { text-decoration-thickness: 2px; }
 .deux-cartes.droite { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
 @media (max-width: 900px) { .deux-cartes.droite { grid-template-columns: minmax(0, 1fr); } }
