@@ -323,3 +323,8 @@ details.compact summary { cursor: pointer; }
 .menu-tags { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .menu-err { font-size: 0.78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .menu-liste .bouton-discret { margin: 6px 4px 2px; }
+
+.pied { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 18px; }
+.pied .auteur { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-bottom: 8px; font-size: 0.9rem; color: var(--ink-2); }
+.pied .auteur-nom { font-weight: 600; color: var(--ink); }
+.pied p { margin: 0; }
