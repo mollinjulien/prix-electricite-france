@@ -4,7 +4,7 @@
 const TXT = {
   fr: {
     titre: "Prix de l'électricité de demain en France",
-    sous_titre: "Chaque matin, nos modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Le modèle principal, « Europe », combine prévisions météo, gaz, marchés voisins, prix britannique et nucléaire disponible. Les prévisions sont ensuite comparées au prix fixé par le marché.",
+    sous_titre: "Chaque matin, nos modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Le modèle principal est la moyenne de quatre variantes du modèle « Europe », qui combine prévisions météo, gaz, marchés voisins, prix britannique et nucléaire disponible. Les prévisions sont ensuite comparées au prix fixé par le marché.",
     o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
     maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
@@ -259,7 +259,7 @@ const TXT = {
   },
   en: {
     titre: "Tomorrow's electricity price in France",
-    sous_titre: "Every morning, our machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. The main model, \"Europe\", combines weather forecasts, gas, neighbouring markets, the British price and available nuclear capacity. Forecasts are then compared with the price set by the market.",
+    sous_titre: "Every morning, our machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. The main model is the average of four variants of the \"Europe\" model, which combines weather forecasts, gas, neighbouring markets, the British price and available nuclear capacity. Forecasts are then compared with the price set by the market.",
     o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
     maj: "Site updated {d}",
     prix_du: "Prices for {d}",
