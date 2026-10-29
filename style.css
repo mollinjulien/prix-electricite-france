@@ -20,6 +20,8 @@
   --s-gt: #1baf7a;
   --s-sol: #c28a00;
   --s-eol: #7b5bd6;
+  --s-sol-reel: #7a5200; --s-sol-rte: #e8c46a;     /* dégradé onglet Production : réel foncé, notre prévision, RTE clair */
+  --s-eol-reel: #3f2696; --s-eol-rte: #b9a8f0;
   --bande: rgba(42, 120, 214, 0.12);
   --ok: #0ca30c;
   --alerte: #fab219;
@@ -38,6 +40,7 @@
     --surbrillance: rgba(57, 135, 229, 0.18);
     --s-em: #e8618f; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
     --s-sol: #c08a0c; --s-eol: #9479e6;
+    --s-sol-reel: #f5cc55; --s-sol-rte: #9a7426; --s-eol-reel: #cbbcff; --s-eol-rte: #6c58a8;
     --ok-texte: #0ca30c;
     --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
     --ecart-rgb: 240, 239, 236;
@@ -50,6 +53,7 @@
   --surbrillance: rgba(57, 135, 229, 0.18);
   --s-em: #e8618f; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
   --s-sol: #c08a0c; --s-eol: #9479e6;
+    --s-sol-reel: #f5cc55; --s-sol-rte: #9a7426; --s-eol-reel: #cbbcff; --s-eol-rte: #6c58a8;
   --ok-texte: #0ca30c;
   --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
   --ecart-rgb: 240, 239, 236;
@@ -365,5 +369,7 @@ details.compact summary { cursor: pointer; }
 .pied .mentions { font-size: 0.78rem; color: var(--muted); }
 
 /* prévision RTE (onglet Production) : trait pointillé dans les cases à cocher, colonne discrète dans les tableaux */
-.trait-rte { display: inline-block; width: 18px; height: 0; border-top: 2px dotted var(--ink); margin-right: 6px; vertical-align: middle; }
+.trait-rte { display: inline-block; width: 18px; height: 0; border-top: 2px dotted var(--ink-2); margin-right: 6px; vertical-align: middle; }
+.trait { display: inline-block; width: 16px; height: 0; border-top: 2px solid currentColor; margin-right: 5px; vertical-align: middle; }
+.trait.tirets { border-top-style: dashed; } .trait.points { border-top-style: dotted; border-top-width: 3px; } .trait.plein { border-top-width: 3px; }
 .table-donnees td.faible { color: var(--ink-2); }

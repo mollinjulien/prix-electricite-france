@@ -1139,6 +1139,7 @@ function ficheProduction(cle) {
     + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${["gfs", "prod", "capa", "registre"].map(lienSource).join("")}</ul></div></div>`;
 }
 const TECHS = [{ k: "sol", c: "--s-sol", lib: "sol_court", prevu: "sol_prevu", reel: "sol_reel", rte: "sol_rte" }, { k: "eol", c: "--s-eol", lib: "eol_court", prevu: "eol_prevu", reel: "eol_reel", rte: "eol_rte" }];
+const trait = (couleur, style) => `<span class="trait ${style}" style="color:${css(couleur)}" aria-hidden="true"></span>`;   // réel : plein, foncé ; nous : tirets ; RTE : points, clair
 const pastTech = (x) => `<span class="pastille" style="color:${css(x.c)}"></span>`;
 function choixProd(id) {                                             // cases Solaire / Éolien de l'onglet Production (un seul état pour tout l'onglet)
   const el = $(id);
@@ -1157,7 +1158,7 @@ function rendreProduction() {
   if (!js.length) { $("prod-tuiles").innerHTML = `<p class="note">${t("pas_de_prod")}</p>`; return; }
   for (const id of ["prod-choix-demain", "prod-choix", "prod-choix-regions", "prod-choix-hist"]) choixProd(id);
   const vus = TECHS.filter((x) => etat.prodVisibles[x.k]), deux = vus.length === 2, rteOn = etat.prodVisibles.rte;
-  const RTE_DS = { borderDash: [2, 3], borderWidth: 1.8 };
+  const RTE_DS = { borderDash: [2, 3], borderWidth: 2.2 };
   // 1) production prévue du prochain jour (demain après 10 h)
   const A = joursAccueil(), jd = A.jHaut && A.jHaut.prod ? A.jHaut : js[js.length - 1], pd = jd.prod;
   $("prod-demain-titre").textContent = t("prod_demain", { d: dateLongue(jd.jour) });
@@ -1167,7 +1168,7 @@ function rendreProduction() {
   const rd = (k) => (aR(pd, k) ? somme(pd[k + "_rte"]) : null);
   $("prod-demain-tuiles").innerHTML = vus.map((x) => tuileSimple(pastTech(x) + t(x.prevu), somme(pd[x.k]), rd(x.k))).join("") + (deux ? tuileSimple(t("total_court"), somme(pd.sol) + somme(pd.eol), aR(pd, "sol") && aR(pd, "eol") ? rd("sol") + rd("eol") : null) : "");
   const dsD = vus.map((x) => dsProd(t(x.prevu), pd[x.k], x.c));
-  for (const x of vus) if (aR(pd, x.k)) dsD.push(dsProd(t(x.rte), pd[x.k + "_rte"], x.c, RTE_DS));
+  for (const x of vus) if (aR(pd, x.k)) dsD.push(dsProd(t(x.rte), pd[x.k + "_rte"], x.c + "-rte", RTE_DS));
   dessiner("prod-g-demain", { type: "line", data: { labels: pd.heures, datasets: dsD }, options: optionsGW(12, "GW"), plugins: [curseur] });
   // 2) contrôle : prévu contre réel, jour au choix (par défaut le dernier jour dont la production réelle est complète)
   const complets = js.filter((x) => x.prod.reel_complet);
@@ -1182,8 +1183,8 @@ function rendreProduction() {
   if (deux) T.push(tuileProd(t("total_court"), tp_("sol") + tp_("eol"), tr_("sol") !== null && tr_("eol") !== null ? tr_("sol") + tr_("eol") : null, Math.min(nConnus(p.sol_reel), nConnus(p.eol_reel)), nT));
   $("prod-tuiles").innerHTML = T.join("");
   const ds = vus.map((x) => dsProd(t(x.prevu), p[x.k], x.c, { borderDash: [6, 4] }));
-  for (const x of vus) if (p[x.k + "_reel"]) ds.push(dsProd(t(x.reel) + " (RTE)", p[x.k + "_reel"], x.c, { borderWidth: 3 }));
-  for (const x of vus) if (aR(p, x.k)) ds.push(dsProd(t(x.rte), p[x.k + "_rte"], x.c, RTE_DS));
+  for (const x of vus) if (p[x.k + "_reel"]) ds.push(dsProd(t(x.reel) + " (RTE)", p[x.k + "_reel"], x.c + "-reel", { borderWidth: 3 }));
+  for (const x of vus) if (aR(p, x.k)) ds.push(dsProd(t(x.rte), p[x.k + "_rte"], x.c + "-rte", RTE_DS));
   const ch = dessiner("prod-g-jour", { type: "line", data: { labels: p.heures, datasets: ds }, options: optionsGW(12, "GW"), plugins: [curseur] });
   $("prod-g-jour").setAttribute("aria-label", dateLongue(j.jour));
   const v = (a, k) => (a ? nombre(a[k]) : "–");
@@ -1192,7 +1193,7 @@ function rendreProduction() {
   const ar = rteOn, nc = ar ? 4 : 3;
   const cRte = (x, k) => (ar ? `<td class="faible">${v(p[x.k + "_rte"], k)}</td>` : "");
   let h = `<thead><tr><th rowspan="2">${t("heure")}</th>${vus.map((x) => `<th colspan="${nc}" class="groupe modele">${pastTech(x)} ${t(x.lib)}</th>`).join("")}</tr>`
-    + `<tr>${vus.map(() => `<th class="groupe">${t("p_prevu")}</th>${ar ? `<th>${t("p_rte")}</th>` : ""}<th>${t("p_reel")}</th><th>${t("ecart")}</th>`).join("")}</tr></thead><tbody>`;
+    + `<tr>${vus.map((x) => `<th class="groupe">${trait(x.c, "tirets")}${t("p_prevu")}</th>${ar ? `<th>${trait(x.c + "-rte", "points")}${t("p_rte")}</th>` : ""}<th>${trait(x.c + "-reel", "plein")}${t("p_reel")}</th><th>${t("ecart")}</th>`).join("")}</tr></thead><tbody>`;
   p.heures.forEach((lab, k) => {
     h += `<tr data-i="${k}"><td>${lab}</td>` + vus.map((x) => `<td class="groupe">${v(p[x.k], k)}</td>${cRte(x, k)}<td class="reel">${v(p[x.k + "_reel"], k)}</td><td>${ec(p[x.k], p[x.k + "_reel"], k)}</td>`).join("") + "</tr>";
   });
@@ -1246,7 +1247,7 @@ function rendreProduction() {
     const carte = $("prod-carte-h-" + x.k);
     carte.hidden = !etat.prodVisibles[x.k];
     if (carte.hidden) { effacer("prod-h-" + x.k); continue; }
-    dessiner("prod-h-" + x.k, { type: "line", data: { labels: lab, datasets: [dsProd(t(x.prevu), js.map((y) => somme(y.prod[x.k])), x.c, { pointRadius: 2, borderDash: [6, 4] }), dsProd(t(x.reel) + " (RTE)", js.map((y) => totJ(y, x.k + "_reel")), x.c, { pointRadius: 2, borderWidth: 3 })].concat(rteOn ? [dsProd(t(x.rte), js.map((y) => totJ(y, x.k + "_rte")), x.c, { pointRadius: 0, ...RTE_DS })] : []) }, options: optionsGW(8, "GWh"), plugins: [curseur] });
+    dessiner("prod-h-" + x.k, { type: "line", data: { labels: lab, datasets: [dsProd(t(x.prevu), js.map((y) => somme(y.prod[x.k])), x.c, { pointRadius: 2, borderDash: [6, 4] }), dsProd(t(x.reel) + " (RTE)", js.map((y) => totJ(y, x.k + "_reel")), x.c + "-reel", { pointRadius: 2, borderWidth: 3 })].concat(rteOn ? [dsProd(t(x.rte), js.map((y) => totJ(y, x.k + "_rte")), x.c + "-rte", { pointRadius: 0, ...RTE_DS })] : []) }, options: optionsGW(8, "GWh"), plugins: [curseur] });
   }
   $("prod-hist-cartes").classList.toggle("une", !deux);
 }
