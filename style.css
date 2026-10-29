@@ -328,3 +328,16 @@ details.compact summary { cursor: pointer; }
 .pied .auteur { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-bottom: 8px; font-size: 0.9rem; color: var(--ink-2); }
 .pied .auteur-nom { font-weight: 600; color: var(--ink); }
 .pied p { margin: 0; }
+
+/* contact (bas de page) */
+.pied .contact { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px 24px; padding: 18px 20px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.contact-qui { display: flex; flex-direction: column; gap: 2px; }
+.contact-titre { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.contact-nom { font-size: 1.1rem; font-weight: 600; color: var(--ink); }
+.contact-liens { display: flex; flex-wrap: wrap; gap: 10px; }
+.contact-lien { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px; color: var(--ink); text-decoration: none; font-size: 0.88rem; transition: background 0.15s, border-color 0.15s; }
+.contact-lien:hover { background: var(--wash); border-color: var(--axis); }
+.contact-lien.linkedin svg { color: #0a66c2; }
+:root[data-theme="dark"] .contact-lien.linkedin svg { color: #4d9de0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .contact-lien.linkedin svg { color: #4d9de0; } }
+.pied .mentions { font-size: 0.78rem; color: var(--muted); }
