@@ -88,7 +88,7 @@ const TXT = {
       ["Vers 11 h 30, la veille", "Mise à jour des données : prix des jours passés en France et chez les voisins, consommation et prévision de consommation de RTE, production régionale récente, prix du gaz, échanges aux frontières (JAO), consommation prévue des voisins et avis d'indisponibilité des réacteurs nucléaires (ENTSO-E), prix britannique de demain (Nord Pool, publié vers 11 h)."],
       ["Météo de demain", "Téléchargement du dernier run de minuit du modèle météo GFS (NOAA) : rayonnement, vent à 100 m, température, nuages, pression sur la France."],
       ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région (utilisée par le modèle « GFS-G-P »)."],
-      ["Prix horaire", "Tous les modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain. Le modèle Europe est publié comme principal ; s'il lui manque des données, c'est le premier secours disponible qui le remplace."],
+      ["Prix horaire", "Tous les modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain. Depuis le 30/10/2026 le modèle publié est la moyenne EM ; s'il lui manque des données, le premier niveau disponible de la chaîne EM, EP, EU, GB, GR le remplace."],
       ["Quart d'heure", "Un second modèle répartit chaque heure en quatre quarts d'heure (le prix varie dans l'heure, surtout matin et soir)."],
       ["Publication", "Le site est mis à jour vers 11 h 45, avant l'enchère de 12 h 45."],
       ["Vers 13 h 45", "Le prix fixé par le marché est récupéré : le site ajoute la courbe réelle et calcule les écarts."],
@@ -199,12 +199,19 @@ const TXT = {
       "Ce qu'il a appris quand le gaz était bon marché reste ainsi valable quand il est cher : les effets du vent ou du soleil deviennent des pourcentages du prix. Conséquence : il réagit plus fort au vent. Très bon le 23/10/2026, quand le prix s'est effondré toute la journée ; moins bon le 21/10, quand seul l'après-midi s'est effondré.",
     ],
     gt_table: [["Prix du gaz TTF", "Coût de l'électricité d'une centrale à gaz"], ["10 €/MWh (2020)", "18 €/MWh"], ["35 €/MWh (2025)", "64 €/MWh"], ["90 €/MWh (octobre 2026)", "164 €/MWh"]],
+    nom_EM: "Moyenne de 4 modèles Europe (EU, P, Q, F : surplus avec notre production, météo du run de 6 h)",
+    nom_EP: "Moyenne de 2 modèles Europe (EU + surplus avec notre production)",
     nom_EU: "Modèle Europe : prévisions GFS + gaz + marchés voisins + prix britannique + surplus d'électricité",
     nom_EUC: "Modèle Europe complet : Europe + capacités d'échange du jour + nucléaire indisponible",
     nom_GB: "Prévisions GFS + gaz + prix des voisins de la veille + prix britannique",
-    court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
-    tag_s1: "secours n°1", tag_s2: "secours n°2", tag_s3: "secours n°3", tag_ancien: "ancien",
-    f_EU: ["Le modèle principal depuis le 29/10/2026. Il part de « GFS + gaz » (météo GFS, consommation RTE, calendrier, prix passés, gaz) et regarde aussi chez les voisins : leurs prix de la veille (Allemagne, Belgique, Espagne, Italie, Suisse), les échanges aux frontières (JAO), leur consommation prévue (ENTSO-E) et le prix britannique du jour visé, fixé vers 11 h par une enchère qui a lieu avant la nôtre.",
+    court_EM: "EUR-moy4", court_EP: "EUR-moy2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
+    tag_s1: "secours n°1", tag_s2: "secours n°2", tag_s3: "secours n°3", tag_s4: "dernier recours", tag_suivi: "suivi", tag_ancien: "ancien",
+    f_EM: ["Le modèle principal depuis le 30/10/2026 : la moyenne de quatre variantes du modèle Europe, toutes réapprises chaque matin. EU : le modèle Europe d'origine. P : EU dont le « surplus » est calculé avec NOTRE prévision de production solaire et éolienne au lieu des indicateurs météo bruts. Q : EU avec les deux surplus. F : EU avec la météo du run GFS de 6 h UTC (publié vers 10 h 45), plus récent de 6 h que le run de 0 h.",
+           "Pourquoi une moyenne : les quatre variantes se trompent un peu différemment, et la moyenne efface une partie de ces erreurs. Il n'y a pas de modèle plus malin, juste moins de bruit.",
+           "Test sur 2026 (301 jours, réappris chaque jour) : 13,29 €/MWh d'erreur moyenne à l'heure contre 13,60 pour EU seul (gain 0,30 [0,18 ; 0,43], mieux 63 % des jours). Sur les 48 jours d'OpenWindCast : 17,3 contre 17,6. Si le run de 6 h manque, le service publie EP."],
+    f_EP: ["Premier secours : la moyenne de deux variantes, EU et P (surplus calculé avec notre production prévue). Il ne dépend pas du run de 6 h, donc il prend la main si ce run n'est pas encore publié.",
+           "Test sur 2026 : 13,35 €/MWh contre 13,60 pour EU (gain 0,25 [0,11 ; 0,40], mieux 60 % des jours)."],
+    f_EU: ["Modèle principal du 29/10/2026, aujourd'hui secours n°2 et composante des moyennes EM et EP. Il part de « GFS + gaz » (météo GFS, consommation RTE, calendrier, prix passés, gaz) et regarde aussi chez les voisins : leurs prix de la veille (Allemagne, Belgique, Espagne, Italie, Suisse), les échanges aux frontières (JAO), leur consommation prévue (ENTSO-E) et le prix britannique du jour visé, fixé vers 11 h par une enchère qui a lieu avant la nôtre.",
            "Variable clé : le « surplus » = nucléaire disponible (avis d'indisponibilité connus la veille à 11 h) + vent + soleil prévus − consommation prévue. Quand il est grand, la France doit exporter beaucoup et le prix s'effondre. Comme GFS-RG, le prix est appris rapporté au coût du gaz.",
            "Test sur 2026 (301 jours, réappris chaque jour) : 13,6 €/MWh d'erreur moyenne à l'heure, contre 19,2 pour « GFS + gaz » et 27,9 pour la veille. Sur les 48 jours où OpenWindCast publie ses erreurs : 17,8 contre 17,6 (égalité, écart non significatif)."],
     f_EUC: ["La version complète du modèle Europe : 13 variables de plus (capacités d'échange maximales du jour visé publiées par JAO, capacités vers l'Espagne, l'Italie et la Suisse, nucléaire indisponible seul).",
@@ -447,12 +454,19 @@ const TXT = {
       "What it learned when gas was cheap thus still applies when gas is expensive: the effects of wind or sun become percentages of the price. As a result it reacts more strongly to wind. Very good on 23/10/2026, when the price collapsed all day; worse on 21/10, when only the afternoon collapsed.",
     ],
     gt_table: [["TTF gas price", "Electricity cost of a gas plant"], ["10 €/MWh (2020)", "18 €/MWh"], ["35 €/MWh (2025)", "64 €/MWh"], ["90 €/MWh (October 2026)", "164 €/MWh"]],
+    nom_EM: "Average of 4 Europe models (EU, P, Q, F: surplus from our production forecast, 6 h GFS run)",
+    nom_EP: "Average of 2 Europe models (EU + surplus from our production forecast)",
     nom_EU: "Europe model: GFS forecasts + gas + neighbouring markets + British price + power surplus",
     nom_EUC: "Full Europe model: Europe + transfer capacities of the day + unavailable nuclear",
     nom_GB: "GFS forecasts + gas + neighbours' prices of the day before + British price",
-    court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
-    tag_s1: "fallback 1", tag_s2: "fallback 2", tag_s3: "fallback 3", tag_ancien: "past",
-    f_EU: ["The main model since 29/10/2026. It starts from \"GFS + gas\" (GFS weather, RTE load, calendar, past prices, gas) and also looks next door: neighbours' prices of the day before (Germany, Belgium, Spain, Italy, Switzerland), cross-border flows (JAO), their load forecasts (ENTSO-E) and the British price of the target day, set around 11:00 by an auction held before ours.",
+    court_EM: "EUR-avg4", court_EP: "EUR-avg2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
+    tag_s1: "fallback 1", tag_s2: "fallback 2", tag_s3: "fallback 3", tag_s4: "last resort", tag_suivi: "tracked", tag_ancien: "past",
+    f_EM: ["The main model since 30/10/2026: the average of four variants of the Europe model, all retrained every morning. EU: the original Europe model. P: EU whose \"surplus\" is computed with OUR solar and wind production forecast instead of raw weather indicators. Q: EU with both surpluses. F: EU with the weather of the 06 UTC GFS run (published around 10:45), six hours fresher than the 00 UTC run.",
+           "Why an average: the four variants err a little differently, and averaging cancels part of those errors. No smarter model, just less noise.",
+           "2026 test (301 days, retrained daily): 13.29 €/MWh mean hourly error versus 13.60 for EU alone (gain 0.30 [0.18; 0.43], better on 63% of days). On the 48 OpenWindCast days: 17.3 versus 17.6. If the 6 h run is missing, the service publishes EP."],
+    f_EP: ["First fallback: the average of two variants, EU and P (surplus computed with our production forecast). It does not depend on the 6 h run, so it takes over when that run is not yet published.",
+           "2026 test: 13.35 €/MWh versus 13.60 for EU (gain 0.25 [0.11; 0.40], better on 60% of days)."],
+    f_EU: ["Main model from 29/10/2026, now fallback 2 and a component of the EM and EP averages. It starts from \"GFS + gas\" (GFS weather, RTE load, calendar, past prices, gas) and also looks next door: neighbours' prices of the day before (Germany, Belgium, Spain, Italy, Switzerland), cross-border flows (JAO), their load forecasts (ENTSO-E) and the British price of the target day, set around 11:00 by an auction held before ours.",
            "Key variable: the \"surplus\" = available nuclear (outage notices known at 11:00 the day before) + forecast wind + sun − forecast load. When it is large, France must export a lot and the price collapses. Like GFS-RG, the price is learnt relative to the cost of gas.",
            "2026 test (301 days, retrained daily): 13.6 €/MWh mean hourly error, versus 19.2 for \"GFS + gas\" and 27.9 for the day before. On the 48 days for which OpenWindCast publishes its errors: 17.8 versus 17.6 (a tie, not significant)."],
     f_EUC: ["The full version of the Europe model: 13 more variables (maximum exchanges of the target day published by JAO, transfer capacities to Spain, Italy and Switzerland, unavailable nuclear on its own).",
@@ -501,10 +515,12 @@ const TXT = {
 };
 
 const MODELES = [                                                     // modèles en service depuis le 29/10/2026 : principal puis secours
-  { code: "EU", couleur: "--s-eu", tirets: null, tag: "tag_principal" },
-  { code: "EUC", couleur: "--s-euc", tirets: [6, 4], tag: "tag_s1" },
-  { code: "GB", couleur: "--s-gb", tirets: [2, 3], tag: "tag_s2" },
-  { code: "GR", couleur: "--s-gr", tirets: null, tag: "tag_s3" },
+  { code: "EM", couleur: "--s-em", tirets: null, tag: "tag_principal" },
+  { code: "EP", couleur: "--s-ep", tirets: [6, 4], tag: "tag_s1" },
+  { code: "EU", couleur: "--s-eu", tirets: null, tag: "tag_s2" },
+  { code: "GB", couleur: "--s-gb", tirets: [2, 3], tag: "tag_s3" },
+  { code: "GR", couleur: "--s-gr", tirets: null, tag: "tag_s4" },
+  { code: "EUC", couleur: "--s-euc", tirets: [6, 4], tag: "tag_suivi" },
 ];
 const MODELES_ANCIENS = [                                             // toujours calculés, montrés dans l'onglet « Anciens modèles »
   { code: "CR", couleur: "--s-cr", tirets: null, tag: "tag_ancien" },
@@ -512,7 +528,7 @@ const MODELES_ANCIENS = [                                             // toujour
 ];
 const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourHist: null, modeHist: "jour", plage: { preset: "7", debut: null, fin: null },
-               visibles: { EU: true, EUC: true, GB: false, GR: false, CR: true, GT: true, hier: false, bande: true },
+               visibles: { EM: true, EP: false, EU: true, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: false, bande: true },
                prodVisibles: { sol: true, eol: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
@@ -1217,7 +1233,7 @@ function lienSource(id) {
   const s = t("src").find((x) => x[0] === id);
   return `<li><a href="#sources">${s[1]}</a> : ${s[2]}${s[4].length ? " · " + s[4].map(([lib, url]) => `<a href="${url}" target="_blank" rel="noopener">${lib}</a>`).join(" · ") : ""}</li>`;
 }
-const ARBRES_EUROPE = { EU: 721, EUC: 228, GB: 1064 };
+const ARBRES_EUROPE = { EM: 3493, EP: 2026, EU: 721, EUC: 228, GB: 1064 };
 function detailsModele(code) {
   const europe = code in ARBRES_EUROPE, relatif = europe || code === "GT";
   const groupes = [t("v_cal"), relatif ? t("v_prix_gaz") : t("v_prix"), code === "CR" ? t("v_fond_prod") : t("v_fond"), t("v_gaz")];
