@@ -265,3 +265,7 @@ main { padding-bottom: 24px; }
   .bloc-jour.second { margin-top: 40px; }
   .titre-jour h2 { font-size: 1.25rem; }
 }
+
+.choix-modele { display: inline-flex; align-items: center; gap: 8px; }
+.choix-modele select { font: inherit; color: var(--ink); background: var(--surface, transparent); border: 1px solid var(--axis); border-radius: 8px; padding: 5px 10px; max-width: 100%; }
+.bloc-jour .navigation-jour { margin: 0 0 14px; }

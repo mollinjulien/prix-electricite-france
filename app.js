@@ -5,7 +5,7 @@ const TXT = {
   fr: {
     titre: "Prix de l'électricité de demain en France",
     sous_titre: "Chaque matin, nos modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Le modèle principal est la moyenne de quatre variantes du modèle « Europe », qui combine prévisions météo, gaz, marchés voisins, prix britannique et nucléaire disponible. Les prévisions sont ensuite comparées au prix fixé par le marché.",
-    o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
+    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
     maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
@@ -260,7 +260,7 @@ const TXT = {
   en: {
     titre: "Tomorrow's electricity price in France",
     sous_titre: "Every morning, our machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. The main model is the average of four variants of the \"Europe\" model, which combines weather forecasts, gas, neighbouring markets, the British price and available nuclear capacity. Forecasts are then compared with the price set by the market.",
-    o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
+    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
     maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
@@ -527,8 +527,8 @@ const MODELES_ANCIENS = [                                             // toujour
   { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: "tag_ancien" },
 ];
 const TOUS = MODELES.concat(MODELES_ANCIENS);
-const etat = { d: null, langue: "fr", onglet: "prevision", jourHist: null, modeHist: "jour", plage: { preset: "7", debut: null, fin: null },
-               visibles: { EM: true, EP: false, EU: true, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: false, bande: true },
+const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, modelePrev: null,
+               visibles: { EM: true, EP: true, EU: true, EUC: true, GB: true, GR: true, CR: true, GT: true, hier: false, bande: true },
                prodVisibles: { sol: true, eol: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
@@ -570,7 +570,7 @@ const jours = () => etat.d.jours;
 const joursAvecPrix = () => jours().filter((j) => j.reel);
 const jourDe = (iso) => jours().find((j) => j.jour === iso);
 const modelesDuJour = (j) => MODELES.filter((m) => j[m.code]);
-const visibles = (j) => modelesDuJour(j).filter((m) => etat.visibles[m.code]);
+const visibles = (j) => TOUS.filter((m) => j[m.code] && etat.visibles[m.code]);
 const colonnes = (j) => visibles(j).map((m) => m.code).concat(etat.visibles.hier ? ["hier"] : []);   // séries cochées d'un jour, repère « veille » compris
 function meilleur(j, parmi) {                                        // modèle à la plus petite erreur moyenne du jour (parmi les modèles en service, ou la liste `parmi`)
   const c = modelesDuJour(j).map((m) => m.code).filter((k) => j.erreurs && j.erreurs[k] && (!parmi || parmi.includes(k)));
@@ -871,152 +871,71 @@ function tablePrix(id, s, j) {                                       // tableau 
   $(id).innerHTML = h;
   collerEntetes($(id));
 }
-function rendreBloc(cote, iso, j, now) {
-  const p = "p-" + cote, el = $("prev-" + cote), badge = badgeJour(iso, now);
-  const tete = (extra) => `<div class="titre-jour"><h2>${t("prix_du", { d: dateLongue(iso) })}</h2><span class="badge${badge === "b_demain" ? " fort" : ""}">${t(badge)}</span>${extra}</div>`;
+const SEL_VIDE = () => Object.fromEntries(TOUS.map((m) => [m.code, false]).concat([["hier", false], ["bande", false]]));
+const modeleParDefaut = (j) => (j.principal && j[j.principal] ? j.principal : (TOUS.find((m) => j[m.code]) || {}).code);
+const modelesDispos = (j) => TOUS.filter((m) => j[m.code]);
+function rendreBloc(cote, iso, j, now) {                              // un seul graphique : le modèle choisi (par défaut le principal du jour) et le marché
+  const sauv = etat.visibles;
+  try {
+    if (j) { const sel = etat.modelePrev && j[etat.modelePrev] ? etat.modelePrev : modeleParDefaut(j); etat.visibles = { ...SEL_VIDE(), [sel]: true }; }
+    rendreBlocJour(cote, iso, j, now);
+  } finally { etat.visibles = sauv; }
+}
+function navigationJour(iso) {
+  const js = jours(), premier = js[0].jour, dernier = js[js.length - 1].jour, A = joursAccueil(), max = dernier > A.haut ? dernier : A.haut;
+  return `<div class="navigation-jour"><button type="button" id="prev-prec" class="bouton" aria-label="${t("jour_prec")}"${iso <= premier ? " disabled" : ""}>‹</button>`
+    + `<input type="date" id="prev-date" aria-label="Date" min="${premier}" max="${max}" value="${iso}">`
+    + `<button type="button" id="prev-suiv" class="bouton" aria-label="${t("jour_suiv")}"${iso >= max ? " disabled" : ""}>›</button></div>`;
+}
+function lierNavigation(iso) {
+  const A = joursAccueil(), js = jours(), max = js[js.length - 1].jour > A.haut ? js[js.length - 1].jour : A.haut;
+  $("prev-date").addEventListener("change", (e) => { const v = e.target.value; if (v && v >= js[0].jour && v <= max) ouvrirJour(v); });
+  $("prev-prec").addEventListener("click", () => ouvrirJour(ajouterJours(iso, -1)));
+  $("prev-suiv").addEventListener("click", () => ouvrirJour(ajouterJours(iso, 1)));
+}
+function rendreBlocJour(cote, iso, j, now) {
+  const p = "p-" + cote, el = $("prev-" + cote), badge = badgeJour(iso, now), nav = navigationJour(iso);
+  const tete = (extra) => `<div class="titre-jour"><h2>${t("prix_du", { d: dateLongue(iso) })}</h2><span class="badge${badge === "b_demain" ? " fort" : ""}">${t(badge)}</span>${extra}</div>${nav}`;
   if (!j) {
     effacer(p + "-graphique");
-    el.innerHTML = tete(`<span class="badge">${t("b_calcul")}</span>`)
-      + `<div class="carte"><h3 class="petit-titre">${t("etapes_titre")}</h3><div class="etapes-jour">${etapesAttente(ajouterJours(iso, -1))}</div><p class="note">${t("attente_d")}</p></div>`;
+    el.innerHTML = tete(iso > now.date ? `<span class="badge">${t("b_calcul")}</span>` : "")
+      + (iso > now.date ? `<div class="carte"><h3 class="petit-titre">${t("etapes_titre")}</h3><div class="etapes-jour">${etapesAttente(ajouterJours(iso, -1))}</div><p class="note">${t("attente_d")}</p></div>` : `<div class="carte"><p class="note">${t("pas_de_reel")}</p></div>`);
+    lierNavigation(iso);
     return;
   }
-  const etapes = `<div class="etapes-jour">${etapesJour(j)}</div>`;
-  el.innerHTML = tete(j.reel ? `<span class="badge">${t("b_reel")}</span>` : "")
-    + (cote === "haut" ? `<div class="carte"><h3 class="petit-titre">${t("etapes_titre")}</h3>${etapes}</div>`
-                       : `<details class="carte replie" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary class="petit-titre">${t("etapes_voir")}</summary>${etapes}</details>`)
+  const etapes = j.controles && Object.keys(j.controles).length ? `<div class="etapes-jour">${etapesJour(j)}</div>` : "";
+  const bloc = !etapes ? "" : badge === "b_demain"
+    ? `<div class="carte"><h3 class="petit-titre">${t("etapes_titre")}</h3>${etapes}</div>`
+    : `<details class="carte replie" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary class="petit-titre">${t("etapes_voir")}</summary>${etapes}</details>`;
+  el.innerHTML = tete(j.reel ? `<span class="badge">${t("b_reel")}</span>` : "") + bloc
     + `<div class="tuiles">${tuilesJour(j)}</div>`
     + `<div class="carte"><div class="barre-outils"><h3 class="petit-titre">${t("prix_du_jour")}</h3><div class="segments" id="${p}-pas" role="group"></div></div>`
     + `<div class="choix" id="${p}-choix"></div>`
     + `<div class="duo"><div class="cadre-table"><table id="${p}-table" class="table-donnees"></table></div>`
     + `<div class="graphique"><canvas id="${p}-graphique" role="img" aria-label="${t("prix_du", { d: dateLongue(iso) })}"></canvas></div></div>`
     + `<p class="note">${t(j.reel ? "note_prev_reel" : "note_prev_attente")}</p></div>`;
+  lierNavigation(iso);
   const det = $(p + "-details");
   if (det) det.addEventListener("toggle", () => { etat.etapesOuvertes = det.open; });
   segments(p + "-pas", [["quart", t("p_quart")], ["heure", t("p_heure")]], etat.pasPrev[cote], (v) => { etat.pasPrev[cote] = v; rendreBloc(cote, iso, j, maintenantParis()); });
-  const s = series(j, etat.pasPrev[cote]);
-  choixModeles(p + "-choix", modelesDuJour(j).map((m) => m.code), legendeJour(s));
+  const s = series(j, etat.pasPrev[cote]), sel = modeleParDefaut(j) && etat.visibles ? Object.keys(etat.visibles).find((c) => etat.visibles[c]) : null;
+  const options_ = modelesDispos(j).map((m) => `<option value="${m.code}"${m.code === sel ? " selected" : ""}>${courtModele(m.code)} · ${nomModele(m.code)}${m.code === j.principal ? " (" + t("tag_principal") + ")" : ""}</option>`).join("");
+  $(p + "-choix").innerHTML = `<label class="choix-modele"><span class="choix-titre">${t("modele_aff")}</span><select id="${p}-modele">${options_}</select></label>`
+    + (s.reel ? `<span class="choix-legende"><span class="choix-fixe">${pastille("reel")}${t("marche")}</span></span>` : "");
+  $(p + "-modele").addEventListener("change", (e) => { etat.modelePrev = e.target.value; rendreBloc(cote, iso, j, maintenantParis()); });
   tablePrix(p + "-table", s, j);
   lier(dessiner(p + "-graphique", { type: "line", data: { labels: s.labels, datasets: dsJour(s, j) }, options: options(13), plugins: [curseur] }), p + "-table");
 }
 function rendrePrevision() {
   const A = joursAccueil();
-  etat.cleAccueil = A.haut + (A.jHaut ? "+" : "-");
+  const iso = etat.jourPrev && jourDe(etat.jourPrev) ? etat.jourPrev : A.haut;
+  etat.cleAccueil = A.haut + (A.jHaut ? "+" : "-") + "|" + (etat.jourPrev || "");
   const bandeau = $("bandeau-retard");
-  bandeau.hidden = Boolean(A.jHaut) || (A.haut !== A.now.date && A.now.hm < "12:15");
+  bandeau.hidden = iso !== A.haut || Boolean(A.jHaut) || (A.haut !== A.now.date && A.now.hm < "12:15");
   if (!bandeau.hidden) bandeau.textContent = "⚠ " + t("retard", { d: dateLongue(A.haut) });
   $("maj").textContent = t("maj", { d: new Date(etat.d.maj).toLocaleString(loc(), { dateStyle: "long", timeStyle: "short" }) });
-  rendreBloc("haut", A.haut, A.jHaut, A.now);
-  if (A.jBas) rendreBloc("bas", A.jBas.jour, A.jBas, A.now); else $("prev-bas").innerHTML = "";
+  rendreBloc("haut", iso, jourDe(iso), A.now);
 }
-
-/* ---------------------------------------------------------------- onglet Historique */
-function rendreHistorique() {
-  segments("hist-mode", [["jour", t("m_jour")], ["plage", t("m_plage")], ["perf", t("o_performance")]], etat.modeHist,
-    (v) => { location.hash = v === "plage" ? "#historique/plage" : v === "perf" ? "#historique/performance" : "#historique/" + (etat.jourHist || ""); });
-  $("hist-jour").hidden = etat.modeHist !== "jour";
-  $("hist-plage").hidden = etat.modeHist !== "plage";
-  $("hist-perf").hidden = etat.modeHist !== "perf";
-  if (etat.modeHist === "jour") rendreJour(); else if (etat.modeHist === "plage") rendrePlage(); else rendrePerformance();
-}
-
-function rendreJour() {
-  const js = jours();
-  if (!etat.jourHist || !jourDe(etat.jourHist)) { const a = joursAvecPrix(); etat.jourHist = (a.length ? a[a.length - 1] : js[js.length - 1]).jour; }
-  const j = jourDe(etat.jourHist), i = js.indexOf(j);
-  const inp = $("hist-date");
-  inp.min = js[0].jour; inp.max = js[js.length - 1].jour; inp.value = j.jour;
-  $("hist-prec").disabled = i === 0; $("hist-suiv").disabled = i === js.length - 1;
-  $("hist-badge").textContent = `${dateLongue(j.jour)} · ${t(j.source === "direct" ? "source_direct" : "source_rejeu")}`;
-  const cols = colonnes(j), b = meilleur(j), T = [];
-  if (j.reel) T.push(tuile(pastille("reel") + t("marche_moyen"), enEuros(moyenne(j.reel)), dateCourte(j.jour)));
-  for (const c of cols) {
-    const m = MODELES.find((x) => x.code === c), e = j.erreurs && j.erreurs[c], lib = pastille(c) + courtModele(c) + (m ? etiquette(m) : "") + etiquetteMeilleur(c === b);
-    T.push(e ? tuile(lib, enEuros(e.mae), t("erreur_biais", { b: signe(e.biais) }) + " · " + t("corr_court", { r: nombre(correlation(j[c], j.reel), 2) }), nomModele(c)) : tuile(lib, enEuros(moyenne(j[c])), t("prix_moyen"), nomModele(c)));
-  }
-  $("hist-tuiles").innerHTML = T.join("");
-  segments("hist-pas", [["quart", t("p_quart")], ["heure", t("p_heure")]], etat.pasHist, (v) => { etat.pasHist = v; rendreJour(); });
-  $("hist-sous-titre").textContent = j.reel ? t(etat.pasHist === "quart" ? "hist_quart" : "hist_heure") : t("pas_de_reel");
-  const s = series(j, etat.pasHist);
-  choixModeles("hist-choix", modelesDuJour(j).map((m) => m.code), s.reel ? [["reel", t("marche")]] : []);
-  let h = `<thead><tr><th rowspan="2">${t("heure")}</th><th rowspan="2">${pastille("reel")} ${t("marche_court")}</th>`
-    + cols.map((c) => `<th colspan="2" class="groupe modele" title="${nomModele(c)}">${pastille(c)} ${courtModele(c)}</th>`).join("") + "</tr><tr>"
-    + cols.map(() => `<th class="groupe">${t("prevu")}</th><th>${t("ecart")}</th>`).join("") + "</tr></thead><tbody>";
-  s.labels.forEach((lab, k) => {
-    const r = s.reel ? s.reel[k] : null;
-    h += `<tr data-i="${k}"><td>${lab}</td><td class="reel">${nombre(r)}</td>` + cols.map((c) => `<td class="groupe">${nombre(s[c][k])}</td>${celluleEcart(s[c][k], r)}`).join("") + "</tr>";
-  });
-  const err = (c) => j.erreurs && j.erreurs[c];                       // erreurs officielles du jour, au quart d'heure (comme les tuiles)
-  h += `</tbody><tfoot><tr><td>${t("moyenne")}</td><td class="reel">${nombre(moyenne(s.reel))}</td>`
-    + cols.map((c) => `<td class="groupe">${nombre(moyenne(s[c]))}</td><td>${err(c) ? signe(err(c).biais) : "–"}</td>`).join("")
-    + `</tr><tr><td>${t("erreur_abs")}</td><td></td>` + cols.map((c) => `<td class="groupe"></td><td>${err(c) ? nombre(err(c).mae) : "–"}</td>`).join("") + "</tr></tfoot>";
-  const tab = $("hist-table");
-  tab.innerHTML = h;
-  collerEntetes(tab);
-  const ds = [];
-  if (s.reel) ds.push(dsMarche(s.reel));
-  for (const m of visibles(j)) ds.push(dsModele(m, s[m.code]));
-  if (etat.visibles.hier) ds.push(dsHier(s.hier));
-  const ch = dessiner("hist-graphique", { type: "line", data: { labels: s.labels, datasets: ds }, options: options(9), plugins: [curseur] });
-  $("hist-graphique").setAttribute("aria-label", dateLongue(j.jour));
-  lier(ch, "hist-table");
-}
-
-function bornesPlage() {
-  const js = jours(), dernier = js[js.length - 1].jour, premier = js[0].jour;
-  if (etat.plage.preset === "perso" && etat.plage.debut && etat.plage.fin) return [etat.plage.debut, etat.plage.fin];
-  if (etat.plage.preset === "tout") return [premier, dernier];
-  const n = etat.plage.preset === "30" ? 30 : 7, debut = ajouterJours(dernier, -(n - 1));
-  return [debut < premier ? premier : debut, dernier];
-}
-function rendrePlage() {
-  segments("plage-presets", [["7", t("p_7")], ["30", t("p_30")], ["tout", t("p_tout")]], etat.plage.preset, (v) => { etat.plage.preset = v; rendrePlage(); });
-  const [a, b] = bornesPlage(), js = jours().filter((j) => j.jour >= a && j.jour <= b);
-  const d1 = $("plage-debut"), d2 = $("plage-fin");
-  for (const el of [d1, d2]) { el.min = jours()[0].jour; el.max = jours()[jours().length - 1].jour; }
-  d1.value = a; d2.value = b;
-  $("plage-sous-titre").textContent = t("plage_titre", { n: js.length, a: dateCourte(a), b: dateCourte(b) });
-  segments("plage-pas", [["heure", t("p_heure")], ["jour", t("p_jour")]], etat.pasPlage, (v) => { etat.pasPlage = v; rendrePlage(); });
-  const codes = MODELES.map((m) => m.code), cols = codes.filter((c) => etat.visibles[c]).concat(etat.visibles.hier ? ["hier"] : []);
-  for (const id of ["plage-choix", "plage-choix2"]) choixModeles(id, codes, [["reel", t("marche")]]);
-  const labels = [], S = { reel: [], ...Object.fromEntries(cols.map((c) => [c, []])) };
-  for (const j of js) {
-    if (etat.pasPlage === "jour") {
-      labels.push(dateCourte(j.jour));
-      S.reel.push(j.reel ? moyenne(j.reel) : null);
-      for (const c of cols) S[c].push(j[c] ? moyenne(j[c]) : null);
-    } else {
-      const s = series(j, "heure"), vide = s.labels.map(() => null);
-      s.labels.forEach((lab) => labels.push(`${dateCourte(j.jour)} ${lab}`));
-      S.reel.push(...(s.reel || vide));
-      for (const c of cols) S[c].push(...(s[c] || vide));
-    }
-  }
-  const style = etat.pasPlage === "jour" ? { pointRadius: 2 } : { borderWidth: 1.5 }, ds = [dsMarche(S.reel)];
-  for (const m of MODELES) if (S[m.code] && S[m.code].some((x) => x !== null)) ds.push(dsModele(m, S[m.code], style));
-  if (etat.visibles.hier) ds.push(dsHier(S.hier, etat.pasPlage === "jour" ? { pointRadius: 2 } : {}));
-  dessiner("plage-graphique", { type: "line", data: { labels, datasets: ds }, options: options(10), plugins: [curseur] });
-  $("plage-graphique").setAttribute("aria-label", $("plage-sous-titre").textContent);
-  let h = `<thead><tr><th rowspan="2">${t("date")}</th><th rowspan="2">${t("source")}</th><th rowspan="2">${pastille("reel")} ${t("marche_moyen")}</th>`
-    + cols.map((c) => `<th colspan="2" class="groupe modele" title="${nomModele(c)}">${pastille(c)} ${courtModele(c)}</th>`).join("") + "</tr><tr>"
-    + cols.map(() => `<th class="groupe">${t("prevu_moyen")}</th><th>${t("erreur_court")}</th>`).join("") + "</tr></thead><tbody>";
-  for (const j of [...js].reverse()) {
-    const best = meilleur(j);
-    h += `<tr data-jour="${j.jour}"><td>${dateMoyenne(j.jour)}</td><td>${t(j.source === "direct" ? "direct" : "rejeu")}</td><td class="reel">${nombre(j.reel ? moyenne(j.reel) : null)}</td>`
-      + cols.map((c) => {
-        const e = j.erreurs && j.erreurs[c];
-        return `<td class="groupe">${nombre(j[c] ? moyenne(j[c]) : null)}</td><td${c === best ? ' class="fort"' : ""}>${e ? nombre(e.mae) : "–"}</td>`;
-      }).join("") + "</tr>";
-  }
-  const avecPrix = js.filter((j) => j.reel);
-  h += `</tbody><tfoot><tr><td>${t("moyenne_periode")}</td><td></td><td class="reel">${nombre(moyenne(avecPrix.map((j) => moyenne(j.reel))))}</td>`
-    + cols.map((c) => { const st = stats(avecPrix, c); return `<td class="groupe">${nombre(moyenne(js.map((j) => (j[c] ? moyenne(j[c]) : null))))}</td><td>${st ? nombre(st.mae) : "–"}</td>`; }).join("")
-    + "</tr></tfoot>";
-  const tab = $("plage-table");
-  tab.innerHTML = h;
-  collerEntetes(tab);
-  tab.querySelectorAll("tbody tr").forEach((r) => r.addEventListener("click", () => ouvrirJour(r.dataset.jour)));
-}
-function ouvrirJour(iso) { etat.jourHist = iso; etat.modeHist = "jour"; location.hash = "#historique/" + iso; }
 
 /* ---------------------------------------------------------------- onglet Performance */
 function rendrePerformance() {
@@ -1263,15 +1182,13 @@ function rendreSources() {
 }
 
 /* ---------------------------------------------------------------- navigation */
-const RENDUS = { prevision: rendrePrevision, historique: rendreHistorique, production: rendreProduction, anciens: rendreAnciens, apropos: () => { rendreModeles(); rendreSources(); } };
-const ANCIENS = { performance: ["historique", "performance"], modeles: ["apropos"], sources: ["apropos"] };       // anciens liens
+const RENDUS = { prevision: rendrePrevision, performance: rendrePerformance, production: rendreProduction, anciens: rendreAnciens, apropos: () => { rendreModeles(); rendreSources(); } };
+const ANCIENS = { historique: ["prevision"], modeles: ["apropos"], sources: ["apropos"] };       // anciens liens
 function lireAncre() {
   let [o, jour] = location.hash.replace("#", "").split("/");
   if (ANCIENS[o]) [o, jour] = ANCIENS[o];
   etat.onglet = RENDUS[o] ? o : "prevision";
-  if (etat.onglet === "historique" && jour === "performance") etat.modeHist = "perf";
-  else if (etat.onglet === "historique" && jour === "plage") etat.modeHist = "plage";
-  else if (etat.onglet === "historique" && jour && etat.d && jourDe(jour)) { etat.jourHist = jour; etat.modeHist = "jour"; }
+  if (etat.onglet === "prevision") etat.jourPrev = jour && etat.d && jourDe(jour) ? jour : etat.jourPrev;
   else if (etat.onglet === "production" && jour && etat.d && jourDe(jour)) etat.jourProd = jour;
 }
 function afficher() {
@@ -1295,7 +1212,7 @@ function rafraichir() {                                              // toutes l
       const nouveau = d.maj !== etat.d.maj;
       etat.d = d;
       const A = joursAccueil();
-      if (nouveau || (etat.onglet === "prevision" && A.haut + (A.jHaut ? "+" : "-") !== etat.cleAccueil)) afficher();
+      if (nouveau || (etat.onglet === "prevision" && A.haut + (A.jHaut ? "+" : "-") + "|" + (etat.jourPrev || "") !== etat.cleAccueil)) afficher();
     })
     .catch(() => { /* réseau indisponible : on réessaiera */ });
 }
@@ -1311,7 +1228,7 @@ function demarrer() {
   });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (etat.d) toutAfficher(); });
   document.querySelectorAll("[role=tab]").forEach((b) => b.addEventListener("click", () => {
-    location.hash = b.dataset.onglet === "historique" && etat.jourHist && etat.modeHist === "jour" ? "#historique/" + etat.jourHist : "#" + b.dataset.onglet;
+    location.hash = "#" + b.dataset.onglet;
   }));
   document.querySelector("[role=tablist]").addEventListener("keydown", (e) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
@@ -1319,17 +1236,10 @@ function demarrer() {
     const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click();
   });
   window.addEventListener("hashchange", () => { lireAncre(); afficher(); });
-  $("hist-date").addEventListener("change", (e) => { if (jourDe(e.target.value)) ouvrirJour(e.target.value); });
-  const pas = (d) => { const js = jours(), i = js.findIndex((j) => j.jour === etat.jourHist) + d; if (js[i]) ouvrirJour(js[i].jour); };
-  $("hist-prec").addEventListener("click", () => pas(-1));
-  $("hist-suiv").addEventListener("click", () => pas(1));
   $("prod-date").addEventListener("change", (e) => { if (jourDe(e.target.value)) ouvrirProd(e.target.value); });
   const pasProd = (d) => { const js = jours().filter((j) => j.prod), i = js.findIndex((j) => j.jour === etat.jourProd) + d; if (js[i]) ouvrirProd(js[i].jour); };
   $("prod-prec").addEventListener("click", () => pasProd(-1));
   $("prod-suiv").addEventListener("click", () => pasProd(1));
-  const perso = () => { const a = $("plage-debut").value, b = $("plage-fin").value; if (a && b && a <= b) { etat.plage = { preset: "perso", debut: a, fin: b }; rendrePlage(); } };
-  $("plage-debut").addEventListener("change", perso);
-  $("plage-fin").addEventListener("change", perso);
   let attente;
   window.addEventListener("resize", () => { clearTimeout(attente); attente = setTimeout(() => { if (etat.d) afficher(); }, 250); });
   fetch("data/donnees.json", { cache: "no-store" })
