@@ -88,7 +88,8 @@ h2 { font-size: 1.3rem; margin: 0; }
 }
 
 /* ---------------------------------------------------------------- onglets */
-.onglets { display: flex; gap: 2px; margin: 0 0 20px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.onglets { display: flex; gap: 2px; margin: 0 0 20px; border-bottom: 1px solid var(--border); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.onglets::-webkit-scrollbar { display: none; }
 .onglets button {
   font: inherit; font-size: 0.9rem; font-weight: 500; color: var(--ink-2); background: none; border: 0; border-bottom: 2px solid transparent;
   padding: 11px 14px 10px; cursor: pointer; white-space: nowrap; margin-bottom: -1px;
