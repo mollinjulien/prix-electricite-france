@@ -842,10 +842,16 @@ function badgeJour(iso, now) {
   return "b_passe";
 }
 const meilleurDuJour = (j) => TOUS.map((m) => m.code).filter((k) => j[k] && j.erreurs && j.erreurs[k]).reduce((a, b) => (a === null || j.erreurs[b].mae < j.erreurs[a].mae ? b : a), null);
-const etiquetteJour = (m, j) => ` <span class="etiquette${m.code === j.principal ? " principal" : ""}">${t(m.code === j.principal ? "tag_principal" : m.tag)}</span>`;
+const CHAINE = ["EM", "EP", "EU", "GB", "GR"];                              // chaîne de repli du modèle publié
+const principalActuel = () => ([...jours()].reverse().find((j) => j.source === "direct" && j.principal) || {}).principal || "EM";
+function principalDe(j) {                                             // le principal ACTUEL pour tous les jours ; s'il manque ce jour-là, le niveau suivant de la chaîne
+  const p = principalActuel(), L = [p, ...CHAINE.filter((c) => c !== p)];
+  return L.find((c) => j[c]) || (TOUS.find((m) => j[m.code]) || {}).code;
+}
+const etiquetteJour = (m, j) => ` <span class="etiquette${m.code === principalDe(j) ? " principal" : ""}">${t(m.code === principalDe(j) ? "tag_principal" : m.tag)}</span>`;
 function tuileModele(m, j, best) {
   const e = j.erreurs && j.erreurs[m.code];
-  return `<div class="tuile modele${m.code === j.principal ? " principal" : ""}" title="${nomModele(m.code)}"><div class="libelle">${pastille(m.code)}${courtModele(m.code)}${etiquetteJour(m, j)}${etiquetteMeilleur(m.code === best)}</div>`
+  return `<div class="tuile modele${m.code === principalDe(j) ? " principal" : ""}" title="${nomModele(m.code)}"><div class="libelle">${pastille(m.code)}${courtModele(m.code)}${etiquetteJour(m, j)}${etiquetteMeilleur(m.code === best)}</div>`
     + `<div class="duo-valeurs"><div><div class="petit">${t("t_moyenne")}</div><div class="valeur">${enEuros(moyenne(j[m.code]))}</div></div>`
     + `<div><div class="petit">${t("t_erreur")}</div><div class="valeur erreur">${e ? enEuros(e.mae) : `<span class="attente">${t("t_attente")}</span>`}</div></div></div></div>`;
 }
@@ -853,7 +859,7 @@ function tuilesJour(j) {
   const T = [], b = meilleurDuJour(j);
   if (j.reel) T.push(`<div class="tuile marche"><div class="libelle">${pastille("reel")}${t("marche_moyen")}</div><div class="duo-valeurs"><div><div class="petit">${t("t_moyenne")}</div><div class="valeur">${enEuros(moyenne(j.reel))}</div></div></div></div>`);
   for (const m of visibles(j)) T.push(tuileModele(m, j, b));
-  const ref = j.reel ? "reel" : j.principal && j[j.principal] ? j.principal : modelesDuJour(j).length ? modelesDuJour(j)[0].code : null;
+  const ref = j.reel ? "reel" : principalDe(j) || null;
   if (ref) {
     const h = parHeure(j[ref], j.heures), lab = heuresLabels(j.heures), v = h.filter((x) => x !== null);
     const iMin = h.indexOf(Math.min(...v)), iMax = h.indexOf(Math.max(...v));
@@ -874,7 +880,7 @@ function tablePrix(id, s, j) {                                       // tableau 
   collerEntetes($(id));
 }
 const SEL_VIDE = () => Object.fromEntries(TOUS.map((m) => [m.code, false]).concat([["hier", false], ["bande", false]]));
-const modeleParDefaut = (j) => (j.principal && j[j.principal] ? j.principal : (TOUS.find((m) => j[m.code]) || {}).code);
+const modeleParDefaut = (j) => principalDe(j);
 const modelesDispos = (j) => TOUS.filter((m) => j[m.code]);
 function selectionDuJour(j) {                                        // modèles cochés dans le menu (ceux qui existent ce jour-là), sinon le principal du jour
   const sel = (etat.selPrev || []).filter((c) => j[c]);
@@ -907,7 +913,7 @@ function lierNavigation(iso) {
 function menuModeles(p, j) {                                         // menu déroulant à cases à cocher : principal mis en avant, meilleur du jour signalé
   const sel = selectionDuJour(j), best = meilleurDuJour(j);
   const ligne = (m) => {
-    const e = j.erreurs && j.erreurs[m.code], pr = m.code === j.principal;
+    const e = j.erreurs && j.erreurs[m.code], pr = m.code === principalDe(j);
     return `<label class="menu-item${pr ? " principal" : ""}"><input type="checkbox" data-c="${m.code}"${sel.includes(m.code) ? " checked" : ""}>${pastille(m.code)}`
       + `<span class="menu-nom"><b>${courtModele(m.code)}</b><small>${nomModele(m.code)}</small></span>`
       + `<span class="menu-tags">${pr ? `<span class="etiquette principal">${t("tag_principal")}</span>` : ""}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
@@ -968,7 +974,7 @@ function ouvrirJour(iso) { etat.jourPrev = iso; location.hash = "#prevision/" + 
 
 /* ---------------------------------------------------------------- onglet Performance */
 function menuPerf(id, codes, js) {                                   // même menu déroulant que l'onglet Prévision : principal mis en avant, meilleur de la période, erreur de chaque modèle
-  const tous = codes.concat(["hier"]), princ = ([...jours()].reverse().find((j) => j.principal) || {}).principal;
+  const tous = codes.concat(["hier"]), princ = principalActuel();
   const err = Object.fromEntries(tous.map((c) => [c, js.length ? stats(js, c) : null]));
   const avec = codes.filter((c) => err[c]), best = avec.length ? avec.reduce((a, b) => (err[b].mae < err[a].mae ? b : a)) : null;
   const ligne = (c) => `<label class="menu-item${c === princ ? " principal" : ""}"><input type="checkbox" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>${pastille(c)}`
