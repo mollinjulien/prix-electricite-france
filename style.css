@@ -363,3 +363,7 @@ details.compact summary { cursor: pointer; }
 :root[data-theme="dark"] .contact-lien.linkedin svg { color: #4d9de0; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .contact-lien.linkedin svg { color: #4d9de0; } }
 .pied .mentions { font-size: 0.78rem; color: var(--muted); }
+
+/* prévision RTE (onglet Production) : trait pointillé dans les cases à cocher, colonne discrète dans les tableaux */
+.trait-rte { display: inline-block; width: 18px; height: 0; border-top: 2px dotted var(--ink); margin-right: 6px; vertical-align: middle; }
+.table-donnees td.faible { color: var(--ink-2); }

@@ -153,6 +153,10 @@ const TXT = {
     sol_prevu: "Solaire prévu", eol_prevu: "Éolien prévu", sol_reel: "Solaire réel", eol_reel: "Éolien réel",
     reel_vs: "réel {r} GWh · écart {e} %", reel_partiel: "réel connu sur {h} h sur {n}", reel_absent: "réel pas encore publié (mis à jour chaque matin)",
     perf_ligne: "erreur journalière {j} % · horaire {h} % · biais {b} %", perf_n: "{n} jours complets",
+    p_rte: "prévu RTE", rte_court: "Prévision RTE", sol_rte: "Solaire prévu par RTE", eol_rte: "Éolien prévu par RTE", rte_jour: "RTE prévoit {v} GWh",
+    rte_titre: "Notre prévision contre celle de RTE",
+    rte_note: "RTE publie chaque jour sa propre prévision de production solaire et éolienne pour le lendemain, pour la France entière (transmise à ENTSO-E). Elle est publiée jusqu'à 18 h la veille, avec des prévisions météo plus récentes que la nôtre (faite vers 11 h 30 avec le seul run GFS de la nuit) et la télémesure de ses installations : la comparaison l'avantage. Notre solaire est une production potentielle (avant écrêtement), d'où un biais positif. Mêmes jours pour les deux prévisions.",
+    rte_cols: ["", "Erreur journalière : nous", "RTE", "Erreur horaire : nous", "RTE", "Biais : nous", "RTE", "Jours où nous faisons mieux"],
     pas_de_prod: "Pas encore de prévision de production.",
     pm_sol_titre: "Modèle de production solaire", pm_eol_titre: "Modèle de production éolienne",
     pm_sol_cible: "La production potentielle de chaque région, heure par heure : taux de charge prévu × capacité solaire installée.",
@@ -416,6 +420,10 @@ const TXT = {
     sol_prevu: "Forecast solar", eol_prevu: "Forecast wind", sol_reel: "Actual solar", eol_reel: "Actual wind",
     reel_vs: "actual {r} GWh · error {e}%", reel_partiel: "actual known for {h} h out of {n}", reel_absent: "actual not published yet (updated every morning)",
     perf_ligne: "daily error {j}% · hourly {h}% · bias {b}%", perf_n: "{n} complete days",
+    p_rte: "RTE forecast", rte_court: "RTE forecast", sol_rte: "Solar forecast by RTE", eol_rte: "Wind forecast by RTE", rte_jour: "RTE forecasts {v} GWh",
+    rte_titre: "Our forecast against RTE's",
+    rte_note: "Every day RTE publishes its own solar and wind output forecast for the next day, for France as a whole (sent to ENTSO-E). It is published up to 18:00 the day before, with more recent weather forecasts than ours (made around 11:30 with only the overnight GFS run) and live telemetry from its plants: the comparison favours RTE. Our solar is a potential output (before curtailment), hence a positive bias. Same days for both forecasts.",
+    rte_cols: ["", "Daily error: us", "RTE", "Hourly error: us", "RTE", "Bias: us", "RTE", "Days we do better"],
     pas_de_prod: "No production forecast yet.",
     pm_sol_titre: "Solar production model", pm_eol_titre: "Wind production model",
     pm_sol_cible: "Each region's potential output, hour by hour: forecast load factor × installed solar capacity.",
@@ -545,7 +553,7 @@ const MODELES_ANCIENS = [                                             // toujour
 const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, selPrev: null, menuOuvert: false,
                visibles: { EM: true, EP: true, EU: true, EUC: true, GB: true, GR: true, CR: true, GT: true, hier: false, bande: true },
-               prodVisibles: { sol: true, eol: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
+               prodVisibles: { sol: true, eol: true, rte: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
 
@@ -1130,11 +1138,12 @@ function ficheProduction(cle) {
     + `<div class="detail-bloc"><h5>${t("d_appr")}</h5><ul>${appr.map((x) => `<li>${x}</li>`).join("")}</ul></div>`
     + `<div class="detail-bloc"><h5>${t("d_sources")}</h5><ul>${["gfs", "prod", "capa", "registre"].map(lienSource).join("")}</ul></div></div>`;
 }
-const TECHS = [{ k: "sol", c: "--s-sol", lib: "sol_court", prevu: "sol_prevu", reel: "sol_reel" }, { k: "eol", c: "--s-eol", lib: "eol_court", prevu: "eol_prevu", reel: "eol_reel" }];
+const TECHS = [{ k: "sol", c: "--s-sol", lib: "sol_court", prevu: "sol_prevu", reel: "sol_reel", rte: "sol_rte" }, { k: "eol", c: "--s-eol", lib: "eol_court", prevu: "eol_prevu", reel: "eol_reel", rte: "eol_rte" }];
 const pastTech = (x) => `<span class="pastille" style="color:${css(x.c)}"></span>`;
 function choixProd(id) {                                             // cases Solaire / Éolien de l'onglet Production (un seul état pour tout l'onglet)
   const el = $(id);
-  el.innerHTML = `<span class="choix-titre">${t("afficher")}</span>` + TECHS.map((x) => `<label class="choix-item"><input type="checkbox" id="${id}-${x.k}" data-k="${x.k}"${etat.prodVisibles[x.k] ? " checked" : ""}>${pastTech(x)}<span>${t(x.lib)}</span></label>`).join("");
+  el.innerHTML = `<span class="choix-titre">${t("afficher")}</span>` + TECHS.map((x) => `<label class="choix-item"><input type="checkbox" id="${id}-${x.k}" data-k="${x.k}"${etat.prodVisibles[x.k] ? " checked" : ""}>${pastTech(x)}<span>${t(x.lib)}</span></label>`).join("")
+    + (id === "prod-choix-regions" ? "" : `<label class="choix-item"><input type="checkbox" id="${id}-rte" data-k="rte"${etat.prodVisibles.rte ? " checked" : ""}><span class="trait-rte" aria-hidden="true"></span><span>${t("rte_court")}</span></label>`);   // RTE ne publie que pour la France entière
   el.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => {
     etat.prodVisibles[inp.dataset.k] = inp.checked;
     rendreProduction();
@@ -1147,14 +1156,19 @@ function rendreProduction() {
   const js = jours().filter((j) => j.prod), now = maintenantParis();
   if (!js.length) { $("prod-tuiles").innerHTML = `<p class="note">${t("pas_de_prod")}</p>`; return; }
   for (const id of ["prod-choix-demain", "prod-choix", "prod-choix-regions", "prod-choix-hist"]) choixProd(id);
-  const vus = TECHS.filter((x) => etat.prodVisibles[x.k]), deux = vus.length === 2;
+  const vus = TECHS.filter((x) => etat.prodVisibles[x.k]), deux = vus.length === 2, rteOn = etat.prodVisibles.rte;
+  const RTE_DS = { borderDash: [2, 3], borderWidth: 1.8 };
   // 1) production prévue du prochain jour (demain après 10 h)
   const A = joursAccueil(), jd = A.jHaut && A.jHaut.prod ? A.jHaut : js[js.length - 1], pd = jd.prod;
   $("prod-demain-titre").textContent = t("prod_demain", { d: dateLongue(jd.jour) });
   $("prod-demain-badge").textContent = t(badgeJour(jd.jour, now));
-  const tuileSimple = (lib, v) => tuile(lib, `${nombre(v)} <small>GWh</small>`, t("prod_prevu_jour"));
-  $("prod-demain-tuiles").innerHTML = vus.map((x) => tuileSimple(pastTech(x) + t(x.prevu), somme(pd[x.k]))).join("") + (deux ? tuileSimple(t("total_court"), somme(pd.sol) + somme(pd.eol)) : "");
-  dessiner("prod-g-demain", { type: "line", data: { labels: pd.heures, datasets: vus.map((x) => dsProd(t(x.prevu), pd[x.k], x.c)) }, options: optionsGW(12, "GW"), plugins: [curseur] });
+  const aR = (q, k) => rteOn && Boolean(q[k + "_rte"]);                      // prévision RTE de cette filière connue ce jour-là
+  const tuileSimple = (lib, v, r) => tuile(lib, `${nombre(v)} <small>GWh</small>`, r === null ? t("prod_prevu_jour") : t("rte_jour", { v: nombre(r) }));
+  const rd = (k) => (aR(pd, k) ? somme(pd[k + "_rte"]) : null);
+  $("prod-demain-tuiles").innerHTML = vus.map((x) => tuileSimple(pastTech(x) + t(x.prevu), somme(pd[x.k]), rd(x.k))).join("") + (deux ? tuileSimple(t("total_court"), somme(pd.sol) + somme(pd.eol), aR(pd, "sol") && aR(pd, "eol") ? rd("sol") + rd("eol") : null) : "");
+  const dsD = vus.map((x) => dsProd(t(x.prevu), pd[x.k], x.c));
+  for (const x of vus) if (aR(pd, x.k)) dsD.push(dsProd(t(x.rte), pd[x.k + "_rte"], x.c, RTE_DS));
+  dessiner("prod-g-demain", { type: "line", data: { labels: pd.heures, datasets: dsD }, options: optionsGW(12, "GW"), plugins: [curseur] });
   // 2) contrôle : prévu contre réel, jour au choix (par défaut le dernier jour dont la production réelle est complète)
   const complets = js.filter((x) => x.prod.reel_complet);
   if (!etat.jourProd || !js.some((j) => j.jour === etat.jourProd)) etat.jourProd = (complets.length ? complets[complets.length - 1] : js[js.length - 1]).jour;
@@ -1169,17 +1183,20 @@ function rendreProduction() {
   $("prod-tuiles").innerHTML = T.join("");
   const ds = vus.map((x) => dsProd(t(x.prevu), p[x.k], x.c, { borderDash: [6, 4] }));
   for (const x of vus) if (p[x.k + "_reel"]) ds.push(dsProd(t(x.reel) + " (RTE)", p[x.k + "_reel"], x.c, { borderWidth: 3 }));
+  for (const x of vus) if (aR(p, x.k)) ds.push(dsProd(t(x.rte), p[x.k + "_rte"], x.c, RTE_DS));
   const ch = dessiner("prod-g-jour", { type: "line", data: { labels: p.heures, datasets: ds }, options: optionsGW(12, "GW"), plugins: [curseur] });
   $("prod-g-jour").setAttribute("aria-label", dateLongue(j.jour));
   const v = (a, k) => (a ? nombre(a[k]) : "–");
   const ec = (a, b, k) => (a && b && b[k] !== null && b[k] !== undefined ? signe(a[k] - b[k]) : "–");
   const ecJ = (a, b) => (b === null ? "–" : `${signe(ecartPc(a, b), 0)} %`);
-  let h = `<thead><tr><th rowspan="2">${t("heure")}</th>${vus.map((x) => `<th colspan="3" class="groupe modele">${pastTech(x)} ${t(x.lib)}</th>`).join("")}</tr>`
-    + `<tr>${vus.map(() => `<th class="groupe">${t("p_prevu")}</th><th>${t("p_reel")}</th><th>${t("ecart")}</th>`).join("")}</tr></thead><tbody>`;
+  const ar = rteOn, nc = ar ? 4 : 3;
+  const cRte = (x, k) => (ar ? `<td class="faible">${v(p[x.k + "_rte"], k)}</td>` : "");
+  let h = `<thead><tr><th rowspan="2">${t("heure")}</th>${vus.map((x) => `<th colspan="${nc}" class="groupe modele">${pastTech(x)} ${t(x.lib)}</th>`).join("")}</tr>`
+    + `<tr>${vus.map(() => `<th class="groupe">${t("p_prevu")}</th>${ar ? `<th>${t("p_rte")}</th>` : ""}<th>${t("p_reel")}</th><th>${t("ecart")}</th>`).join("")}</tr></thead><tbody>`;
   p.heures.forEach((lab, k) => {
-    h += `<tr data-i="${k}"><td>${lab}</td>` + vus.map((x) => `<td class="groupe">${v(p[x.k], k)}</td><td class="reel">${v(p[x.k + "_reel"], k)}</td><td>${ec(p[x.k], p[x.k + "_reel"], k)}</td>`).join("") + "</tr>";
+    h += `<tr data-i="${k}"><td>${lab}</td>` + vus.map((x) => `<td class="groupe">${v(p[x.k], k)}</td>${cRte(x, k)}<td class="reel">${v(p[x.k + "_reel"], k)}</td><td>${ec(p[x.k], p[x.k + "_reel"], k)}</td>`).join("") + "</tr>";
   });
-  h += `</tbody><tfoot><tr><td>GWh</td>` + vus.map((x) => `<td class="groupe">${nombre(tp_(x.k))}</td><td class="reel">${tr_(x.k) === null ? "–" : nombre(tr_(x.k))}</td><td>${ecJ(tp_(x.k), tr_(x.k))}</td>`).join("") + "</tr></tfoot>";
+  h += `</tbody><tfoot><tr><td>GWh</td>` + vus.map((x) => `<td class="groupe">${nombre(tp_(x.k))}</td>${ar ? `<td class="faible">${p[x.k + "_rte"] ? nombre(somme(p[x.k + "_rte"])) : "–"}</td>` : ""}<td class="reel">${tr_(x.k) === null ? "–" : nombre(tr_(x.k))}</td><td>${ecJ(tp_(x.k), tr_(x.k))}</td>`).join("") + "</tr></tfoot>";
   $("prod-table").innerHTML = vus.length ? h : "";
   if (vus.length) { collerEntetes($("prod-table")); lier(ch, "prod-table"); }
   const cellE = (pr, r) => (r === null ? "<td>–</td>" : `<td>${signe(ecartPc(pr, r), 0)} %</td>`);
@@ -1203,13 +1220,33 @@ function rendreProduction() {
   const tp = (lib, q) => tuile(lib, q ? `${nombre(q.j)} <small>%</small>` : "–", q ? t("perf_ligne", { j: nombre(q.j), h: nombre(q.h), b: signe(q.b) }) + " · " + t("perf_n", { n: complets.length }) : "");
   $("prod-perf").innerHTML = vus.map((x) => tp(pastTech(x) + t(x.lib), perf((y) => y[x.k], (y) => y[x.k + "_reel"]))).join("")
     + (deux ? tp(t("total_court"), perf((x) => x.sol.map((y, k) => y + x.eol[k]), (x) => x.sol_reel.map((y, k) => y + x.eol_reel[k]))) : "");
+  // 3b) nous contre RTE, sur les mêmes jours (réel complet et prévision RTE connue)
+  const cr = complets.filter((x) => x.prod.sol_rte && x.prod.eol_rte);
+  const mes = (P_, R_) => {
+    let sj = 0, sh = 0, sb = 0, sr = 0;
+    for (const x of cr) { const P = P_(x.prod), R = R_(x.prod); sj += Math.abs(somme(P) - somme(R)); sb += somme(P) - somme(R); sr += somme(R); P.forEach((y, k) => { sh += Math.abs(y - R[k]); }); }
+    return { j: (100 * sj) / sr, h: (100 * sh) / sr, b: (100 * sb) / sr };
+  };
+  const cle = (k, a) => (a === "" ? k : k + "_" + a);
+  const serie = (k, a) => (k === "tot" ? (q) => q[cle("sol", a)].map((y, i) => y + q[cle("eol", a)][i]) : (q) => q[cle(k, a)]);
+  const lignesR = vus.map((x) => [pastTech(x) + t(x.lib), x.k]).concat(deux ? [[t("total_court"), "tot"]] : []);
+  let hrt = `<thead><tr>${t("rte_cols").map((c, i) => `<th${i === 0 ? "" : ' class="num"'}>${i === 0 ? t("jours_n", { n: cr.length }) : c}</th>`).join("")}</tr></thead><tbody>`;
+  for (const [lib, k] of lignesR) {
+    const n = mes(serie(k, ""), serie(k, "reel")), r = mes(serie(k, "rte"), serie(k, "reel"));
+    const mieux = cr.filter((x) => Math.abs(somme(serie(k, "")(x.prod)) - somme(serie(k, "reel")(x.prod))) < Math.abs(somme(serie(k, "rte")(x.prod)) - somme(serie(k, "reel")(x.prod)))).length;
+    const b = (u, w) => (u < w ? ` class="positif"` : "");
+    hrt += `<tr><td>${lib}</td><td${b(n.j, r.j)}>${nombre(n.j)} %</td><td${b(r.j, n.j)}>${nombre(r.j)} %</td><td${b(n.h, r.h)}>${nombre(n.h)} %</td><td${b(r.h, n.h)}>${nombre(r.h)} %</td>`
+      + `<td>${signe(n.b)} %</td><td>${signe(r.b)} %</td><td>${nombre((100 * mieux) / cr.length, 0)} %</td></tr>`;
+  }
+  $("prod-rte-carte").hidden = !cr.length || !vus.length;
+  $("prod-rte").innerHTML = cr.length && vus.length ? hrt + "</tbody>" : "";
   const lab = js.map((x) => dateCourte(x.jour));
   const totJ = (x, k) => (x.prod[k] && nConnus(x.prod[k]) === x.prod.heures.length ? somme(x.prod[k]) : null);
   for (const x of TECHS) {
     const carte = $("prod-carte-h-" + x.k);
     carte.hidden = !etat.prodVisibles[x.k];
     if (carte.hidden) { effacer("prod-h-" + x.k); continue; }
-    dessiner("prod-h-" + x.k, { type: "line", data: { labels: lab, datasets: [dsProd(t(x.prevu), js.map((y) => somme(y.prod[x.k])), x.c, { pointRadius: 2, borderDash: [6, 4] }), dsProd(t(x.reel) + " (RTE)", js.map((y) => totJ(y, x.k + "_reel")), x.c, { pointRadius: 2, borderWidth: 3 })] }, options: optionsGW(8, "GWh"), plugins: [curseur] });
+    dessiner("prod-h-" + x.k, { type: "line", data: { labels: lab, datasets: [dsProd(t(x.prevu), js.map((y) => somme(y.prod[x.k])), x.c, { pointRadius: 2, borderDash: [6, 4] }), dsProd(t(x.reel) + " (RTE)", js.map((y) => totJ(y, x.k + "_reel")), x.c, { pointRadius: 2, borderWidth: 3 })].concat(rteOn ? [dsProd(t(x.rte), js.map((y) => totJ(y, x.k + "_rte")), x.c, { pointRadius: 0, ...RTE_DS })] : []) }, options: optionsGW(8, "GWh"), plugins: [curseur] });
   }
   $("prod-hist-cartes").classList.toggle("une", !deux);
 }
