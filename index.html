@@ -6,21 +6,28 @@
   <title>Prix de l'électricité de demain</title>
   <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=24">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+  <link rel="stylesheet" href="style.css?v=25">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=31" defer></script>
+  <script src="app.js?v=32" defer></script>
 </head>
 <body>
   <header class="entete">
-    <div class="entete-haut">
-      <div>
-        <h1 data-t="titre"></h1>
-        <p class="sous-titre" data-t="sous_titre"></p>
-      </div>
+    <div class="filet">
+      <span class="rubrique" data-t="rubrique"></span>
       <div class="reglages">
         <button type="button" id="langue" class="bouton-discret" aria-label="Language / langue">EN</button>
         <button type="button" id="theme" class="bouton-discret" aria-label="Thème clair ou sombre">◐</button>
       </div>
+    </div>
+    <div class="entete-haut">
+      <div class="titre-bloc">
+        <h1 data-t="titre"></h1>
+        <p class="sous-titre" data-t="sous_titre"></p>
+      </div>
+      <a class="cotation" id="cotation" href="#prevision" hidden></a>
     </div>
     <nav class="onglets" role="tablist" aria-label="Sections">
       <button type="button" role="tab" id="tab-prevision" data-onglet="prevision" aria-controls="prevision" data-t="o_prevision"></button>
