@@ -573,7 +573,7 @@ const modelesDuJour = (j) => MODELES.filter((m) => j[m.code]);
 const visibles = (j) => TOUS.filter((m) => j[m.code] && etat.visibles[m.code]);
 const colonnes = (j) => visibles(j).map((m) => m.code).concat(etat.visibles.hier ? ["hier"] : []);   // séries cochées d'un jour, repère « veille » compris
 function meilleur(j, parmi) {                                        // modèle à la plus petite erreur moyenne du jour (parmi les modèles en service, ou la liste `parmi`)
-  const c = modelesDuJour(j).map((m) => m.code).filter((k) => j.erreurs && j.erreurs[k] && (!parmi || parmi.includes(k)));
+  const c = TOUS.filter((m) => j[m.code]).map((m) => m.code).filter((k) => j.erreurs && j.erreurs[k] && (!parmi || parmi.includes(k)));
   return c.length ? c.reduce((a, b) => (j.erreurs[b].mae < j.erreurs[a].mae ? b : a)) : null;
 }
 
@@ -992,7 +992,7 @@ function menuPerf(id, codes, js) {                                   // même me
 }
 function rendrePerformance() {
   segments("perf-periode", [["tout", t("pf_tout")], ["30", t("pf_30")], ["direct", t("pf_direct")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
-  const codes = MODELES.map((m) => m.code);
+  const codes = TOUS.map((m) => m.code);
   let js = joursAvecPrix();
   if (etat.periodePerf === "30") js = js.slice(-30);
   if (etat.periodePerf === "direct") js = js.filter((j) => j.source === "direct");
@@ -1012,12 +1012,12 @@ function rendrePerformance() {
   const best = st.length ? st.reduce((a, b) => (b[1].mae < a[1].mae ? b : a))[0] : null;
   let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
   for (const [c, s] of st.concat(etat.visibles.hier ? [["hier", sh]] : [])) {
-    const m = MODELES.find((x) => x.code === c);
+    const m = TOUS.find((x) => x.code === c);
     h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(js, c).r, 2)}</td><td>${nombre(correlations(js, c).rj, 2)}</td>`
       + `<td>${c === "hier" ? "–" : nombre((100 * victoires[c]) / nj, 0) + " %"}</td><td>${c === "hier" ? "–" : `<span class="positif">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
   }
   resume.innerHTML = h + "</tbody>";
-  const ds = MODELES.filter((m) => etat.visibles[m.code] && js.some((j) => j.erreurs[m.code])).map((m) => dsModele(m, js.map((j) => (j.erreurs[m.code] ? j.erreurs[m.code].mae : null)), { pointRadius: 2 }));
+  const ds = TOUS.filter((m) => etat.visibles[m.code] && js.some((j) => j.erreurs[m.code])).map((m) => dsModele(m, js.map((j) => (j.erreurs[m.code] ? j.erreurs[m.code].mae : null)), { pointRadius: 2 }));
   if (etat.visibles.hier) ds.push(dsHier(js.map((j) => j.erreurs.hier.mae)));
   const o = options(8, true), iDirect = js.findIndex((j) => j.source === "direct");
   o.plugins.marqueur = { index: iDirect > 0 ? iDirect : null, texte: t("mise_en_ligne") };
@@ -1036,7 +1036,7 @@ function rendrePerformance() {
   }
   const hs = [...Array(24).keys()].map((x) => String(x).padStart(2, "0"));
   const serieH = (c) => hs.map((k) => (nb[c] && nb[c][k] ? somme[c][k] / nb[c][k] : null));
-  const dh = MODELES.filter((m) => etat.visibles[m.code] && somme[m.code]).map((m) => dsModele(m, serieH(m.code), { pointRadius: 2 }));
+  const dh = TOUS.filter((m) => etat.visibles[m.code] && somme[m.code]).map((m) => dsModele(m, serieH(m.code), { pointRadius: 2 }));
   if (etat.visibles.hier) dh.push(dsHier(serieH("hier")));
   dessiner("perf-heures", { type: "line", data: { labels: hs.map((k) => k + (etat.langue === "fr" ? " h" : ":00")), datasets: dh }, options: options(12, true), plugins: [curseur] });
   const cols = vus.concat(etat.visibles.hier ? ["hier"] : []);
