@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
-  <link rel="stylesheet" href="style.css?v=29">
+  <link rel="stylesheet" href="style.css?v=30">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=37" defer></script>
+  <script src="app.js?v=38" defer></script>
 </head>
 <body>
   <header class="entete">
@@ -75,50 +75,42 @@
     <!-- ============================================================ PRODUCTION (bonus) -->
     <section id="production" role="tabpanel" aria-labelledby="tab-production" class="panneau" hidden>
       <div class="carte">
-        <h3 class="petit-titre" data-t="prod_titre"></h3>
-        <p class="intro" data-t="intro_prod"></p>
-        <details class="plus"><summary data-t="prod_details"></summary><div class="fiches" id="prod-modeles"></div></details>
-      </div>
-      <div class="carte" id="prod-rte-carte" hidden>
-        <h3 class="petit-titre" data-t="rte_titre"></h3>
-        <div class="tuiles" id="prod-rte-tuiles"></div>
-        <p class="intro" data-t="rte_note"></p>
-        <details class="plus"><summary data-t="rte_detail"></summary><div class="cadre-table libre"><table id="prod-rte" class="table-donnees"></table></div></details>
-      </div>
-      <div class="carte">
-        <div class="titre-jour"><h3 class="petit-titre" id="prod-demain-titre"></h3><span id="prod-demain-badge" class="badge fort"></span></div>
-        <div class="choix" id="prod-choix-demain"></div>
-        <div class="tuiles" id="prod-demain-tuiles"></div>
-        <div class="graphique moyen"><canvas id="prod-g-demain" role="img"></canvas></div>
-      </div>
-      <div class="carte">
-        <h3 class="petit-titre" data-t="prod_controle"></h3>
-        <p class="note" data-t="prod_controle_note"></p>
-        <div class="choix" id="prod-choix"></div>
+        <div class="titre-jour"><h3 class="petit-titre" id="prod-titre-jour"></h3><span id="prod-badge" class="badge fort"></span></div>
         <div class="navigation-jour">
           <button type="button" id="prod-prec" class="bouton" aria-label="Jour précédent">‹</button>
           <input type="date" id="prod-date" aria-label="Date">
           <button type="button" id="prod-suiv" class="bouton" aria-label="Jour suivant">›</button>
-          <span id="prod-badge" class="badge"></span>
         </div>
-        <div class="tuiles" id="prod-tuiles"></div>
+        <div class="choix" id="prod-choix"></div>
+        <div class="duel" id="prod-duel"></div>
         <div class="duo">
           <div class="cadre-table"><table id="prod-table" class="table-donnees"></table></div>
           <div class="graphique"><canvas id="prod-g-jour" role="img"></canvas></div>
         </div>
       </div>
-      <div class="carte"><h3 class="petit-titre" data-t="prod_regions"></h3><div class="choix" id="prod-choix-regions"></div><div class="cadre-table libre"><table id="prod-regions" class="table-donnees"></table></div></div>
-      <div class="carte">
-        <h3 class="petit-titre" data-t="prod_historique"></h3>
-        <p class="note" data-t="prod_hist_note"></p>
+      <div class="carte" id="prod-rte-carte" hidden>
+        <h3 class="petit-titre" id="prod-rte-titre"></h3>
+        <div class="duel" id="prod-rte-duel"></div>
+        <p class="note" data-t="rte_court_note"></p>
         <div class="choix" id="prod-choix-hist"></div>
-        <div class="tuiles" id="prod-perf"></div>
+        <h4 class="mini-titre" data-t="rte_err_titre"></h4>
+        <div class="graphique moyen"><canvas id="prod-g-err" role="img"></canvas></div>
+        <details class="plus"><summary data-t="rte_detail"></summary><div class="cadre-table libre"><table id="prod-rte" class="table-donnees"></table></div></details>
       </div>
+      <div class="carte"><h3 class="petit-titre" data-t="prod_regions"></h3><div class="choix" id="prod-choix-regions"></div><div class="cadre-table libre"><table id="prod-regions" class="table-donnees"></table></div></div>
       <div class="deux-cartes" id="prod-hist-cartes">
         <div class="carte" id="prod-carte-h-sol"><h3 class="petit-titre" data-t="prod_hist_sol"></h3><div class="graphique moyen"><canvas id="prod-h-sol" role="img"></canvas></div></div>
         <div class="carte" id="prod-carte-h-eol"><h3 class="petit-titre" data-t="prod_hist_eol"></h3><div class="graphique moyen"><canvas id="prod-h-eol" role="img"></canvas></div></div>
       </div>
-      <p class="note" data-t="prod_note"></p>
+      <div class="carte">
+        <h3 class="petit-titre" data-t="prod_titre"></h3>
+        <p class="intro" data-t="intro_prod"></p>
+        <h4 class="mini-titre" data-t="rte_pourquoi"></h4>
+        <p class="note" data-t="rte_note"></p>
+        <p class="note" data-t="prod_hist_note"></p>
+        <p class="note" data-t="prod_note"></p>
+        <details class="plus"><summary data-t="prod_details"></summary><div class="fiches" id="prod-modeles"></div></details>
+      </div>
     </section>
 
     <!-- ============================================================ ANCIENS MODÈLES -->

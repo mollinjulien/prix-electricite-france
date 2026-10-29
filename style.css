@@ -373,4 +373,17 @@ details.compact summary { cursor: pointer; }
 .trait { display: inline-block; width: 16px; height: 0; border-top: 2px solid currentColor; margin-right: 5px; vertical-align: middle; }
 .trait.tirets { border-top-style: dashed; } .trait.points { border-top-style: dotted; border-top-width: 3px; } .trait.plein { border-top-width: 3px; }
 .table-donnees td.faible { color: var(--ink-2); }
-#prod-rte-tuiles + .intro { margin-top: 16px; }
+
+/* onglet Production : « duel » notre modèle / RTE / réel */
+.duel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 4px 0 18px; }
+.duel.deux { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.duel-case { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--surface); }
+.duel-case.gagne { border: 2px solid var(--ok-texte); padding: 13px 15px; }
+.duel-lib { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-size: 0.85rem; font-weight: 600; color: var(--ink-2); }
+.duel-badge { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ok-texte); border: 1px solid currentColor; border-radius: 99px; padding: 1px 7px; }
+.duel-val { font-size: 2.1rem; font-weight: 650; font-variant-numeric: tabular-nums; margin: 6px 0 2px; line-height: 1.1; }
+.duel-val small { font-size: 0.95rem; font-weight: 400; color: var(--muted); }
+.duel-vide { font-size: 1.05rem; font-weight: 500; color: var(--muted); }
+.duel-det { font-size: 0.82rem; color: var(--muted); }
+.mini-titre { font-size: 0.9rem; font-weight: 600; margin: 16px 0 6px; color: var(--ink-2); }
+@media (max-width: 700px) { .duel, .duel.deux { grid-template-columns: 1fr; } .duel-val { font-size: 1.7rem; } }

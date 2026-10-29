@@ -155,7 +155,17 @@ const TXT = {
     perf_ligne: "erreur journalière {j} % · horaire {h} % · biais {b} %", perf_n: "{n} jours complets",
     p_rte: "prévu RTE", rte_court: "Prévision RTE", sol_rte: "Solaire prévu par RTE", eol_rte: "Éolien prévu par RTE", rte_jour: "RTE prévoit {v} GWh",
     rte_titre: "Notre prévision de production contre celle de RTE",
-    rte_note: "Pourquoi ne pas utiliser directement la prévision de RTE ? Parce qu'elle arrive trop tard : RTE la publie la veille jusqu'à 18 h, alors que l'enchère qui fixe le prix a lieu à 12 h 45. Pour prévoir le prix, nous sommes donc obligés de prévoir nous-mêmes la production solaire et éolienne, vers 11 h 30. Nous sommes légèrement moins bons que RTE, et cela s'explique : son modèle tourne sur des prévisions météo plus récentes (publiées plusieurs heures après le run GFS de la nuit que nous utilisons) et sur la télémesure de ses installations. Notre solaire est en plus une production « potentielle » (avant l'arrêt volontaire des parcs quand le prix est négatif), d'où un biais positif. Les deux prévisions sont comparées sur les mêmes jours, à la production réellement mesurée par RTE.",
+    prod_jour: "Production solaire et éolienne du {d}",
+    duel_nous: "Notre modèle", duel_rte: "Prévision de RTE", duel_reel: "Réel mesuré par RTE", duel_proche: "le plus proche",
+    duel_ecart: "écart au réel : {e} %", duel_faite: "prévision faite la veille vers 11 h 30", duel_rte_absent: "pas encore publiée",
+    duel_rte_quand: "publiée la veille jusqu'à 18 h, trop tard pour l'enchère", duel_attente: "pas encore connu", duel_attente_d: "publié par RTE au fil de la journée",
+    duel_mesure: "éCO2mix temps réel, valeurs provisoires", duel_rte_partiel: "{f} seulement : l'autre filière n'est pas publiée par RTE ce jour-là",
+    rte_hist_titre: "Sur tout l'historique : notre modèle contre RTE ({q}, {n} jours)",
+    hist_det: "erreur journalière · horaire {h} % · biais {b} %", hist_mieux: "Notre modèle fait mieux que RTE", hist_jours: "des jours", hist_mieux_d: "{m} jours sur {n}",
+    rte_court_note: "RTE publie sa prévision trop tard pour l'enchère du prix (jusqu'à 18 h la veille, contre 12 h 45) : nous devons donc prévoir nous-mêmes la production. Pourquoi RTE fait un peu mieux : voir en bas de page.",
+    rte_err_titre: "Erreur de chaque jour (écart entre le total prévu et le total réel, en %)",
+    rte_pourquoi: "Pourquoi prévoir nous-mêmes alors que RTE publie une prévision ?",
+    rte_note: "La prévision de RTE arrive trop tard : RTE la publie la veille jusqu'à 18 h, alors que l'enchère qui fixe le prix a lieu à 12 h 45. Pour prévoir le prix, nous sommes donc obligés de prévoir nous-mêmes la production solaire et éolienne, vers 11 h 30. Nous sommes légèrement moins bons que RTE, et cela s'explique : son modèle tourne sur des prévisions météo plus récentes (publiées plusieurs heures après le run GFS de la nuit que nous utilisons) et sur la télémesure de ses installations. Notre solaire est en plus une production « potentielle » (avant l'arrêt volontaire des parcs quand le prix est négatif), d'où un biais positif. Les deux prévisions sont comparées sur les mêmes jours, à la production réellement mesurée par RTE.",
     rte_detail: "Détail par filière (erreur journalière, horaire, biais)",
     rte_t_jour: "Erreur journalière, solaire + éolien", rte_t_heure: "Erreur horaire, solaire + éolien", rte_t_mieux: "Jours où nous faisons mieux que RTE",
     rte_t_nous: "nous", rte_t_rte: "RTE : {v} %", rte_t_n: "sur {n} jours",
@@ -425,7 +435,17 @@ const TXT = {
     perf_ligne: "daily error {j}% · hourly {h}% · bias {b}%", perf_n: "{n} complete days",
     p_rte: "RTE forecast", rte_court: "RTE forecast", sol_rte: "Solar forecast by RTE", eol_rte: "Wind forecast by RTE", rte_jour: "RTE forecasts {v} GWh",
     rte_titre: "Our production forecast against RTE's",
-    rte_note: "Why not use RTE's forecast directly? Because it comes too late: RTE publishes it up to 18:00 the day before, while the auction that sets the price closes at 12:45. To forecast the price, we therefore have to forecast solar and wind output ourselves, around 11:30. We are slightly less accurate than RTE, and this is expected: its model runs on more recent weather forecasts (published several hours after the overnight GFS run we use) and on live telemetry from its plants. Our solar is also a \"potential\" output (before plants deliberately stop when the price is negative), hence a positive bias. Both forecasts are compared on the same days, against the output actually measured by RTE.",
+    prod_jour: "Solar and wind output on {d}",
+    duel_nous: "Our model", duel_rte: "RTE forecast", duel_reel: "Actual, measured by RTE", duel_proche: "closest",
+    duel_ecart: "error vs actual: {e}%", duel_faite: "forecast made the day before around 11:30", duel_rte_absent: "not published yet",
+    duel_rte_quand: "published up to 18:00 the day before, too late for the auction", duel_attente: "not known yet", duel_attente_d: "published by RTE during the day",
+    duel_mesure: "éCO2mix real time, provisional values", duel_rte_partiel: "{f} only: RTE has not published the other technology for this day",
+    rte_hist_titre: "Over the whole history: our model against RTE ({q}, {n} days)",
+    hist_det: "daily error · hourly {h}% · bias {b}%", hist_mieux: "Our model beats RTE", hist_jours: "of days", hist_mieux_d: "{m} days out of {n}",
+    rte_court_note: "RTE publishes its forecast too late for the price auction (up to 18:00 the day before, versus 12:45): we therefore have to forecast output ourselves. Why RTE does slightly better: see the bottom of the page.",
+    rte_err_titre: "Error on each day (gap between forecast and actual daily totals, %)",
+    rte_pourquoi: "Why forecast ourselves when RTE publishes a forecast?",
+    rte_note: "RTE's forecast comes too late: RTE publishes it up to 18:00 the day before, while the auction that sets the price closes at 12:45. To forecast the price, we therefore have to forecast solar and wind output ourselves, around 11:30. We are slightly less accurate than RTE, and this is expected: its model runs on more recent weather forecasts (published several hours after the overnight GFS run we use) and on live telemetry from its plants. Our solar is also a \"potential\" output (before plants deliberately stop when the price is negative), hence a positive bias. Both forecasts are compared on the same days, against the output actually measured by RTE.",
     rte_detail: "Detail by technology (daily error, hourly error, bias)",
     rte_t_jour: "Daily error, solar + wind", rte_t_heure: "Hourly error, solar + wind", rte_t_mieux: "Days we beat RTE",
     rte_t_nous: "us", rte_t_rte: "RTE: {v}%", rte_t_n: "over {n} days",
@@ -1161,38 +1181,44 @@ function choixProd(id) {                                             // cases So
 function rendreProduction() {
   $("prod-modeles").innerHTML = ficheProduction("sol") + ficheProduction("eol");
   const js = jours().filter((j) => j.prod), now = maintenantParis();
-  if (!js.length) { $("prod-tuiles").innerHTML = `<p class="note">${t("pas_de_prod")}</p>`; return; }
-  for (const id of ["prod-choix-demain", "prod-choix", "prod-choix-regions", "prod-choix-hist"]) choixProd(id);
+  if (!js.length) { $("prod-duel").innerHTML = `<p class="note">${t("pas_de_prod")}</p>`; return; }
+  for (const id of ["prod-choix", "prod-choix-regions", "prod-choix-hist"]) choixProd(id);
   const vus = TECHS.filter((x) => etat.prodVisibles[x.k]), deux = vus.length === 2, rteOn = etat.prodVisibles.rte;
   const RTE_DS = { borderDash: [2, 3], borderWidth: 2.2 };
-  // 1) production prévue du prochain jour (demain après 10 h)
-  const A = joursAccueil(), jd = A.jHaut && A.jHaut.prod ? A.jHaut : js[js.length - 1], pd = jd.prod;
-  $("prod-demain-titre").textContent = t("prod_demain", { d: dateLongue(jd.jour) });
-  $("prod-demain-badge").textContent = t(badgeJour(jd.jour, now));
   const aR = (q, k) => rteOn && Boolean(q[k + "_rte"]);                      // prévision RTE de cette filière connue ce jour-là
-  const tuileSimple = (lib, v, r) => tuile(lib, `${nombre(v)} <small>GWh</small>`, r === null ? t("prod_prevu_jour") : t("rte_jour", { v: nombre(r) }));
-  const rd = (k) => (aR(pd, k) ? somme(pd[k + "_rte"]) : null);
-  $("prod-demain-tuiles").innerHTML = vus.map((x) => tuileSimple(pastTech(x) + t(x.prevu), somme(pd[x.k]), rd(x.k))).join("") + (deux ? tuileSimple(t("total_court"), somme(pd.sol) + somme(pd.eol), aR(pd, "sol") && aR(pd, "eol") ? rd("sol") + rd("eol") : null) : "");
-  const dsD = vus.map((x) => dsProd(t(x.prevu), pd[x.k], x.c));
-  for (const x of vus) if (aR(pd, x.k)) dsD.push(dsProd(t(x.rte), pd[x.k + "_rte"], x.c + "-rte", RTE_DS));
-  dessiner("prod-g-demain", { type: "line", data: { labels: pd.heures, datasets: dsD }, options: optionsGW(12, "GW"), plugins: [curseur] });
-  // 2) contrôle : prévu contre réel, jour au choix (par défaut le dernier jour dont la production réelle est complète)
-  const complets = js.filter((x) => x.prod.reel_complet);
-  if (!etat.jourProd || !js.some((j) => j.jour === etat.jourProd)) etat.jourProd = (complets.length ? complets[complets.length - 1] : js[js.length - 1]).jour;
+  // 1) un jour au choix (par défaut : demain après 11 h 30, comme l'onglet Prévision)
+  const A = joursAccueil(), complets = js.filter((x) => x.prod.reel_complet);
+  if (!etat.jourProd || !js.some((j) => j.jour === etat.jourProd)) etat.jourProd = (A.jHaut && A.jHaut.prod ? A.jHaut : js[js.length - 1]).jour;
   const i = js.findIndex((j) => j.jour === etat.jourProd), j = js[i], p = j.prod;
   const inp = $("prod-date");
   inp.min = js[0].jour; inp.max = js[js.length - 1].jour; inp.value = j.jour;
   $("prod-prec").disabled = i === 0; $("prod-suiv").disabled = i === js.length - 1;
-  $("prod-badge").textContent = `${dateLongue(j.jour)} · ${t(badgeJour(j.jour, now))}`;
-  const nT = p.heures.length, tp_ = (k) => somme(p[k]), tr_ = (k) => (nConnus(p[k + "_reel"]) === nT ? somme(p[k + "_reel"]) : null);
-  const T = vus.map((x) => tuileProd(pastTech(x) + t(x.prevu), tp_(x.k), tr_(x.k), nConnus(p[x.k + "_reel"]), nT));
-  if (deux) T.push(tuileProd(t("total_court"), tp_("sol") + tp_("eol"), tr_("sol") !== null && tr_("eol") !== null ? tr_("sol") + tr_("eol") : null, Math.min(nConnus(p.sol_reel), nConnus(p.eol_reel)), nT));
-  $("prod-tuiles").innerHTML = T.join("");
+  $("prod-titre-jour").textContent = t("prod_jour", { d: dateLongue(j.jour) });
+  $("prod-badge").textContent = t(badgeJour(j.jour, now));
+  const nT = p.heures.length;
+  const tot = (suf) => (vus.length && vus.every((x) => p[x.k + suf] && nConnus(p[x.k + suf]) === nT) ? vus.reduce((s, x) => s + somme(p[x.k + suf]), 0) : null);
+  const vN = vus.length ? vus.reduce((s, x) => s + somme(p[x.k]), 0) : null, vR = rteOn ? tot("_rte") : null, vV = tot("_reel");
+  const nReel = vus.length ? Math.min(...vus.map((x) => nConnus(p[x.k + "_reel"]))) : 0;
+  const ecart = (v) => (v !== null && vV ? t("duel_ecart", { e: signe(ecartPc(v, vV), 1) }) : "");
+  const gagnant = vN !== null && vR !== null && vV ? (Math.abs(vN - vV) <= Math.abs(vR - vV) ? "nous" : "rte") : null;
+  const cas = (cls, trait_, lib, val, det, gagne) => `<div class="duel-case ${cls}${gagne ? " gagne" : ""}"><div class="duel-lib">${trait_}${lib}${gagne ? `<span class="duel-badge">${t("duel_proche")}</span>` : ""}</div>`
+    + `<div class="duel-val">${val}</div><div class="duel-det">${det}</div></div>`;
+  const gwh = (v) => `${nombre(v)} <small>GWh</small>`;
+  let duel = cas("nous", trait("--ink-2", "tirets"), t("duel_nous"), vN === null ? "–" : gwh(vN), vV ? ecart(vN) : t("duel_faite"), gagnant === "nous");
+  const partR = vus.filter((x) => p[x.k + "_rte"]);                              // RTE n'a parfois publié qu'une filière (solaire absent d'ENTSO-E depuis le 26/10/2026)
+  if (rteOn) duel += cas("rte", trait("--muted", "points"), t("duel_rte"),
+    vR !== null ? gwh(vR) : partR.length ? gwh(partR.reduce((s, x) => s + somme(p[x.k + "_rte"]), 0)) : `<span class="duel-vide">${t("duel_rte_absent")}</span>`,
+    vR !== null ? (vV ? ecart(vR) : t("duel_rte_quand")) : partR.length ? t("duel_rte_partiel", { f: t(partR[0].lib).toLowerCase() }) : t("duel_rte_quand"), gagnant === "rte");
+  duel += cas("reel", trait("--ink", "plein"), t("duel_reel"), vV === null ? `<span class="duel-vide">${t("duel_attente")}</span>` : gwh(vV), vV === null ? (nReel ? t("reel_partiel", { h: nReel, n: nT }) : t("duel_attente_d")) : t("duel_mesure"), false);
+  $("prod-duel").innerHTML = vus.length ? duel : "";
+  $("prod-duel").classList.toggle("deux", !rteOn);
+  // graphique + tableau du jour
   const ds = vus.map((x) => dsProd(t(x.prevu), p[x.k], x.c, { borderDash: [6, 4] }));
-  for (const x of vus) if (p[x.k + "_reel"]) ds.push(dsProd(t(x.reel) + " (RTE)", p[x.k + "_reel"], x.c + "-reel", { borderWidth: 3 }));
   for (const x of vus) if (aR(p, x.k)) ds.push(dsProd(t(x.rte), p[x.k + "_rte"], x.c + "-rte", RTE_DS));
+  for (const x of vus) if (p[x.k + "_reel"]) ds.push(dsProd(t(x.reel) + " (RTE)", p[x.k + "_reel"], x.c + "-reel", { borderWidth: 3 }));
   const ch = dessiner("prod-g-jour", { type: "line", data: { labels: p.heures, datasets: ds }, options: optionsGW(12, "GW"), plugins: [curseur] });
   $("prod-g-jour").setAttribute("aria-label", dateLongue(j.jour));
+  const tp_ = (k) => somme(p[k]), tr_ = (k) => (nConnus(p[k + "_reel"]) === nT ? somme(p[k + "_reel"]) : null);
   const v = (a, k) => (a ? nombre(a[k]) : "–");
   const ec = (a, b, k) => (a && b && b[k] !== null && b[k] !== undefined ? signe(a[k] - b[k]) : "–");
   const ecJ = (a, b) => (b === null ? "–" : `${signe(ecartPc(a, b), 0)} %`);
@@ -1206,6 +1232,7 @@ function rendreProduction() {
   h += `</tbody><tfoot><tr><td>GWh</td>` + vus.map((x) => `<td class="groupe">${nombre(tp_(x.k))}</td>${ar ? `<td class="faible">${p[x.k + "_rte"] ? nombre(somme(p[x.k + "_rte"])) : "–"}</td>` : ""}<td class="reel">${tr_(x.k) === null ? "–" : nombre(tr_(x.k))}</td><td>${ecJ(tp_(x.k), tr_(x.k))}</td>`).join("") + "</tr></tfoot>";
   $("prod-table").innerHTML = vus.length ? h : "";
   if (vus.length) { collerEntetes($("prod-table")); lier(ch, "prod-table"); }
+  // régions du jour choisi
   const cellE = (pr, r) => (r === null ? "<td>–</td>" : `<td>${signe(ecartPc(pr, r), 0)} %</td>`);
   const col = { sol: [1, 2], eol: [3, 4] };
   let hr = `<thead><tr><th rowspan="2">${t("region")} · ${dateCourte(j.jour)}</th>${vus.map((x) => `<th colspan="3" class="groupe modele">${pastTech(x)} ${t(x.lib)}</th>`).join("")}</tr>`
@@ -1214,46 +1241,43 @@ function rendreProduction() {
   hr += `</tbody><tfoot><tr><td>${t("france")}</td>` + vus.map((x) => `<td class="groupe">${nombre(tp_(x.k))}</td><td class="reel">${tr_(x.k) === null ? "–" : nombre(tr_(x.k))}</td>${cellE(tp_(x.k), tr_(x.k))}`).join("") + "</tr></tfoot>";
   $("prod-regions").innerHTML = vus.length ? hr : "";
   if (vus.length) collerEntetes($("prod-regions"));
-  // 3) précision sur tout l'historique (jours dont la production réelle est connue toute la journée)
-  const perf = (P_, R_) => {
-    let sj = 0, sh = 0, sb = 0, sr2 = 0;
-    for (const x of complets) {
-      const P = P_(x.prod), R = R_(x.prod);
-      sj += Math.abs(somme(P) - somme(R)); sb += somme(P) - somme(R); sr2 += somme(R);
-      P.forEach((y, k) => { sh += Math.abs(y - R[k]); });
-    }
-    return sr2 ? { j: (100 * sj) / sr2, h: (100 * sh) / sr2, b: (100 * sb) / sr2 } : null;
-  };
-  const tp = (lib, q) => tuile(lib, q ? `${nombre(q.j)} <small>%</small>` : "–", q ? t("perf_ligne", { j: nombre(q.j), h: nombre(q.h), b: signe(q.b) }) + " · " + t("perf_n", { n: complets.length }) : "");
-  $("prod-perf").innerHTML = vus.map((x) => tp(pastTech(x) + t(x.lib), perf((y) => y[x.k], (y) => y[x.k + "_reel"]))).join("")
-    + (deux ? tp(t("total_court"), perf((x) => x.sol.map((y, k) => y + x.eol[k]), (x) => x.sol_reel.map((y, k) => y + x.eol_reel[k]))) : "");
-  // 3b) nous contre RTE, sur les mêmes jours (réel complet et prévision RTE connue)
-  const cr = complets.filter((x) => x.prod.sol_rte && x.prod.eol_rte);
-  const mes = (P_, R_) => {
+  // 2) tout l'historique : notre modèle contre RTE, mêmes jours (réel complet et prévision RTE des filières cochées connue)
+  const cr = complets.filter((x) => vus.length && vus.every((y) => x.prod[y.k + "_rte"]));
+  const cle = (k, a) => (a === "" ? k : k + "_" + a);
+  const serie = (k, a) => (k === "tot" ? (q) => q[cle("sol", a)].map((y, n) => y + q[cle("eol", a)][n]) : (q) => q[cle(k, a)]);
+  const mes = (P_, R_, J) => {
     let sj = 0, sh = 0, sb = 0, sr = 0;
-    for (const x of cr) { const P = P_(x.prod), R = R_(x.prod); sj += Math.abs(somme(P) - somme(R)); sb += somme(P) - somme(R); sr += somme(R); P.forEach((y, k) => { sh += Math.abs(y - R[k]); }); }
+    for (const x of J) { const P = P_(x.prod), R = R_(x.prod); sj += Math.abs(somme(P) - somme(R)); sb += somme(P) - somme(R); sr += somme(R); P.forEach((y, n) => { sh += Math.abs(y - R[n]); }); }
     return { j: (100 * sj) / sr, h: (100 * sh) / sr, b: (100 * sb) / sr };
   };
-  const cle = (k, a) => (a === "" ? k : k + "_" + a);
-  const serie = (k, a) => (k === "tot" ? (q) => q[cle("sol", a)].map((y, i) => y + q[cle("eol", a)][i]) : (q) => q[cle(k, a)]);
-  const lignesR = vus.map((x) => [pastTech(x) + t(x.lib), x.k]).concat(deux ? [[t("total_court"), "tot"]] : []);
-  let hrt = `<thead><tr>${t("rte_cols").map((c, i) => `<th${i === 0 ? "" : ' class="num"'}>${i === 0 ? t("jours_n", { n: cr.length }) : c}</th>`).join("")}</tr></thead><tbody>`;
-  for (const [lib, k] of lignesR) {
-    const n = mes(serie(k, ""), serie(k, "reel")), r = mes(serie(k, "rte"), serie(k, "reel"));
-    const mieux = cr.filter((x) => Math.abs(somme(serie(k, "")(x.prod)) - somme(serie(k, "reel")(x.prod))) < Math.abs(somme(serie(k, "rte")(x.prod)) - somme(serie(k, "reel")(x.prod)))).length;
-    const b = (u, w) => (u < w ? ` class="positif"` : "");
-    hrt += `<tr><td>${lib}</td><td${b(n.j, r.j)}>${nombre(n.j)} %</td><td${b(r.j, n.j)}>${nombre(r.j)} %</td><td${b(n.h, r.h)}>${nombre(n.h)} %</td><td${b(r.h, n.h)}>${nombre(r.h)} %</td>`
-      + `<td>${signe(n.b)} %</td><td>${signe(r.b)} %</td><td>${nombre((100 * mieux) / cr.length, 0)} %</td></tr>`;
-  }
-  if (cr.length) {                                                   // résumé en tête d'onglet : total solaire + éolien, toujours (indépendant des cases)
-    const n = mes(serie("tot", ""), serie("tot", "reel")), r = mes(serie("tot", "rte"), serie("tot", "reel"));
-    const mieux = cr.filter((x) => Math.abs(somme(serie("tot", "")(x.prod)) - somme(serie("tot", "reel")(x.prod))) < Math.abs(somme(serie("tot", "rte")(x.prod)) - somme(serie("tot", "reel")(x.prod)))).length;
-    $("prod-rte-tuiles").innerHTML = tuile(t("rte_t_jour"), `${nombre(n.j)} <small>% ${t("rte_t_nous")}</small>`, t("rte_t_rte", { v: nombre(r.j) }))
-      + tuile(t("rte_t_heure"), `${nombre(n.h)} <small>% ${t("rte_t_nous")}</small>`, t("rte_t_rte", { v: nombre(r.h) }))
-      + tuile(t("rte_t_mieux"), `${nombre((100 * mieux) / cr.length, 0)} <small>%</small>`, t("rte_t_n", { n: cr.length }));
-  }
+  const kv = deux ? "tot" : vus.length ? vus[0].k : null;
   $("prod-rte-carte").hidden = !cr.length;
-  $("prod-rte").innerHTML = cr.length && vus.length ? hrt + "</tbody>" : "";
+  if (cr.length) {
+    const n = mes(serie(kv, ""), serie(kv, "reel"), cr), r = mes(serie(kv, "rte"), serie(kv, "reel"), cr);
+    const errJ = (x, a) => (100 * Math.abs(somme(serie(kv, a)(x.prod)) - somme(serie(kv, "reel")(x.prod)))) / somme(serie(kv, "reel")(x.prod));
+    const mieux = cr.filter((x) => errJ(x, "") < errJ(x, "rte")).length;
+    const quoi = (deux ? t("total_court") : t(vus[0].lib)).toLowerCase();
+    $("prod-rte-titre").textContent = t("rte_hist_titre", { q: quoi, n: cr.length });
+    const pc = (x) => `${nombre(x)} <small>%</small>`;
+    $("prod-rte-duel").innerHTML = cas("nous", trait("--ink-2", "tirets"), t("duel_nous"), pc(n.j), t("hist_det", { h: nombre(n.h), b: signe(n.b) }), n.j < r.j)
+      + cas("rte", trait("--muted", "points"), t("duel_rte"), pc(r.j), t("hist_det", { h: nombre(r.h), b: signe(r.b) }), r.j <= n.j)
+      + cas("reel", "", t("hist_mieux"), `${nombre((100 * mieux) / cr.length, 0)} <small>% ${t("hist_jours")}</small>`, t("hist_mieux_d", { m: mieux, n: cr.length }), false);
+    dessiner("prod-g-err", { type: "line", data: { labels: cr.map((x) => dateCourte(x.jour)), datasets: [
+      dsProd(t("duel_nous"), cr.map((x) => errJ(x, "")), "--s-em", { pointRadius: 2.5, borderWidth: 2 }),
+      dsProd(t("duel_rte"), cr.map((x) => errJ(x, "rte")), "--muted", { pointRadius: 2.5, borderDash: [2, 3], borderWidth: 2 })] }, options: optionsGW(10, "%"), plugins: [curseur] });
+    const lignesR = vus.map((x) => [pastTech(x) + t(x.lib), x.k]).concat(deux ? [[t("total_court"), "tot"]] : []);
+    let hrt = `<thead><tr>${t("rte_cols").map((c, q) => `<th${q === 0 ? "" : ' class="num"'}>${q === 0 ? t("jours_n", { n: cr.length }) : c}</th>`).join("")}</tr></thead><tbody>`;
+    for (const [lib, k] of lignesR) {
+      const a = mes(serie(k, ""), serie(k, "reel"), cr), b = mes(serie(k, "rte"), serie(k, "reel"), cr);
+      const e1 = (x, s) => Math.abs(somme(serie(k, s)(x.prod)) - somme(serie(k, "reel")(x.prod)));
+      const m = cr.filter((x) => e1(x, "") < e1(x, "rte")).length;
+      const g = (u, w) => (u < w ? ` class="positif"` : "");
+      hrt += `<tr><td>${lib}</td><td${g(a.j, b.j)}>${nombre(a.j)} %</td><td${g(b.j, a.j)}>${nombre(b.j)} %</td><td${g(a.h, b.h)}>${nombre(a.h)} %</td><td${g(b.h, a.h)}>${nombre(b.h)} %</td>`
+        + `<td>${signe(a.b)} %</td><td>${signe(b.b)} %</td><td>${nombre((100 * m) / cr.length, 0)} %</td></tr>`;
+    }
+    $("prod-rte").innerHTML = hrt + "</tbody>";
+  } else effacer("prod-g-err");
+  // 3) totaux de chaque jour
   const lab = js.map((x) => dateCourte(x.jour));
   const totJ = (x, k) => (x.prod[k] && nConnus(x.prod[k]) === x.prod.heures.length ? somme(x.prod[k]) : null);
   for (const x of TECHS) {
