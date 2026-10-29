@@ -964,6 +964,8 @@ function rendrePrevision() {
   rendreBloc("haut", iso, jourDe(iso), A.now);
 }
 
+function ouvrirJour(iso) { etat.jourPrev = iso; location.hash = "#prevision/" + iso; }
+
 /* ---------------------------------------------------------------- onglet Performance */
 function rendrePerformance() {
   segments("perf-periode", [["tout", t("pf_tout")], ["30", t("pf_30")], ["direct", t("pf_direct")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
