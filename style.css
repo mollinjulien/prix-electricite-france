@@ -293,3 +293,33 @@ details.compact[open] summary { margin-bottom: 14px; }
 .chip-etape b { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
 .resume-etapes { gap: 4px 18px; }
 details.compact summary { cursor: pointer; }
+
+/* bloc du jour compact (31/10) */
+.bloc-jour .titre-jour { margin-bottom: 12px; }
+.bloc-jour details.compact { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; margin-bottom: 14px; }
+.bloc-jour details.compact summary .petit-titre { margin: 0; font-size: 0.84rem; }
+.bloc-jour details.compact[open] { padding-bottom: 14px; }
+.bloc-jour .tuiles { margin-bottom: 16px; }
+.outils-gauche { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.outils-gauche .navigation-jour { margin: 0; }
+.tuile .duo-valeurs { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 6px; }
+.tuile .petit { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.tuile .duo-valeurs .valeur { font-size: 1.6rem; margin-top: 0; }
+.tuile .valeur.erreur { color: var(--ink); }
+.tuile .valeur .attente { font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+.tuile.principal { border-color: var(--s-em); box-shadow: inset 3px 0 0 var(--s-em); }
+.etiquette.principal { background: var(--s-em); border-color: var(--s-em); color: #fff; }
+.etiquette.meilleur { border-color: var(--ok); color: var(--ok-texte); }
+.menu-modeles { position: relative; }
+.menu-modeles > summary { list-style: none; cursor: pointer; font-size: 0.86rem; padding: 6px 12px; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-modeles > summary::-webkit-details-marker { display: none; }
+.menu-liste { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: min(460px, 88vw); max-height: 60vh; overflow: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); padding: 6px; }
+.menu-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 7px; cursor: pointer; }
+.menu-item:hover { background: var(--wash); }
+.menu-item input { margin: 0; accent-color: var(--ink); }
+.menu-item.principal { background: color-mix(in srgb, var(--s-em) 10%, transparent); }
+.menu-nom { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.menu-nom small { color: var(--muted); font-size: 0.74rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-tags { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.menu-err { font-size: 0.78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.menu-liste .bouton-discret { margin: 6px 4px 2px; }

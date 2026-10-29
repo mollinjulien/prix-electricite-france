@@ -5,7 +5,7 @@ const TXT = {
   fr: {
     titre: "Prix de l'électricité de demain en France",
     sous_titre: "Chaque matin, nos modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Le modèle principal est la moyenne de quatre variantes du modèle « Europe », qui combine prévisions météo, gaz, marchés voisins, prix britannique et nucléaire disponible. Les prévisions sont ensuite comparées au prix fixé par le marché.",
-    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
+    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_attente: "en attente du prix", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
     maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
@@ -260,7 +260,7 @@ const TXT = {
   en: {
     titre: "Tomorrow's electricity price in France",
     sous_titre: "Every morning, our machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. The main model is the average of four variants of the \"Europe\" model, which combines weather forecasts, gas, neighbouring markets, the British price and available nuclear capacity. Forecasts are then compared with the price set by the market.",
-    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
+    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", modeles_menu: "Models", m_meilleur: "best of the day", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_attente: "awaiting price", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
     maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
@@ -527,7 +527,7 @@ const MODELES_ANCIENS = [                                             // toujour
   { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: "tag_ancien" },
 ];
 const TOUS = MODELES.concat(MODELES_ANCIENS);
-const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, modelePrev: null,
+const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, selPrev: null, menuOuvert: false,
                visibles: { EM: true, EP: true, EU: true, EUC: true, GB: true, GR: true, CR: true, GT: true, hier: false, bande: true },
                prodVisibles: { sol: true, eol: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", jourProd: null,
@@ -841,18 +841,18 @@ function badgeJour(iso, now) {
   if (iso === ajouterJours(now.date, -1)) return "b_hier";
   return "b_passe";
 }
+const meilleurDuJour = (j) => TOUS.map((m) => m.code).filter((k) => j[k] && j.erreurs && j.erreurs[k]).reduce((a, b) => (a === null || j.erreurs[b].mae < j.erreurs[a].mae ? b : a), null);
+const etiquetteJour = (m, j) => ` <span class="etiquette${m.code === j.principal ? " principal" : ""}">${t(m.code === j.principal ? "tag_principal" : m.tag)}</span>`;
+function tuileModele(m, j, best) {
+  const e = j.erreurs && j.erreurs[m.code];
+  return `<div class="tuile modele${m.code === j.principal ? " principal" : ""}" title="${nomModele(m.code)}"><div class="libelle">${pastille(m.code)}${courtModele(m.code)}${etiquetteJour(m, j)}${etiquetteMeilleur(m.code === best)}</div>`
+    + `<div class="duo-valeurs"><div><div class="petit">${t("t_moyenne")}</div><div class="valeur">${enEuros(moyenne(j[m.code]))}</div></div>`
+    + `<div><div class="petit">${t("t_erreur")}</div><div class="valeur erreur">${e ? enEuros(e.mae) : `<span class="attente">${t("t_attente")}</span>`}</div></div></div></div>`;
+}
 function tuilesJour(j) {
-  const T = [], b = meilleur(j);
-  if (j.reel) T.push(tuile(pastille("reel") + t("marche_moyen"), enEuros(moyenne(j.reel)), dateCourte(j.jour)));
-  for (const m of visibles(j)) {
-    const e = j.erreurs && j.erreurs[m.code];
-    T.push(tuile(pastille(m.code) + courtModele(m.code) + etiquette(m) + etiquetteMeilleur(m.code === b), enEuros(moyenne(j[m.code])),
-                 e ? t("prevu_erreur", { x: nombre(e.mae) }) + " · " + t("corr_court", { r: nombre(correlation(j[m.code], j.reel), 2) }) : t("prix_moyen"), nomModele(m.code)));
-  }
-  if (etat.visibles.hier) {
-    const e = j.erreurs && j.erreurs.hier;
-    T.push(tuile(pastille("hier") + t("veille"), enEuros(moyenne(j.hier)), e ? t("prevu_erreur", { x: nombre(e.mae) }) + " · " + t("corr_court", { r: nombre(correlation(j.hier, j.reel), 2) }) : t("hier")));
-  }
+  const T = [], b = meilleurDuJour(j);
+  if (j.reel) T.push(`<div class="tuile marche"><div class="libelle">${pastille("reel")}${t("marche_moyen")}</div><div class="duo-valeurs"><div><div class="petit">${t("t_moyenne")}</div><div class="valeur">${enEuros(moyenne(j.reel))}</div></div></div></div>`);
+  for (const m of visibles(j)) T.push(tuileModele(m, j, b));
   const ref = j.reel ? "reel" : j.principal && j[j.principal] ? j.principal : modelesDuJour(j).length ? modelesDuJour(j)[0].code : null;
   if (ref) {
     const h = parHeure(j[ref], j.heures), lab = heuresLabels(j.heures), v = h.filter((x) => x !== null);
@@ -876,10 +876,14 @@ function tablePrix(id, s, j) {                                       // tableau 
 const SEL_VIDE = () => Object.fromEntries(TOUS.map((m) => [m.code, false]).concat([["hier", false], ["bande", false]]));
 const modeleParDefaut = (j) => (j.principal && j[j.principal] ? j.principal : (TOUS.find((m) => j[m.code]) || {}).code);
 const modelesDispos = (j) => TOUS.filter((m) => j[m.code]);
-function rendreBloc(cote, iso, j, now) {                              // un seul graphique : le modèle choisi (par défaut le principal du jour) et le marché
+function selectionDuJour(j) {                                        // modèles cochés dans le menu (ceux qui existent ce jour-là), sinon le principal du jour
+  const sel = (etat.selPrev || []).filter((c) => j[c]);
+  return sel.length ? sel : [modeleParDefaut(j)];
+}
+function rendreBloc(cote, iso, j, now) {                              // un seul graphique : les modèles choisis (par défaut le principal du jour) et le marché
   const sauv = etat.visibles;
   try {
-    if (j) { const sel = etat.modelePrev && j[etat.modelePrev] ? etat.modelePrev : modeleParDefaut(j); etat.visibles = { ...SEL_VIDE(), [sel]: true }; }
+    if (j) { etat.visibles = SEL_VIDE(); for (const c of selectionDuJour(j)) etat.visibles[c] = true; }
     rendreBlocJour(cote, iso, j, now);
   } finally { etat.visibles = sauv; }
 }
@@ -900,35 +904,52 @@ function lierNavigation(iso) {
   $("prev-prec").addEventListener("click", () => ouvrirJour(ajouterJours(iso, -1)));
   $("prev-suiv").addEventListener("click", () => ouvrirJour(ajouterJours(iso, 1)));
 }
+function menuModeles(p, j) {                                         // menu déroulant à cases à cocher : principal mis en avant, meilleur du jour signalé
+  const sel = selectionDuJour(j), best = meilleurDuJour(j);
+  const ligne = (m) => {
+    const e = j.erreurs && j.erreurs[m.code], pr = m.code === j.principal;
+    return `<label class="menu-item${pr ? " principal" : ""}"><input type="checkbox" data-c="${m.code}"${sel.includes(m.code) ? " checked" : ""}>${pastille(m.code)}`
+      + `<span class="menu-nom"><b>${courtModele(m.code)}</b><small>${nomModele(m.code)}</small></span>`
+      + `<span class="menu-tags">${pr ? `<span class="etiquette principal">${t("tag_principal")}</span>` : ""}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
+      + `${e ? `<span class="menu-err">${nombre(e.mae)} €</span>` : ""}</span></label>`;
+  };
+  const resume = sel.map((c) => courtModele(c)).join(", ");
+  return `<details class="menu-modeles" id="${p}-menu"${etat.menuOuvert ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span> ${resume} ▾</summary>`
+    + `<div class="menu-liste">${modelesDispos(j).map(ligne).join("")}<button type="button" class="bouton-discret" id="${p}-reset">${t("m_reset")}</button></div></details>`;
+}
 function rendreBlocJour(cote, iso, j, now) {
   const p = "p-" + cote, el = $("prev-" + cote), badge = badgeJour(iso, now), nav = navigationJour(iso);
-  const tete = (extra) => `<div class="titre-jour"><h2>${t("prix_du", { d: dateLongue(iso) })}</h2><span class="badge${badge === "b_demain" ? " fort" : ""}">${t(badge)}</span>${extra}</div>${nav}`;
+  const tete = (extra) => `<div class="titre-jour"><h2>${t("prix_du", { d: dateLongue(iso) })}</h2><span class="badge${badge === "b_demain" ? " fort" : ""}">${t(badge)}</span>${extra}</div>`;
   if (!j) {
     effacer(p + "-graphique");
     const att = `<div class="etapes-jour">${etapesAttente(ajouterJours(iso, -1))}</div>`;
     el.innerHTML = tete(iso > now.date ? `<span class="badge">${t("b_calcul")}</span>` : "")
-      + (iso > now.date ? `<details class="carte replie compact"><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(att)}</summary>${att}<p class="note">${t("attente_d")}</p></details>` : `<div class="carte"><p class="note">${t("pas_de_reel")}</p></div>`);
+      + (iso > now.date ? `<details class="replie compact"><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(att)}</summary>${att}<p class="note">${t("attente_d")}</p></details>` : "")
+      + `<div class="carte"><div class="barre-outils">${nav}</div><p class="note">${t(iso > now.date ? "attente_d" : "pas_de_reel")}</p></div>`;
     lierNavigation(iso);
     return;
   }
   const etapes = j.controles && Object.keys(j.controles).length ? `<div class="etapes-jour">${etapesJour(j)}</div>` : "";
-  const bloc = !etapes ? "" : `<details class="carte replie compact" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(etapes)}</summary>${etapes}</details>`;
+  const bloc = !etapes ? "" : `<details class="replie compact" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(etapes)}</summary>${etapes}</details>`;
   el.innerHTML = tete(j.reel ? `<span class="badge">${t("b_reel")}</span>` : "") + bloc
     + `<div class="tuiles">${tuilesJour(j)}</div>`
-    + `<div class="carte"><div class="barre-outils"><h3 class="petit-titre">${t("prix_du_jour")}</h3><div class="segments" id="${p}-pas" role="group"></div></div>`
-    + `<div class="choix" id="${p}-choix"></div>`
+    + `<div class="carte"><div class="barre-outils"><div class="outils-gauche">${nav}${menuModeles(p, j)}</div><div class="segments" id="${p}-pas" role="group"></div></div>`
     + `<div class="duo"><div class="cadre-table"><table id="${p}-table" class="table-donnees"></table></div>`
     + `<div class="graphique"><canvas id="${p}-graphique" role="img" aria-label="${t("prix_du", { d: dateLongue(iso) })}"></canvas></div></div>`
-    + `<p class="note">${t(j.reel ? "note_prev_reel" : "note_prev_attente")}</p></div>`;
+    + `<p class="note">${t("prix_du_jour")} · ${t(j.reel ? "note_prev_reel" : "note_prev_attente")}</p></div>`;
   lierNavigation(iso);
   const det = $(p + "-details");
   if (det) det.addEventListener("toggle", () => { etat.etapesOuvertes = det.open; });
   segments(p + "-pas", [["quart", t("p_quart")], ["heure", t("p_heure")]], etat.pasPrev[cote], (v) => { etat.pasPrev[cote] = v; rendreBloc(cote, iso, j, maintenantParis()); });
-  const s = series(j, etat.pasPrev[cote]), sel = modeleParDefaut(j) && etat.visibles ? Object.keys(etat.visibles).find((c) => etat.visibles[c]) : null;
-  const options_ = modelesDispos(j).map((m) => `<option value="${m.code}"${m.code === sel ? " selected" : ""}>${courtModele(m.code)} · ${nomModele(m.code)}${m.code === j.principal ? " (" + t("tag_principal") + ")" : ""}</option>`).join("");
-  $(p + "-choix").innerHTML = `<label class="choix-modele"><span class="choix-titre">${t("modele_aff")}</span><select id="${p}-modele">${options_}</select></label>`
-    + (s.reel ? `<span class="choix-legende"><span class="choix-fixe">${pastille("reel")}${t("marche")}</span></span>` : "");
-  $(p + "-modele").addEventListener("change", (e) => { etat.modelePrev = e.target.value; rendreBloc(cote, iso, j, maintenantParis()); });
+  const menu = $(p + "-menu");
+  menu.addEventListener("toggle", () => { etat.menuOuvert = menu.open; });
+  menu.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => {
+    const L = [...menu.querySelectorAll("input:checked")].map((x) => x.dataset.c);
+    etat.selPrev = L.length ? L : null;
+    rendreBloc(cote, iso, j, maintenantParis());
+  }));
+  $(p + "-reset").addEventListener("click", () => { etat.selPrev = null; rendreBloc(cote, iso, j, maintenantParis()); });
+  const s = series(j, etat.pasPrev[cote]);
   tablePrix(p + "-table", s, j);
   lier(dessiner(p + "-graphique", { type: "line", data: { labels: s.labels, datasets: dsJour(s, j) }, options: options(13), plugins: [curseur] }), p + "-table");
 }
@@ -1242,6 +1263,7 @@ function demarrer() {
     const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click();
   });
   window.addEventListener("hashchange", () => { lireAncre(); afficher(); });
+  document.addEventListener("click", (e) => { const m = document.querySelector(".menu-modeles[open]"); if (m && !m.contains(e.target)) { m.open = false; etat.menuOuvert = false; } });
   $("prod-date").addEventListener("change", (e) => { if (jourDe(e.target.value)) ouvrirProd(e.target.value); });
   const pasProd = (d) => { const js = jours().filter((j) => j.prod), i = js.findIndex((j) => j.jour === etat.jourProd) + d; if (js[i]) ouvrirProd(js[i].jour); };
   $("prod-prec").addEventListener("click", () => pasProd(-1));
