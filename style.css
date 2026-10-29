@@ -274,3 +274,22 @@ details.compact[open] summary { margin-bottom: 14px; }
 .resume-etapes { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; margin-left: auto; font-size: 0.84rem; color: var(--ink-2); }
 .resume-pastille { display: inline-flex; align-items: center; gap: 5px; }
 .resume-pastille .coche { width: 18px; height: 18px; font-size: 0.68rem; }
+
+/* étapes épurées */
+.etapes-jour { gap: 4px 36px; }
+.groupe-etapes h4 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.groupe-etapes .compte { font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.groupe-etapes .coches { gap: 11px; }
+.coches li { gap: 11px; align-items: baseline; }
+.point { flex-shrink: 0; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transform: translateY(-1px); }
+.point.ok { background: var(--ok); }
+.point.alerte { background: var(--alerte); }
+.point.echec { background: var(--echec); }
+.point.info { background: var(--muted); opacity: 0.55; }
+.point.attente { background: transparent; box-shadow: inset 0 0 0 1.5px var(--muted); }
+.coches .libelle { font-weight: 450; font-size: 0.88rem; color: var(--ink); }
+.coches .detail { margin-top: 1px; font-size: 0.78rem; line-height: 1.35; }
+.chip-etape { display: inline-flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--ink-2); }
+.chip-etape b { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+.resume-etapes { gap: 4px 18px; }
+details.compact summary { cursor: pointer; }

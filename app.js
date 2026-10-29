@@ -13,7 +13,7 @@ const TXT = {
     attente_d: "Le calcul démarre vers 11 h 30 (après la publication du prix britannique) et dure une quinzaine de minutes. Cette page se met à jour toute seule.",
     etapes_titre: "Étapes de la prévision",
     etapes_voir: "Étapes de la prévision de ce jour",
-    g_donnees: "Données reçues", g_calculs: "Calculs", g_resultat: "Publication et vérification",
+    g_donnees: "Données reçues", g_calculs: "Calculs", g_resultat: "Publication et vérification", g_donnees_c: "Données", g_calculs_c: "Calculs", g_resultat_c: "Publication",
     prix_du_jour: "Prix de la journée, en €/MWh (heure de Paris)",
     p_quart: "Quart d'heure", p_heure: "Heure", p_jour: "Moyenne par jour",
     note_prev_attente: "Le prix du marché s'ajoutera au tableau et au graphique dès sa publication (enchère de 12 h 45, récupéré vers 13 h 45).",
@@ -30,7 +30,7 @@ const TXT = {
     ck_modele_d: "appris avec les prix jusqu'au {v} inclus · {h} heures prévues · {a} arbres", ck_modele_d_simple: "appris avec les prix jusqu'au {v} inclus",
     ck_modele_rejeu: "calculé a posteriori (rejeu)", ck_modele_absent_d: "absent de la prévision", ck_modele_sans_gaz: "pas de prix du gaz récent",
     ck_publie: "Prévision publiée", nk_publie: "Publication de la prévision",
-    ck_publie_avant: "le {d}, avant l'enchère de 12 h 45", ck_publie_apres: "le {d}, après l'enchère de 12 h 45", ck_publie_att: "vers 10 h 30",
+    ck_publie_d: "le {d}", ck_publie_att: "vers 10 h 30",
     ck_reel: "Prix réel de l'électricité reçu", nk_reel: "Prix réel de l'électricité", ck_reel_d: "le {d}", ck_reel_fichier: "fichier des prix du marché",
     ck_reel_attente: "publié vers 12 h 45 le {d}, récupéré vers 13 h 45", ck_reel_cours: "enchère publiée à 12 h 45 : récupération vers 13 h 45", ck_reel_retard: "pas encore reçu",
     ck_ecarts: "Écarts calculés", nk_ecarts: "Calcul des écarts", ck_ecarts_d: "meilleur : « {m} », {x} €/MWh d'erreur moyenne", ck_ecarts_att: "dès que le prix réel est reçu",
@@ -268,7 +268,7 @@ const TXT = {
     attente_d: "The computation starts around 11:30 (after the British price is published) and takes about fifteen minutes. This page updates by itself.",
     etapes_titre: "Forecast steps",
     etapes_voir: "Forecast steps for this day",
-    g_donnees: "Data received", g_calculs: "Computations", g_resultat: "Publication and check",
+    g_donnees: "Data received", g_calculs: "Computations", g_resultat: "Publication and check", g_donnees_c: "Data", g_calculs_c: "Models", g_resultat_c: "Publication",
     prix_du_jour: "Prices over the day, €/MWh (Paris time)",
     p_quart: "Quarter-hour", p_heure: "Hour", p_jour: "Daily average",
     note_prev_attente: "The market price will be added to the table and chart once published (12:45 auction, fetched around 13:45).",
@@ -285,7 +285,7 @@ const TXT = {
     ck_modele_d: "trained on prices up to {v} included · {h} hours forecast · {a} trees", ck_modele_d_simple: "trained on prices up to {v} included",
     ck_modele_rejeu: "computed afterwards (replay)", ck_modele_absent_d: "missing from the forecast", ck_modele_sans_gaz: "no recent gas price",
     ck_publie: "Forecast published", nk_publie: "Forecast publication",
-    ck_publie_avant: "{d}, before the 12:45 auction", ck_publie_apres: "{d}, after the 12:45 auction", ck_publie_att: "around 10:30",
+    ck_publie_d: "{d}", ck_publie_att: "around 10:30",
     ck_reel: "Actual electricity price received", nk_reel: "Actual electricity price", ck_reel_d: "{d}", ck_reel_fichier: "market price file",
     ck_reel_attente: "published around 12:45 on {d}, fetched around 13:45", ck_reel_cours: "auction published at 12:45: fetched around 13:45", ck_reel_retard: "not received yet",
     ck_ecarts: "Errors computed", nk_ecarts: "Error computation", ck_ecarts_d: "best: \"{m}\", {x} €/MWh mean error", ck_ecarts_att: "once the actual price is received",
@@ -757,11 +757,14 @@ function lier(chart, tableId) {                                      // survol d
 
 /* ---------------------------------------------------------------- étapes de la prévision (coches) */
 const SYMBOLES = { ok: "✓", attente: "…", alerte: "!", echec: "✕", info: "i" };
-function groupesEtapes(G) {
-  return [["donnees", "g_donnees"], ["calculs", "g_calculs"], ["resultat", "g_resultat"]].map(([k, titre], n) =>
-    `<div class="groupe-etapes"><h4><span class="num">${n + 1}</span>${t(titre)}</h4><ul class="coches">`
-    + G[k].map(([cls, lib, det]) => `<li><span class="coche ${cls}" aria-hidden="true">${SYMBOLES[cls]}</span><span><span class="libelle">${lib}</span>${det ? `<span class="detail">${det}</span>` : ""}</span></li>`).join("")
-    + "</ul></div>").join("");
+function groupesEtapes(G) {                                           // trois colonnes sobres : un point de couleur par étape, un compteur par groupe
+  const niveau = (L) => (L.some((x) => x[0] === "echec") ? "echec" : L.some((x) => x[0] === "alerte") ? "alerte" : L.some((x) => x[0] === "attente") ? "attente" : "ok");
+  return [["donnees", "g_donnees"], ["calculs", "g_calculs"], ["resultat", "g_resultat"]].map(([k, titre]) => {
+    const L = G[k], fait = L.filter((x) => x[0] === "ok" || x[0] === "info").length;
+    return `<div class="groupe-etapes" data-cle="${titre}" data-niveau="${niveau(L)}" data-fait="${fait}" data-total="${L.length}"><h4>${t(titre)}<span class="compte">${fait}/${L.length}</span></h4><ul class="coches">`
+      + L.map(([cls, lib, det]) => `<li class="${cls}"><span class="point ${cls}" aria-hidden="true"></span><span><span class="libelle">${lib}</span>${det ? `<span class="detail">${det}</span>` : ""}</span></li>`).join("")
+      + "</ul></div>";
+  }).join("");
 }
 function etapesJour(j) {
   const G = { donnees: [], calculs: [], resultat: [] }, ajout = (g, cls, lib, det) => G[g].push([cls, lib, det]);
@@ -806,8 +809,7 @@ function etapesJour(j) {
   }
   if (!rejeu) {
     if (j.genere) {
-      const avant = j.genere.slice(0, 16) <= `${veille}T12:45`;
-      ajout("resultat", avant ? "ok" : "alerte", t("ck_publie"), t(avant ? "ck_publie_avant" : "ck_publie_apres", { d: dateHeure(j.genere) }));
+      ajout("resultat", "ok", t("ck_publie"), t("ck_publie_d", { d: dateHeure(j.genere) }));
     } else ajout("resultat", "info", t("nk_publie"), t("ck_inconnu"));
   }
   if (j.reel) ajout("resultat", "ok", t("ck_reel"), !rejeu && j.reel_recu && j.reel_recu !== "fichier" ? t("ck_reel_d", { d: dateHeure(j.reel_recu) }) : t("ck_reel_fichier"));
@@ -881,10 +883,10 @@ function rendreBloc(cote, iso, j, now) {                              // un seul
     rendreBlocJour(cote, iso, j, now);
   } finally { etat.visibles = sauv; }
 }
-function resumeEtapes(html) {                                         // pastilles de synthèse dans l'en-tête repliable : nombre d'étapes réussies, en alerte, en échec, en attente
-  const n = (c) => (html.match(new RegExp(`class="coche ${c}"`, "g")) || []).length;
-  const un = (c, sym, k) => (k ? `<span class="resume-pastille"><span class="coche ${c}" aria-hidden="true">${sym}</span>${k}</span>` : "");
-  return `<span class="resume-etapes">${un("ok", SYMBOLES.ok, n("ok"))}${un("alerte", SYMBOLES.alerte, n("alerte"))}${un("echec", SYMBOLES.echec, n("echec"))}${un("attente", SYMBOLES.attente, n("attente"))}</span>`;
+function resumeEtapes(html) {                                         // ligne de synthèse de l'en-tête repliable : un point et un compteur par groupe d'étapes
+  const re = /data-cle="(\w+)" data-niveau="(\w+)" data-fait="(\d+)" data-total="(\d+)"/g, L = [];
+  for (const m of html.matchAll(re)) L.push(`<span class="chip-etape"><span class="point ${m[2]}"></span>${t(m[1] + "_c")} <b>${m[3]}/${m[4]}</b></span>`);
+  return `<span class="resume-etapes">${L.join("")}</span>`;
 }
 function navigationJour(iso) {
   const js = jours(), premier = js[0].jour, dernier = js[js.length - 1].jour, A = joursAccueil(), max = dernier > A.haut ? dernier : A.haut;
