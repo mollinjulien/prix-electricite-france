@@ -154,8 +154,11 @@ const TXT = {
     reel_vs: "réel {r} GWh · écart {e} %", reel_partiel: "réel connu sur {h} h sur {n}", reel_absent: "réel pas encore publié (mis à jour chaque matin)",
     perf_ligne: "erreur journalière {j} % · horaire {h} % · biais {b} %", perf_n: "{n} jours complets",
     p_rte: "prévu RTE", rte_court: "Prévision RTE", sol_rte: "Solaire prévu par RTE", eol_rte: "Éolien prévu par RTE", rte_jour: "RTE prévoit {v} GWh",
-    rte_titre: "Notre prévision contre celle de RTE",
-    rte_note: "RTE publie chaque jour sa propre prévision de production solaire et éolienne pour le lendemain, pour la France entière (transmise à ENTSO-E). Elle est publiée jusqu'à 18 h la veille, avec des prévisions météo plus récentes que la nôtre (faite vers 11 h 30 avec le seul run GFS de la nuit) et la télémesure de ses installations : la comparaison l'avantage. Notre solaire est une production potentielle (avant écrêtement), d'où un biais positif. Mêmes jours pour les deux prévisions.",
+    rte_titre: "Notre prévision de production contre celle de RTE",
+    rte_note: "Pourquoi ne pas utiliser directement la prévision de RTE ? Parce qu'elle arrive trop tard : RTE la publie la veille jusqu'à 18 h, alors que l'enchère qui fixe le prix a lieu à 12 h 45. Pour prévoir le prix, nous sommes donc obligés de prévoir nous-mêmes la production solaire et éolienne, vers 11 h 30. Nous sommes légèrement moins bons que RTE, et cela s'explique : son modèle tourne sur des prévisions météo plus récentes (publiées plusieurs heures après le run GFS de la nuit que nous utilisons) et sur la télémesure de ses installations. Notre solaire est en plus une production « potentielle » (avant l'arrêt volontaire des parcs quand le prix est négatif), d'où un biais positif. Les deux prévisions sont comparées sur les mêmes jours, à la production réellement mesurée par RTE.",
+    rte_detail: "Détail par filière (erreur journalière, horaire, biais)",
+    rte_t_jour: "Erreur journalière, solaire + éolien", rte_t_heure: "Erreur horaire, solaire + éolien", rte_t_mieux: "Jours où nous faisons mieux que RTE",
+    rte_t_nous: "nous", rte_t_rte: "RTE : {v} %", rte_t_n: "sur {n} jours",
     rte_cols: ["", "Erreur journalière : nous", "RTE", "Erreur horaire : nous", "RTE", "Biais : nous", "RTE", "Jours où nous faisons mieux"],
     pas_de_prod: "Pas encore de prévision de production.",
     pm_sol_titre: "Modèle de production solaire", pm_eol_titre: "Modèle de production éolienne",
@@ -421,8 +424,11 @@ const TXT = {
     reel_vs: "actual {r} GWh · error {e}%", reel_partiel: "actual known for {h} h out of {n}", reel_absent: "actual not published yet (updated every morning)",
     perf_ligne: "daily error {j}% · hourly {h}% · bias {b}%", perf_n: "{n} complete days",
     p_rte: "RTE forecast", rte_court: "RTE forecast", sol_rte: "Solar forecast by RTE", eol_rte: "Wind forecast by RTE", rte_jour: "RTE forecasts {v} GWh",
-    rte_titre: "Our forecast against RTE's",
-    rte_note: "Every day RTE publishes its own solar and wind output forecast for the next day, for France as a whole (sent to ENTSO-E). It is published up to 18:00 the day before, with more recent weather forecasts than ours (made around 11:30 with only the overnight GFS run) and live telemetry from its plants: the comparison favours RTE. Our solar is a potential output (before curtailment), hence a positive bias. Same days for both forecasts.",
+    rte_titre: "Our production forecast against RTE's",
+    rte_note: "Why not use RTE's forecast directly? Because it comes too late: RTE publishes it up to 18:00 the day before, while the auction that sets the price closes at 12:45. To forecast the price, we therefore have to forecast solar and wind output ourselves, around 11:30. We are slightly less accurate than RTE, and this is expected: its model runs on more recent weather forecasts (published several hours after the overnight GFS run we use) and on live telemetry from its plants. Our solar is also a \"potential\" output (before plants deliberately stop when the price is negative), hence a positive bias. Both forecasts are compared on the same days, against the output actually measured by RTE.",
+    rte_detail: "Detail by technology (daily error, hourly error, bias)",
+    rte_t_jour: "Daily error, solar + wind", rte_t_heure: "Hourly error, solar + wind", rte_t_mieux: "Days we beat RTE",
+    rte_t_nous: "us", rte_t_rte: "RTE: {v}%", rte_t_n: "over {n} days",
     rte_cols: ["", "Daily error: us", "RTE", "Hourly error: us", "RTE", "Bias: us", "RTE", "Days we do better"],
     pas_de_prod: "No production forecast yet.",
     pm_sol_titre: "Solar production model", pm_eol_titre: "Wind production model",
@@ -1239,7 +1245,14 @@ function rendreProduction() {
     hrt += `<tr><td>${lib}</td><td${b(n.j, r.j)}>${nombre(n.j)} %</td><td${b(r.j, n.j)}>${nombre(r.j)} %</td><td${b(n.h, r.h)}>${nombre(n.h)} %</td><td${b(r.h, n.h)}>${nombre(r.h)} %</td>`
       + `<td>${signe(n.b)} %</td><td>${signe(r.b)} %</td><td>${nombre((100 * mieux) / cr.length, 0)} %</td></tr>`;
   }
-  $("prod-rte-carte").hidden = !cr.length || !vus.length;
+  if (cr.length) {                                                   // résumé en tête d'onglet : total solaire + éolien, toujours (indépendant des cases)
+    const n = mes(serie("tot", ""), serie("tot", "reel")), r = mes(serie("tot", "rte"), serie("tot", "reel"));
+    const mieux = cr.filter((x) => Math.abs(somme(serie("tot", "")(x.prod)) - somme(serie("tot", "reel")(x.prod))) < Math.abs(somme(serie("tot", "rte")(x.prod)) - somme(serie("tot", "reel")(x.prod)))).length;
+    $("prod-rte-tuiles").innerHTML = tuile(t("rte_t_jour"), `${nombre(n.j)} <small>% ${t("rte_t_nous")}</small>`, t("rte_t_rte", { v: nombre(r.j) }))
+      + tuile(t("rte_t_heure"), `${nombre(n.h)} <small>% ${t("rte_t_nous")}</small>`, t("rte_t_rte", { v: nombre(r.h) }))
+      + tuile(t("rte_t_mieux"), `${nombre((100 * mieux) / cr.length, 0)} <small>%</small>`, t("rte_t_n", { n: cr.length }));
+  }
+  $("prod-rte-carte").hidden = !cr.length;
   $("prod-rte").innerHTML = cr.length && vus.length ? hrt + "</tbody>" : "";
   const lab = js.map((x) => dateCourte(x.jour));
   const totJ = (x, k) => (x.prod[k] && nConnus(x.prod[k]) === x.prod.heures.length ? somme(x.prod[k]) : null);

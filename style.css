@@ -373,3 +373,4 @@ details.compact summary { cursor: pointer; }
 .trait { display: inline-block; width: 16px; height: 0; border-top: 2px solid currentColor; margin-right: 5px; vertical-align: middle; }
 .trait.tirets { border-top-style: dashed; } .trait.points { border-top-style: dotted; border-top-width: 3px; } .trait.plein { border-top-width: 3px; }
 .table-donnees td.faible { color: var(--ink-2); }
+#prod-rte-tuiles + .intro { margin-top: 16px; }

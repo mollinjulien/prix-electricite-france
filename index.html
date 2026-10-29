@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
-  <link rel="stylesheet" href="style.css?v=28">
+  <link rel="stylesheet" href="style.css?v=29">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-  <script src="app.js?v=36" defer></script>
+  <script src="app.js?v=37" defer></script>
 </head>
 <body>
   <header class="entete">
@@ -79,6 +79,12 @@
         <p class="intro" data-t="intro_prod"></p>
         <details class="plus"><summary data-t="prod_details"></summary><div class="fiches" id="prod-modeles"></div></details>
       </div>
+      <div class="carte" id="prod-rte-carte" hidden>
+        <h3 class="petit-titre" data-t="rte_titre"></h3>
+        <div class="tuiles" id="prod-rte-tuiles"></div>
+        <p class="intro" data-t="rte_note"></p>
+        <details class="plus"><summary data-t="rte_detail"></summary><div class="cadre-table libre"><table id="prod-rte" class="table-donnees"></table></div></details>
+      </div>
       <div class="carte">
         <div class="titre-jour"><h3 class="petit-titre" id="prod-demain-titre"></h3><span id="prod-demain-badge" class="badge fort"></span></div>
         <div class="choix" id="prod-choix-demain"></div>
@@ -107,11 +113,6 @@
         <p class="note" data-t="prod_hist_note"></p>
         <div class="choix" id="prod-choix-hist"></div>
         <div class="tuiles" id="prod-perf"></div>
-      </div>
-      <div class="carte" id="prod-rte-carte" hidden>
-        <h3 class="petit-titre" data-t="rte_titre"></h3>
-        <p class="note" data-t="rte_note"></p>
-        <div class="cadre-table libre"><table id="prod-rte" class="table-donnees"></table></div>
       </div>
       <div class="deux-cartes" id="prod-hist-cartes">
         <div class="carte" id="prod-carte-h-sol"><h3 class="petit-titre" data-t="prod_hist_sol"></h3><div class="graphique moyen"><canvas id="prod-h-sol" role="img"></canvas></div></div>
