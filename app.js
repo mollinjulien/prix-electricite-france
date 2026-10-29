@@ -881,6 +881,11 @@ function rendreBloc(cote, iso, j, now) {                              // un seul
     rendreBlocJour(cote, iso, j, now);
   } finally { etat.visibles = sauv; }
 }
+function resumeEtapes(html) {                                         // pastilles de synthèse dans l'en-tête repliable : nombre d'étapes réussies, en alerte, en échec, en attente
+  const n = (c) => (html.match(new RegExp(`class="coche ${c}"`, "g")) || []).length;
+  const un = (c, sym, k) => (k ? `<span class="resume-pastille"><span class="coche ${c}" aria-hidden="true">${sym}</span>${k}</span>` : "");
+  return `<span class="resume-etapes">${un("ok", SYMBOLES.ok, n("ok"))}${un("alerte", SYMBOLES.alerte, n("alerte"))}${un("echec", SYMBOLES.echec, n("echec"))}${un("attente", SYMBOLES.attente, n("attente"))}</span>`;
+}
 function navigationJour(iso) {
   const js = jours(), premier = js[0].jour, dernier = js[js.length - 1].jour, A = joursAccueil(), max = dernier > A.haut ? dernier : A.haut;
   return `<div class="navigation-jour"><button type="button" id="prev-prec" class="bouton" aria-label="${t("jour_prec")}"${iso <= premier ? " disabled" : ""}>‹</button>`
@@ -898,15 +903,14 @@ function rendreBlocJour(cote, iso, j, now) {
   const tete = (extra) => `<div class="titre-jour"><h2>${t("prix_du", { d: dateLongue(iso) })}</h2><span class="badge${badge === "b_demain" ? " fort" : ""}">${t(badge)}</span>${extra}</div>${nav}`;
   if (!j) {
     effacer(p + "-graphique");
+    const att = `<div class="etapes-jour">${etapesAttente(ajouterJours(iso, -1))}</div>`;
     el.innerHTML = tete(iso > now.date ? `<span class="badge">${t("b_calcul")}</span>` : "")
-      + (iso > now.date ? `<div class="carte"><h3 class="petit-titre">${t("etapes_titre")}</h3><div class="etapes-jour">${etapesAttente(ajouterJours(iso, -1))}</div><p class="note">${t("attente_d")}</p></div>` : `<div class="carte"><p class="note">${t("pas_de_reel")}</p></div>`);
+      + (iso > now.date ? `<details class="carte replie compact"><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(att)}</summary>${att}<p class="note">${t("attente_d")}</p></details>` : `<div class="carte"><p class="note">${t("pas_de_reel")}</p></div>`);
     lierNavigation(iso);
     return;
   }
   const etapes = j.controles && Object.keys(j.controles).length ? `<div class="etapes-jour">${etapesJour(j)}</div>` : "";
-  const bloc = !etapes ? "" : badge === "b_demain"
-    ? `<div class="carte"><h3 class="petit-titre">${t("etapes_titre")}</h3>${etapes}</div>`
-    : `<details class="carte replie" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary class="petit-titre">${t("etapes_voir")}</summary>${etapes}</details>`;
+  const bloc = !etapes ? "" : `<details class="carte replie compact" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(etapes)}</summary>${etapes}</details>`;
   el.innerHTML = tete(j.reel ? `<span class="badge">${t("b_reel")}</span>` : "") + bloc
     + `<div class="tuiles">${tuilesJour(j)}</div>`
     + `<div class="carte"><div class="barre-outils"><h3 class="petit-titre">${t("prix_du_jour")}</h3><div class="segments" id="${p}-pas" role="group"></div></div>`

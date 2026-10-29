@@ -269,3 +269,8 @@ main { padding-bottom: 24px; }
 .choix-modele { display: inline-flex; align-items: center; gap: 8px; }
 .choix-modele select { font: inherit; color: var(--ink); background: var(--surface, transparent); border: 1px solid var(--axis); border-radius: 8px; padding: 5px 10px; max-width: 100%; }
 .bloc-jour .navigation-jour { margin: 0 0 14px; }
+details.compact summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+details.compact[open] summary { margin-bottom: 14px; }
+.resume-etapes { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; margin-left: auto; font-size: 0.84rem; color: var(--ink-2); }
+.resume-pastille { display: inline-flex; align-items: center; gap: 5px; }
+.resume-pastille .coche { width: 18px; height: 18px; font-size: 0.68rem; }
