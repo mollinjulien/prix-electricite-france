@@ -5,7 +5,7 @@ const TXT = {
   fr: {
     titre: "Prix de l'électricité de demain en France",
     sous_titre: "Chaque matin, nos modèles de machine learning prévoient le prix de l'électricité du lendemain en France (enchère day-ahead EPEX, au quart d'heure), avant sa publication vers 12 h 45. Le modèle principal est la moyenne de quatre variantes du modèle « Europe », qui combine prévisions météo, gaz, marchés voisins, prix britannique et nucléaire disponible. Les prévisions sont ensuite comparées au prix fixé par le marché.",
-    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_attente: "en attente du prix", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
+    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_meilleur_p: "meilleur de la période", m_tout: "Tout cocher", n_modeles: "{n} modèles", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_attente: "en attente du prix", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", o_modeles: "Les modèles", o_apropos: "À propos", o_anciens: "Anciens modèles",
     maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
@@ -260,7 +260,7 @@ const TXT = {
   en: {
     titre: "Tomorrow's electricity price in France",
     sous_titre: "Every morning, our machine-learning models forecast the next day's French electricity price (EPEX day-ahead auction, 15-minute resolution) before it is published around 12:45. The main model is the average of four variants of the \"Europe\" model, which combines weather forecasts, gas, neighbouring markets, the British price and available nuclear capacity. Forecasts are then compared with the price set by the market.",
-    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", modeles_menu: "Models", m_meilleur: "best of the day", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_attente: "awaiting price", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
+    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", modeles_menu: "Models", m_meilleur: "best of the day", m_meilleur_p: "best of the period", m_tout: "Select all", n_modeles: "{n} models", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_attente: "awaiting price", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", o_modeles: "The models", o_apropos: "About", o_anciens: "Past models",
     maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
@@ -967,13 +967,30 @@ function rendrePrevision() {
 function ouvrirJour(iso) { etat.jourPrev = iso; location.hash = "#prevision/" + iso; }
 
 /* ---------------------------------------------------------------- onglet Performance */
+function menuPerf(id, codes, js) {                                   // même menu déroulant que l'onglet Prévision : principal mis en avant, meilleur de la période, erreur de chaque modèle
+  const tous = codes.concat(["hier"]), princ = ([...jours()].reverse().find((j) => j.principal) || {}).principal;
+  const err = Object.fromEntries(tous.map((c) => [c, js.length ? stats(js, c) : null]));
+  const avec = codes.filter((c) => err[c]), best = avec.length ? avec.reduce((a, b) => (err[b].mae < err[a].mae ? b : a)) : null;
+  const ligne = (c) => `<label class="menu-item${c === princ ? " principal" : ""}"><input type="checkbox" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>${pastille(c)}`
+    + `<span class="menu-nom"><b>${courtModele(c)}</b><small>${nomModele(c)}</small></span>`
+    + `<span class="menu-tags">${c === princ ? `<span class="etiquette principal">${t("tag_principal")}</span>` : ""}${c === best ? `<span class="etiquette meilleur">${t("m_meilleur_p")}</span>` : ""}`
+    + `${err[c] ? `<span class="menu-err">${nombre(err[c].mae)} €</span>` : ""}</span></label>`;
+  const sel = tous.filter((c) => etat.visibles[c]);
+  const resume = sel.length <= 3 ? sel.map((c) => courtModele(c)).join(", ") || "–" : t("n_modeles", { n: sel.length });
+  $(id).innerHTML = `<details class="menu-modeles" id="${id}-menu"${etat.menuPerf === id ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span> ${resume} ▾</summary>`
+    + `<div class="menu-liste">${tous.map(ligne).join("")}<button type="button" class="bouton-discret" id="${id}-tout">${t("m_tout")}</button></div></details>`;
+  const menu = $(id + "-menu");
+  menu.addEventListener("toggle", () => { etat.menuPerf = menu.open ? id : etat.menuPerf === id ? null : etat.menuPerf; });
+  menu.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => { etat.visibles[inp.dataset.c] = inp.checked; etat.menuPerf = id; rendrePerformance(); }));
+  $(id + "-tout").addEventListener("click", () => { for (const c of codes) etat.visibles[c] = true; etat.menuPerf = id; rendrePerformance(); });
+}
 function rendrePerformance() {
   segments("perf-periode", [["tout", t("pf_tout")], ["30", t("pf_30")], ["direct", t("pf_direct")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
   const codes = MODELES.map((m) => m.code);
-  for (const id of ["perf-choix", "perf-choix2"]) choixModeles(id, codes);
   let js = joursAvecPrix();
   if (etat.periodePerf === "30") js = js.slice(-30);
   if (etat.periodePerf === "direct") js = js.filter((j) => j.source === "direct");
+  for (const id of ["perf-choix", "perf-choix2"]) menuPerf(id, codes, js);
   const resume = $("perf-resume");
   if (!js.length) {
     resume.innerHTML = `<tbody><tr><td>${t("aucun_direct", { d: dateLongue(etat.d.debut_direct) })}</td></tr></tbody>`;
@@ -1265,7 +1282,7 @@ function demarrer() {
     const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click();
   });
   window.addEventListener("hashchange", () => { lireAncre(); afficher(); });
-  document.addEventListener("click", (e) => { const m = document.querySelector(".menu-modeles[open]"); if (m && !m.contains(e.target)) { m.open = false; etat.menuOuvert = false; } });
+  document.addEventListener("click", (e) => { const m = document.querySelector(".menu-modeles[open]"); if (m && !m.contains(e.target)) { m.open = false; etat.menuOuvert = false; etat.menuPerf = null; } });
   $("prod-date").addEventListener("change", (e) => { if (jourDe(e.target.value)) ouvrirProd(e.target.value); });
   const pasProd = (d) => { const js = jours().filter((j) => j.prod), i = js.findIndex((j) => j.jour === etat.jourProd) + d; if (js[i]) ouvrirProd(js[i].jour); };
   $("prod-prec").addEventListener("click", () => pasProd(-1));
