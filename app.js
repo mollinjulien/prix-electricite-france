@@ -27,6 +27,8 @@ const TXT = {
     ck_meteo: "Données météo reçues (GFS, NOAA)", nk_meteo: "Données météo (GFS, NOAA)", ck_meteo_trou: "Données météo incomplètes",
     ck_meteo_d: "run du {d} à 00 h UTC · {h} heures sur {n}",
     ck_prod: "Production solaire et éolienne prévue", nk_prod: "Prévision de production solaire et éolienne", ck_prod_d: "solaire {s} GWh · éolien {e} GWh sur la journée",
+    ck_prod_run_06Z: " · météo du run de 6 h", ck_prod_run_00Z: " · météo du run de 0 h (run de 6 h indisponible : secours)",
+    ck_prod_modeles06: "Modèles de production (run de 6 h) réappris", nk_prod_modeles06: "Réapprentissage des modèles de production (run de 6 h)",
     ck_modele: "Modèle « {m} » calculé", nk_modele: "Modèle « {m} »", ck_modele_absent: "Modèle « {m} » non calculé",
     ck_modele_d: "appris avec les prix jusqu'au {v} inclus · {h} heures prévues · {a} arbres", ck_modele_d_simple: "appris avec les prix jusqu'au {v} inclus",
     ck_modele_rejeu: "calculé a posteriori (rejeu)", ck_modele_absent_d: "absent de la prévision", ck_modele_sans_gaz: "pas de prix du gaz récent",
@@ -88,7 +90,7 @@ const TXT = {
     etapes: [
       ["Vers 11 h 30, la veille", "Mise à jour des données : prix des jours passés en France et chez les voisins, consommation et prévision de consommation de RTE, production régionale récente, prix du gaz, échanges aux frontières (JAO), consommation prévue des voisins et avis d'indisponibilité des réacteurs nucléaires (ENTSO-E), prix britannique de demain (Nord Pool, publié vers 11 h)."],
       ["Météo de demain", "Téléchargement du dernier run de minuit du modèle météo GFS (NOAA) : rayonnement, vent à 100 m, température, nuages, pression sur la France."],
-      ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région (utilisée par le principal « EUR-moy4 », le secours « EUR-moy2 » et l'ancien « GFS-G-P »)."],
+      ["Production prévue", "Nos modèles de production sont réappris avec la production réelle de RTE jusqu'à hier, puis transforment la météo en production solaire et éolienne par région. La production affichée utilise le run GFS de 6 h (publié vers 10 h 45), plus récent ; celle qui entre dans les modèles de prix utilise le run de minuit, sur lequel ils ont appris (utilisée par le principal « EUR-moy4 », le secours « EUR-moy2 » et l'ancien « GFS-G-P »)."],
       ["Prix horaire", "Tous les modèles sont réentraînés sur tout l'historique jusqu'à minuit, puis prévoient le prix de chaque heure de demain. Depuis le 30/10/2026 le modèle publié est la moyenne EM ; s'il lui manque des données, le premier niveau disponible de la chaîne EM, EP, EU, GB, GR le remplace."],
       ["Quart d'heure", "Un second modèle répartit chaque heure en quatre quarts d'heure (le prix varie dans l'heure, surtout matin et soir)."],
       ["Publication", "Le site est mis à jour vers 11 h 45, avant l'enchère de 12 h 45."],
@@ -140,7 +142,7 @@ const TXT = {
     ],
     ck_rejeu: "Prévision recalculée après coup", ck_rejeu_d: "le site a été mis en ligne le {m} : ce jour a été rejoué avec exactement la méthode du service. Le détail des étapes n'est enregistré que depuis le {d}.",
     prod_titre: "Bonus : notre prévision de production solaire et éolienne",
-    intro_prod: "Avant de prévoir le prix, nous prévoyons la production solaire et éolienne de chaque région à partir de la même météo GFS. Depuis le 30/10/2026, cette production alimente le modèle principal « EUR-moy4 » : deux des quatre modèles dont il fait la moyenne calculent le surplus de la France (nucléaire disponible + éolien + solaire − consommation) avec notre production prévue plutôt qu'avec le rayonnement et le vent bruts de GFS. Elle rend le surplus plus juste les jours de grand vent, quand les éoliennes plafonnent (erreur 2026 : 13,42 €/MWh avec notre production, 13,60 sans). Elle alimente aussi le secours « EUR-moy2 » et l'ancien modèle « GFS-G-P ». Elle est comparée ici à la production réellement mesurée par RTE.",
+    intro_prod: "Avant de prévoir le prix, nous prévoyons la production solaire et éolienne de chaque région à partir de la même météo GFS. Depuis le 30/10/2026, cette production alimente le modèle principal « EUR-moy4 » : deux des quatre modèles dont il fait la moyenne calculent le surplus de la France (nucléaire disponible + éolien + solaire − consommation) avec notre production prévue plutôt qu'avec le rayonnement et le vent bruts de GFS. Elle rend le surplus plus juste les jours de grand vent, quand les éoliennes plafonnent (erreur 2026 : 13,42 €/MWh avec notre production, 13,60 sans). Elle alimente aussi le secours « EUR-moy2 » et l'ancien modèle « GFS-G-P ». Elle est comparée ici à la production réellement mesurée par RTE. Depuis le 31/10/2026, la production affichée vient de modèles appris sur le run GFS de 6 h, publié vers 10 h 45 : 6 heures de météo plus récente réduisent l'erreur éolienne (test 2021-2026 : 9,8 % d'erreur journalière contre 10,5 % avec le run de minuit, gain significatif chaque année ; solaire 9,5 % contre 9,6 %). Les modèles de prix gardent la production du run de minuit, sur laquelle ils ont appris : la passer au run de 6 h ne changeait presque rien au prix (13,24 contre 13,26 €/MWh). S'il manque le run de 6 h, le site affiche la production du run de minuit.",
     prod_details: "Détails des deux modèles de production (variables, apprentissage)",
     prod_demain: "Production prévue pour le {d} (France, GW)", prod_prevu_jour: "prévu sur la journée",
     prod_controle: "Prévu contre réel : notre modèle a-t-il bien prévu ?", prod_controle_note: "Production prévue la veille (pointillés) et production réellement mesurée par RTE (traits pleins), pour la France heure par heure. Changez de jour avec les flèches ou le calendrier ; par défaut, le dernier jour dont la production réelle est complète.",
@@ -307,6 +309,8 @@ const TXT = {
     ck_meteo: "Weather data received (GFS, NOAA)", nk_meteo: "Weather data (GFS, NOAA)", ck_meteo_trou: "Weather data incomplete",
     ck_meteo_d: "run of {d} 00 UTC · {h} hours out of {n}",
     ck_prod: "Solar and wind output forecast", nk_prod: "Solar and wind output forecast", ck_prod_d: "solar {s} GWh · wind {e} GWh over the day",
+    ck_prod_run_06Z: " · 06:00 UTC run weather", ck_prod_run_00Z: " · 00:00 UTC run weather (06:00 run unavailable: fallback)",
+    ck_prod_modeles06: "Production models (06:00 run) retrained", nk_prod_modeles06: "Production model retraining (06:00 run)",
     ck_modele: "Model \"{m}\" computed", nk_modele: "Model \"{m}\"", ck_modele_absent: "Model \"{m}\" not computed",
     ck_modele_d: "trained on prices up to {v} included · {h} hours forecast · {a} trees", ck_modele_d_simple: "trained on prices up to {v} included",
     ck_modele_rejeu: "computed afterwards (replay)", ck_modele_absent_d: "missing from the forecast", ck_modele_sans_gaz: "no recent gas price",
@@ -368,7 +372,7 @@ const TXT = {
     etapes: [
       ["Around 11:30, the day before", "Data update: past prices in France and next door, RTE load and load forecast, recent regional output, gas price, cross-border flows (JAO), neighbours' load forecasts and nuclear outage notices (ENTSO-E), tomorrow's British price (Nord Pool, published around 11:00)."],
       ["Tomorrow's weather", "Download of the latest midnight run of the GFS weather model (NOAA): radiation, 100 m wind, temperature, clouds, pressure over France."],
-      ["Forecast output", "Our production models are retrained with RTE actual output up to yesterday, then turn the weather into solar and wind output per region (used by the main model \"EUR-moy4\", the fallback \"EUR-moy2\" and the past model \"GFS-G-P\")."],
+      ["Forecast output", "Our production models are retrained with RTE actual output up to yesterday, then turn the weather into solar and wind output per region. The output shown uses the 06:00 UTC GFS run (published around 10:45), more recent; the one fed to the price models uses the midnight run they were trained on (used by the main model \"EUR-moy4\", the fallback \"EUR-moy2\" and the past model \"GFS-G-P\")."],
       ["Hourly price", "All models are retrained on the full history up to midnight, then forecast the price of each hour of tomorrow. The Europe model is published as the main one; if it lacks data, the first available fallback replaces it."],
       ["Quarter-hour", "A second model splits each hour into four quarter-hours (prices move within the hour, especially morning and evening)."],
       ["Publication", "The site is updated around 11:45, before the 12:45 auction."],
@@ -420,7 +424,7 @@ const TXT = {
     ],
     ck_rejeu: "Forecast recomputed afterwards", ck_rejeu_d: "the site went live on {m}: this day was replayed with exactly the service's method. Step details are only recorded since {d}.",
     prod_titre: "Bonus: our solar and wind production forecast",
-    intro_prod: "Before forecasting the price, we forecast each region's solar and wind output from the same GFS weather. Since 30/10/2026 this output feeds the main model \"EUR-moy4\": two of the four models it averages compute France's surplus (available nuclear + wind + solar − load) with our production forecast rather than GFS raw radiation and wind. It makes the surplus more accurate on very windy days, when turbines reach their cap (2026 error: €13.42/MWh with our production, €13.60 without). It also feeds the fallback \"EUR-moy2\" and the past model \"GFS-G-P\". Here it is compared with the output actually measured by RTE.",
+    intro_prod: "Before forecasting the price, we forecast each region's solar and wind output from the same GFS weather. Since 30/10/2026 this output feeds the main model \"EUR-moy4\": two of the four models it averages compute France's surplus (available nuclear + wind + solar − load) with our production forecast rather than GFS raw radiation and wind. It makes the surplus more accurate on very windy days, when turbines reach their cap (2026 error: €13.42/MWh with our production, €13.60 without). It also feeds the fallback \"EUR-moy2\" and the past model \"GFS-G-P\". Here it is compared with the output actually measured by RTE. Since 31/10/2026 the output shown comes from models trained on the 06:00 UTC GFS run, published around 10:45: six more hours of weather data cut the wind error (2021-2026 test: 9.8% daily error versus 10.5% with the midnight run, significant gain every year; solar 9.5% versus 9.6%). The price models keep the midnight-run output they were trained on: switching them to the 06:00 run barely changed the price (13.24 versus €13.26/MWh). If the 06:00 run is missing, the site shows the midnight-run output.",
     prod_details: "Details of the two production models (variables, training)",
     prod_demain: "Forecast output for {d} (France, GW)", prod_prevu_jour: "forecast for the day",
     prod_controle: "Forecast versus actual: did our model get it right?", prod_controle_note: "Output forecast the day before (dashed) and output actually measured by RTE (solid), for France hour by hour. Change day with the arrows or the calendar; by default, the latest day whose actual output is complete.",
@@ -845,7 +849,10 @@ function etapesJour(j) {
             : ed.gb && ed.gb.publie ? t("ck_europe_d", { d: dateHeure(ed.gb.publie.replace(" ", "T")) }) : "");
     } else if (!ed) ajout("donnees", "info", t("nk_europe"), t("ck_europe_avant"));
     const p = c.production_GWh;
-    if (p) ajout("calculs", "ok", t("ck_prod"), t("ck_prod_d", { s: nombre(p.solaire, 0), e: nombre(p.eolien, 0) }));
+    const p6 = c.production_06z && c.production_06z.modeles;
+    if (p6 && p6.reappris) ajout("calculs", "ok", t("ck_prod_modeles06"), t("ck_prod_modeles_d", { d: dateCourte(ajouterJours(j.jour, -2)), s: nombre(p6.arbres.solaire, 0), e: nombre(p6.arbres.eolien, 0) }));
+    else if (p6) ajout("calculs", "alerte", t("nk_prod_modeles06"), t("ck_prod_modeles_echec"));
+    if (p) ajout("calculs", p.run === "00Z" && c.production_06z ? "alerte" : "ok", t("ck_prod"), t("ck_prod_d", { s: nombre(p.solaire, 0), e: nombre(p.eolien, 0) }) + (p.run ? t("ck_prod_run_" + p.run) : ""));
     else ajout("calculs", "info", t("nk_prod"), t("ck_inconnu"));
   }
   for (const m of MODELES) {
