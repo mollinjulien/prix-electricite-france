@@ -9,7 +9,7 @@ const TXT = {
     jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", contact: "Contact", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_meilleur_p: "meilleur de la période", m_tout: "Tout cocher", n_modeles: "{n} modèles", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_erreur_quart: "Erreur au quart d'heure", t_erreur_heure: "Erreur à l'heure", t_attente: "en attente du prix", err_titre: "Erreur moyenne", err_quart: "au quart d'heure", err_heure: "à l'heure", err_pct: "{p} % du prix moyen", err_attente: "Calculée dès que le prix du marché est publié (vers 13 h 45)", err_aide: "Écart moyen, en valeur absolue, entre notre prévision et le prix fixé par le marché", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
-    retard: "La prévision du {d} n'est pas encore publiée : elle est normalement calculée vers 11 h 30 et publiée vers 11 h 45.",
+    retard: "La prévision du {d} n'est pas encore publiée : elle l'est normalement vers 11 h 15.",
     attente_d: "Le calcul démarre vers 11 h 30 (après la publication du prix britannique) et dure une quinzaine de minutes. Cette page se met à jour toute seule.",
     etapes_titre: "Étapes de la prévision",
     etapes_voir: "Étapes de la prévision de ce jour",
@@ -136,7 +136,7 @@ const TXT = {
     jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", contact: "Contact", modeles_menu: "Models", m_meilleur: "best of the day", m_meilleur_p: "best of the period", m_tout: "Select all", n_modeles: "{n} models", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_erreur_quart: "Quarter-hour error", t_erreur_heure: "Hourly error", t_attente: "awaiting price", err_titre: "Mean error", err_quart: "per quarter-hour", err_heure: "per hour", err_pct: "{p} % of the average price", err_attente: "Computed as soon as the market price is published (around 13:45)", err_aide: "Average absolute gap between our forecast and the price set by the market", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
-    retard: "The forecast for {d} is not published yet: it is normally computed around 11:30 and published around 11:45.",
+    retard: "The forecast for {d} is not published yet: it normally is around 11:15.",
     attente_d: "The computation starts around 11:30 (after the British price is published) and takes about fifteen minutes. This page updates by itself.",
     etapes_titre: "Forecast steps",
     etapes_voir: "Forecast steps for this day",
@@ -624,8 +624,9 @@ function etapesAttente(veille) {                                    // prévisio
 }
 
 /* ---------------------------------------------------------------- onglet Prévision : deux jours */
-function joursAccueil() {                                           // après 11 h 30 : demain en haut, aujourd'hui en bas ; avant : aujourd'hui, puis hier
-  const now = maintenantParis(), haut = now.hm >= "11:30" ? ajouterJours(now.date, 1) : now.date, bas = ajouterJours(haut, -1);
+function joursAccueil() {                                           // demain dès que sa prévision est publiée, sinon aujourd'hui (jamais un jour vide : demande de Julien, 07/11/2026)
+  const now = maintenantParis(), js = jours(), demain = ajouterJours(now.date, 1);
+  const haut = jourDe(demain) ? demain : jourDe(now.date) || !js.length ? now.date : js[js.length - 1].jour, bas = ajouterJours(haut, -1);
   const avant = jours().filter((j) => j.jour < haut);
   return { now, haut, jHaut: jourDe(haut), jBas: jourDe(bas) || avant[avant.length - 1] };
 }
@@ -727,13 +728,13 @@ function resumeEtapes(html) {                                         // ligne d
   return `<span class="resume-etapes">${L.join("")}</span>`;
 }
 function navigationJour(iso) {
-  const js = jours(), premier = js[0].jour, dernier = js[js.length - 1].jour, A = joursAccueil(), max = dernier > A.haut ? dernier : A.haut;
+  const js = jours(), premier = js[0].jour, max = js[js.length - 1].jour;                // dernier jour publié : pas de jour vide dans le calendrier
   return `<div class="navigation-jour"><button type="button" id="prev-prec" class="bouton" aria-label="${t("jour_prec")}"${iso <= premier ? " disabled" : ""}>‹</button>`
     + `<input type="date" id="prev-date" aria-label="Date" min="${premier}" max="${max}" value="${iso}">`
     + `<button type="button" id="prev-suiv" class="bouton" aria-label="${t("jour_suiv")}"${iso >= max ? " disabled" : ""}>›</button></div>`;
 }
 function lierNavigation(iso) {
-  const A = joursAccueil(), js = jours(), max = js[js.length - 1].jour > A.haut ? js[js.length - 1].jour : A.haut;
+  const js = jours(), max = js[js.length - 1].jour;
   $("prev-date").addEventListener("change", (e) => { const v = e.target.value; if (v && v >= js[0].jour && v <= max) ouvrirJour(v); });
   $("prev-prec").addEventListener("click", () => ouvrirJour(ajouterJours(iso, -1)));
   $("prev-suiv").addEventListener("click", () => ouvrirJour(ajouterJours(iso, 1)));
@@ -794,8 +795,9 @@ function rendrePrevision() {
   const iso = etat.jourPrev && jourDe(etat.jourPrev) ? etat.jourPrev : A.haut;
   etat.cleAccueil = A.haut + (A.jHaut ? "+" : "-") + "|" + (etat.jourPrev || "");
   const bandeau = $("bandeau-retard");
-  bandeau.hidden = iso !== A.haut || Boolean(A.jHaut) || (A.haut !== A.now.date && A.now.hm < "12:15");
-  if (!bandeau.hidden) bandeau.textContent = "⚠ " + t("retard", { d: dateLongue(A.haut) });
+  const demain = ajouterJours(A.now.date, 1);                          // prévision de demain en retard (pas encore publiée à 12 h 15) : bandeau, sans afficher de jour vide
+  bandeau.hidden = iso !== A.haut || Boolean(jourDe(demain)) || A.now.hm < "12:15";
+  if (!bandeau.hidden) bandeau.textContent = "⚠ " + t("retard", { d: dateLongue(demain) });
   $("maj").textContent = t("maj", { d: new Date(etat.d.maj).toLocaleString(loc(), { dateStyle: "long", timeStyle: "short" }) });
   rendreBloc("haut", iso, jourDe(iso), A.now);
 }
