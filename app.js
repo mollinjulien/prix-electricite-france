@@ -6,7 +6,7 @@ const TXT = {
     titre: "Prédiction du prix de l’électricité à J+1",
     prevision_modele: "Prévision de notre modèle",
     legende_prevision: "Notre prévision ({m})",
-    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", contact: "Contact", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_meilleur_p: "meilleur de la période", m_tout: "Tout cocher", n_modeles: "{n} modèles", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_erreur_quart: "Erreur au quart d'heure", t_erreur_heure: "Erreur à l'heure", t_attente: "en attente du prix", err_titre: "Erreur moyenne", err_quart: "au quart d'heure", err_heure: "à l'heure", err_pct: "{p} % du prix moyen", err_attente: "Calculée dès que le prix du marché est publié (vers 13 h 45)", err_aide: "Écart moyen, en valeur absolue, entre notre prévision et le prix fixé par le marché", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", maj: "Site mis à jour le {d}",
+    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", contact: "Contact", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_meilleur_p: "meilleur de la période", m_tout: "Tout cocher", n_modeles: "{n} modèles", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_erreur_quart: "Erreur au quart d'heure", t_erreur_heure: "Erreur à l'heure", t_attente: "en attente du prix", err_titre: "Erreur moyenne", err_quart: "au quart d'heure", err_heure: "à l'heure", err_pct: "{p} % du prix moyen", err_veille: "Repère « veille » : {x} € · {g}", err_mieux: "{p} % d'erreur en moins", err_moins: "{p} % d'erreur en plus", err_attente: "Calculée dès que le prix du marché est publié (vers 13 h 45)", err_aide: "Écart moyen, en valeur absolue, entre notre prévision et le prix fixé par le marché", o_prevision: "Prévision", o_historique: "Historique", o_performance: "Performance", maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
     retard: "La prévision du {d} n'est pas encore publiée : elle l'est normalement vers 11 h 15.",
@@ -43,7 +43,7 @@ const TXT = {
     fourchette: "Fourchette indicative (80 % des écarts passés)",
     marche: "Marché (prix réel)", marche_court: "Marché",
     hier: "Prix de la veille (même quart d'heure)", hier_court: "Veille",
-    sem: "Prix de la semaine d'avant (même jour, même quart d'heure)", sem_court: "Semaine d'avant",
+    sem: "Prix du même jour de la semaine précédente (même quart d'heure)", sem_court: "Même jour sem. d'avant",
     heure: "Heure", prevu: "prévu", ecart: "écart", ecart_pc: "écart %", ns: "n.s.", ns_t: "Prix du marché inférieur à 20 €/MWh : un écart en % n'aurait pas de sens", biais_t: "Écart moyen prévu − marché (positif : prévision trop haute en moyenne)", err_rel_t: "Erreur moyenne rapportée au prix moyen du marché", moyenne: "Moyenne", min_t: "Prix le plus bas de la journée", max_t: "Prix le plus haut de la journée", min_c: "le plus bas", max_c: "le plus haut", erreur_abs: "Erreur moyenne",
     erreur_moy: "erreur moyenne",
     m_jour: "Un jour", m_plage: "Plusieurs jours",
@@ -57,8 +57,8 @@ const TXT = {
     clic_jour: "Cliquez sur une ligne pour ouvrir ce jour dans le détail.",
     date: "Date", source: "Source", rejeu: "rejeu", direct: "direct", meilleur: "meilleur",
     prevu_moyen: "prévu", erreur_court: "erreur", moyenne_periode: "Moyenne de la période",
-    intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Deux repères naïfs, sans modèle, servent de comparaison : « Veille » (même quart d'heure la veille) et « Semaine d'avant » (même quart d'heure, même jour de la semaine précédente). Le gain se mesure contre la veille. La corrélation (de −1 à 1, 1 = parfait) dit si le modèle suit bien les hausses et les baisses du prix, sans tenir compte du niveau ; « dans la journée » = moyenne des corrélations de chaque jour sur ses quarts d'heure.",
-    pf_pas_titre: "Erreur calculée", pf_quart: "Au quart d'heure", pf_heure: "À l'heure", pf_jour: "Sur la journée", pf_note_pas: "Prévision et prix du marché sont moyennés par {u} avant de calculer l'écart : plus la durée est longue, plus les erreurs se compensent.", u_heure: "heure", u_jour: "journée", pf_tout: "Tout l'historique", pf_30: "30 derniers jours", pf_direct: "Depuis la mise en ligne",
+    intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Deux repères naïfs, sans modèle, servent de comparaison : « Veille » (même quart d'heure la veille) et « Même jour sem. d'avant » (même quart d'heure, le même jour de la semaine précédente : un mardi est comparé au mardi d'avant). Le gain se mesure contre la veille. La corrélation (de −1 à 1, 1 = parfait) dit si le modèle suit bien les hausses et les baisses du prix, sans tenir compte du niveau ; « dans la journée » = moyenne des corrélations de chaque jour sur ses quarts d'heure.",
+    pf_pas_titre: "Erreur calculée", pf_quart: "Au quart d'heure", pf_heure: "À l'heure", pf_jour: "Sur la journée", pf_note_pas: "Prévision et prix du marché sont moyennés par {u} avant de calculer l'écart : plus la durée est longue, plus les erreurs se compensent.", u_heure: "heure", u_jour: "journée", pf_dates: "Dates précises", jours_h: "{n} jours = {h} heures", pf_du: "du", pf_au: "au", pf_tout: "Tout l'historique", pf_30: "30 derniers jours", pf_direct: "Depuis la mise en ligne",
     aucun_direct: "Pas encore de jour prévu en direct : les premières prévisions publiées commencent le {d}.",
     c_corr: "Corrélation", c_corr_j: "Corrél. jour", corr_court: "corrélation {r}",
     c_modele: "Modèle", c_mae: "Erreur moyenne", c_rel: "Erreur relative", c_biais: "Biais", c_rmse: "Erreur quadratique", c_meilleur: "Meilleur du jour", c_gain: "Gain contre la veille",
@@ -134,7 +134,7 @@ const TXT = {
     titre: "Next-day electricity price forecast",
     prevision_modele: "Our model’s forecast",
     legende_prevision: "Our forecast ({m})",
-    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", contact: "Contact", modeles_menu: "Models", m_meilleur: "best of the day", m_meilleur_p: "best of the period", m_tout: "Select all", n_modeles: "{n} models", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_erreur_quart: "Quarter-hour error", t_erreur_heure: "Hourly error", t_attente: "awaiting price", err_titre: "Mean error", err_quart: "per quarter-hour", err_heure: "per hour", err_pct: "{p} % of the average price", err_attente: "Computed as soon as the market price is published (around 13:45)", err_aide: "Average absolute gap between our forecast and the price set by the market", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", maj: "Site updated {d}",
+    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", contact: "Contact", modeles_menu: "Models", m_meilleur: "best of the day", m_meilleur_p: "best of the period", m_tout: "Select all", n_modeles: "{n} models", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_erreur_quart: "Quarter-hour error", t_erreur_heure: "Hourly error", t_attente: "awaiting price", err_titre: "Mean error", err_quart: "per quarter-hour", err_heure: "per hour", err_pct: "{p} % of the average price", err_veille: "\"Day before\" benchmark: €{x} · {g}", err_mieux: "{p} % less error", err_moins: "{p} % more error", err_attente: "Computed as soon as the market price is published (around 13:45)", err_aide: "Average absolute gap between our forecast and the price set by the market", o_prevision: "Forecast", o_historique: "History", o_performance: "Performance", maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
     retard: "The forecast for {d} is not published yet: it normally is around 11:15.",
@@ -171,7 +171,7 @@ const TXT = {
     fourchette: "Indicative range (80% of past errors)",
     marche: "Market (actual price)", marche_court: "Market",
     hier: "Previous day's price (same quarter-hour)", hier_court: "Day before",
-    sem: "Previous week's price (same weekday, same quarter-hour)", sem_court: "Week before",
+    sem: "Price on the same weekday of the previous week (same quarter-hour)", sem_court: "Same day last week",
     heure: "Time", prevu: "forecast", ecart: "error", ecart_pc: "error %", ns: "n.s.", ns_t: "Market price below 20 €/MWh: a percentage error would be meaningless", biais_t: "Average forecast − market gap (positive: forecast too high on average)", err_rel_t: "Mean error relative to the average market price", moyenne: "Average", min_t: "Lowest price of the day", max_t: "Highest price of the day", min_c: "lowest", max_c: "highest", erreur_abs: "Mean error",
     erreur_moy: "mean error",
     m_jour: "One day", m_plage: "Several days",
@@ -185,8 +185,8 @@ const TXT = {
     clic_jour: "Click a row to open that day in detail.",
     date: "Date", source: "Source", rejeu: "replay", direct: "live", meilleur: "best",
     prevu_moyen: "forecast", erreur_court: "error", moyenne_periode: "Period average",
-    intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. Two naive benchmarks, with no model, serve as references: \"Day before\" (same quarter-hour the day before) and \"Week before\" (same quarter-hour, same weekday of the previous week). The gain is measured against the day before. The correlation (−1 to 1, 1 = perfect) tells whether the model follows the price ups and downs, regardless of level; \"within-day\" = average of each day's correlation over its quarter-hours.",
-    pf_pas_titre: "Error computed", pf_quart: "Per quarter-hour", pf_heure: "Per hour", pf_jour: "Per day", pf_note_pas: "Forecast and market price are averaged over each {u} before the gap is computed: the longer the span, the more the errors cancel out.", u_heure: "hour", u_jour: "day", pf_tout: "Full history", pf_30: "Last 30 days", pf_direct: "Since going live",
+    intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. Two naive benchmarks, with no model, serve as references: \"Day before\" (same quarter-hour the day before) and \"Same day last week\" (same quarter-hour, same weekday of the previous week: a Tuesday is compared with the previous Tuesday). The gain is measured against the day before. The correlation (−1 to 1, 1 = perfect) tells whether the model follows the price ups and downs, regardless of level; \"within-day\" = average of each day's correlation over its quarter-hours.",
+    pf_pas_titre: "Error computed", pf_quart: "Per quarter-hour", pf_heure: "Per hour", pf_jour: "Per day", pf_note_pas: "Forecast and market price are averaged over each {u} before the gap is computed: the longer the span, the more the errors cancel out.", u_heure: "hour", u_jour: "day", pf_dates: "Custom dates", jours_h: "{n} days = {h} hours", pf_du: "from", pf_au: "to", pf_tout: "Full history", pf_30: "Last 30 days", pf_direct: "Since going live",
     aucun_direct: "No live day yet: the first published forecasts start on {d}.",
     c_corr: "Correlation", c_corr_j: "Daily correl.", corr_court: "correlation {r}",
     c_modele: "Model", c_mae: "Mean error", c_rel: "Relative error", c_biais: "Bias", c_rmse: "Root mean square error", c_meilleur: "Best of the day", c_gain: "Gain over the day before",
@@ -658,7 +658,13 @@ function blocErreur(j, code, pas) {                                  // l'erreur
   if (!e) return `<div class="bloc-erreur" title="${t("err_aide")}">${titre}<div class="err-attente">${t("err_attente")}</div></div>`;
   const pc = (100 * e.mae) / moyenne(j.reel);
   return `<div class="bloc-erreur" title="${t("err_aide")}">${titre}<div class="valeur erreur">${enEuros(e.mae)}</div>`
-    + `<div class="err-detail"><span>${t("err_pct", { p: nombre(pc, 1) })}</span></div></div>`;
+    + `<div class="err-detail"><span>${t("err_pct", { p: nombre(pc, 1) })}</span>${comparaisonVeille(j, code, e, pas)}</div></div>`;
+}
+function comparaisonVeille(j, code, e, pas) {                         // le modèle contre le repère naïf « veille » (même quart d'heure la veille), le même jour
+  const v = REPERES.includes(code) ? null : erreurJour(j, "hier", pas);
+  if (!v || !v.mae) return "";
+  const g = (100 * (v.mae - e.mae)) / v.mae;
+  return `<span class="err-veille ${g > 0 ? "positif" : ""}">${t("err_veille", { x: nombre(v.mae), g: t(g > 0 ? "err_mieux" : "err_moins", { p: nombre(Math.abs(g), 0) }) })}</span>`;
 }
 function tuileModele(m, j, best, pas) {
   const e = erreurJour(j, m.code, pas);
@@ -756,7 +762,7 @@ function menuModeles(p, j, pas) {                                    // menu dé
   };
   const resume = sel.map((c) => courtModele(c)).join(", ");
   return `<details class="menu-modeles" id="${p}-menu"${etat.menuOuvert ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span> ${resume} ▾</summary>`
-    + `<div class="menu-liste">${modelesDispos(j).map(ligne).join("")}<button type="button" class="bouton-discret" id="${p}-reset">${t("m_reset")}</button></div></details>`;
+    + `<div class="menu-liste">${modelesDispos(j).concat(REPERES.filter((r) => j[r]).map((r) => ({ code: r }))).map(ligne).join("")}<button type="button" class="bouton-discret" id="${p}-reset">${t("m_reset")}</button></div></details>`;
 }
 function rendreBlocJour(cote, iso, j, now) {
   const p = "p-" + cote, el = $("prev-" + cote), nav = navigationJour(iso), pas = etat.pasPrev[cote];
@@ -828,11 +834,31 @@ function menuPerf(id, codes, js) {                                   // même me
   menu.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => { etat.visibles[inp.dataset.c] = inp.checked; etat.menuPerf = id; rendrePerformance(); }));
   $(id + "-tout").addEventListener("click", () => { for (const c of codes) etat.visibles[c] = true; etat.menuPerf = id; rendrePerformance(); });
 }
+function periodePrecise() {                                          // « Dates précises » : choix du premier et du dernier jour de la comparaison (09/11/2026)
+  const js = joursAvecPrix(), min = js[0].jour, max = js[js.length - 1].jour;
+  if (!etat.perfDu || etat.perfDu < min || etat.perfDu > max) etat.perfDu = min;
+  if (!etat.perfAu || etat.perfAu > max || etat.perfAu < min) etat.perfAu = max;
+  let el = $("perf-dates");
+  if (!el) { $("perf-periode").insertAdjacentHTML("afterend", '<div class="perf-dates" id="perf-dates"></div>'); el = $("perf-dates"); }
+  el.hidden = etat.periodePerf !== "dates";
+  el.innerHTML = `<label>${t("pf_du")} <input type="date" id="perf-du" min="${min}" max="${max}" value="${etat.perfDu}"></label>`
+    + `<label>${t("pf_au")} <input type="date" id="perf-au" min="${min}" max="${max}" value="${etat.perfAu}"></label>`;
+  const changer = (cle, id) => $(id).addEventListener("change", (e) => {
+    const v = e.target.value;
+    if (!v || v < min || v > max) return;
+    etat[cle] = v;
+    if (etat.perfDu > etat.perfAu) { if (cle === "perfDu") etat.perfAu = v; else etat.perfDu = v; }
+    rendrePerformance();
+  });
+  changer("perfDu", "perf-du"); changer("perfAu", "perf-au");
+}
 function rendrePerformance() {
-  segments("perf-periode", [["tout", t("pf_tout")], ["30", t("pf_30")], ["direct", t("pf_direct")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
+  segments("perf-periode", [["tout", t("pf_tout")], ["30", t("pf_30")], ["direct", t("pf_direct")], ["dates", t("pf_dates")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
+  periodePrecise();
   let js = joursAvecPrix();
   if (etat.periodePerf === "30") js = js.slice(-30);
   if (etat.periodePerf === "direct") js = js.filter((j) => j.source === "direct");
+  if (etat.periodePerf === "dates") js = js.filter((j) => j.jour >= etat.perfDu && j.jour <= etat.perfAu);
   segments("perf-pas", [["quart", t("pf_quart")], ["heure", t("pf_heure")], ["jour", t("pf_jour")]], etat.pasPerf, (v) => { etat.pasPerf = v; rendrePerformance(); });
   $("perf-pas-note").textContent = etat.pasPerf === "quart" ? "" : t("pf_note_pas", { u: t(etat.pasPerf === "heure" ? "u_heure" : "u_jour") });
   const jp = aggJours(js, etat.pasPerf);                                     // jours regroupés au pas choisi : sert au tableau de synthèse seulement
@@ -852,7 +878,7 @@ function rendrePerformance() {
   for (const j of js) { const b = meilleur(j, vus.concat(vusR)); if (b) { nj++; victoires[b]++; } }   // « meilleur du jour » parmi les séries cochées (repères compris) : le total fait 100 %
   const st = vus.map((c) => [c, stats(jp, c)]).filter(([, s]) => s);
   const best = st.length ? st.reduce((a, b) => (b[1].mae < a[1].mae ? b : a))[0] : null;
-  let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
+  let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_h", { n: js.length, h: nombre(js.reduce((a, j) => a + j.heures.length, 0) / 4, 0) })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
   for (const [c, s] of st.concat(vusR.map((r) => [r, r === "hier" ? sh : stats(jp, r)]).filter(([, s]) => s))) {
     const m = TOUS.find((x) => x.code === c);
     h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(jp, c).r, 2)}</td><td>${etat.pasPerf === "jour" ? "–" : nombre(correlations(jp, c).rj, 2)}</td>`

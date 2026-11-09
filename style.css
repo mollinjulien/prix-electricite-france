@@ -454,3 +454,9 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 /* écart en % non significatif quand le prix du marché est sous 20 €/MWh (tableau de l'onglet Prévision, 06/11/2026) */
 .table-donnees td.ns { color: var(--muted); }
 .table-donnees th.centre { text-align: center; }
+
+/* période précise (onglet Performance) et comparaison avec la veille (tuiles), 09/11/2026 */
+.perf-dates { display: inline-flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-left: 8px; font-size: 0.85rem; color: var(--muted); }
+.perf-dates[hidden] { display: none; }
+.perf-dates label { display: inline-flex; gap: 6px; align-items: center; }
+.err-veille { display: block; margin-top: 2px; }
