@@ -6,11 +6,11 @@
   <title>Prédiction du prix de l’électricité à J+1</title>
   <meta name="description" content="Prévision du prix day-ahead de l'électricité en France par trois modèles de machine learning, comparée chaque jour au prix du marché.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%232a78d6'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=39">
+  <link rel="stylesheet" href="style.css?v=40">
   <link rel="stylesheet" href="design.css?v=12">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
   <script src="infos_modeles.js?v=5" defer></script>
-  <script src="app.js?v=68" defer></script>
+  <script src="app.js?v=69" defer></script>
   <script src="design.js?v=4" defer></script>
   <!-- onglets bonus retirés le 03/11/2026 (batterie.js, marches.js gardés pour plus tard) -->
 </head>
@@ -107,6 +107,7 @@
         <h3 class="petit-titre" id="prod-rte-titre"></h3>
         <div class="duel" id="prod-rte-duel"></div>
         <p class="note" data-t="rte_court_note"></p>
+        <p class="note" data-t="rte_veille_note"></p>
         <div class="choix" id="prod-choix-hist"></div>
         <h4 class="mini-titre" data-t="rte_err_titre"></h4>
         <div class="graphique moyen"><canvas id="prod-g-err" role="img"></canvas></div>

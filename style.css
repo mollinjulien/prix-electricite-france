@@ -25,6 +25,7 @@
   --s-sol-reel: #7a5200; --s-sol-rte: #e8c46a;     /* dégradé onglet Production : réel foncé, notre prévision, RTE clair */
   --s-eol-reel: #3f2696; --s-eol-rte: #b9a8f0;
   --bande: rgba(42, 120, 214, 0.12);
+  --p-nous: #12805a; --p-nous-aire: rgba(18, 128, 90, 0.10); --p-rte: #2a78d6; --p-veille: #898781; --p-veille-barre: #c9c7bf;   /* onglet Production : notre modèle / RTE / repère naïf */
   --ok: #0ca30c;
   --alerte: #fab219;
   --echec: #d03b3b;
@@ -43,6 +44,7 @@
     --s-emt: #8b8ff0; --s-em: #c4957a; --s-tout: #e8618f; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
     --s-sol: #c08a0c; --s-eol: #9479e6;
     --s-sol-reel: #f5cc55; --s-sol-rte: #9a7426; --s-eol-reel: #cbbcff; --s-eol-rte: #6c58a8;
+    --p-nous: #2fbf8a; --p-nous-aire: rgba(47, 191, 138, 0.13); --p-rte: #4d95ec; --p-veille: #8f8d86; --p-veille-barre: #5a5955;
     --ok-texte: #0ca30c;
     --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
     --ecart-rgb: 240, 239, 236;
@@ -56,6 +58,7 @@
   --s-emt: #8b8ff0; --s-em: #c4957a; --s-tout: #e8618f; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
   --s-sol: #c08a0c; --s-eol: #9479e6;
     --s-sol-reel: #f5cc55; --s-sol-rte: #9a7426; --s-eol-reel: #cbbcff; --s-eol-rte: #6c58a8;
+    --p-nous: #2fbf8a; --p-nous-aire: rgba(47, 191, 138, 0.13); --p-rte: #4d95ec; --p-veille: #8f8d86; --p-veille-barre: #5a5955;
   --ok-texte: #0ca30c;
   --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
   --ecart-rgb: 240, 239, 236;
@@ -340,7 +343,14 @@ details.compact summary { cursor: pointer; }
 .etiquette.secours { background: var(--alerte); border-color: var(--alerte); color: #3a2400; }
 .etiquette.meilleur { border-color: var(--ok); color: var(--ok-texte); }
 .menu-modeles { position: relative; }
-.menu-modeles > summary { list-style: none; cursor: pointer; font-size: 0.86rem; padding: 6px 12px; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-modeles > summary { list-style: none; cursor: pointer; font-size: 0.86rem; padding: 5px 10px; display: inline-flex; flex-wrap: nowrap; align-items: center; gap: 6px; max-width: 100%; white-space: nowrap; }
+@media (max-width: 600px) { .menu-modeles > summary { flex-wrap: wrap; white-space: normal; } }
+.menu-modeles > summary .choix-titre { margin-right: 2px; }
+.puce-modele { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border: 1px solid var(--border); border-radius: 99px; background: var(--wash); font-weight: 600; color: var(--ink); white-space: nowrap; }
+.puce-modele .pastille { width: 12px; }
+.resume-vide { color: var(--muted); }
+.menu-modeles > summary .chevron { color: var(--muted); margin-left: 2px; transition: transform 0.15s; }
+.menu-modeles[open] > summary .chevron { transform: rotate(180deg); }
 .menu-modeles > summary::-webkit-details-marker { display: none; }
 .menu-liste { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: min(460px, 88vw); max-height: 60vh; overflow: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); padding: 6px; }
 .menu-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 7px; cursor: pointer; }
@@ -380,6 +390,11 @@ details.compact summary { cursor: pointer; }
 /* onglet Production : « duel » notre modèle / RTE / réel */
 .duel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 4px 0 18px; }
 .duel.deux { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.duel.quatre { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#prod-rte-duel .duel-case.nous .duel-val { color: var(--p-nous); }
+#prod-rte-duel .duel-case.rte .duel-val { color: var(--p-rte); }
+#prod-rte-duel .duel-case.veille .duel-val { color: var(--muted); }
+@media (max-width: 1000px) { .duel.quatre { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .duel-case { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--surface); }
 .duel-case.gagne { border: 2px solid var(--ok-texte); padding: 13px 15px; }
 .duel-lib { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-size: 0.85rem; font-weight: 600; color: var(--ink-2); }
@@ -389,7 +404,7 @@ details.compact summary { cursor: pointer; }
 .duel-vide { font-size: 1.05rem; font-weight: 500; color: var(--muted); }
 .duel-det { font-size: 0.82rem; color: var(--muted); }
 .mini-titre { font-size: 0.9rem; font-weight: 600; margin: 16px 0 6px; color: var(--ink-2); }
-@media (max-width: 700px) { .duel, .duel.deux { grid-template-columns: 1fr; } .duel-val { font-size: 1.7rem; } }
+@media (max-width: 700px) { .duel, .duel.deux, .duel.quatre { grid-template-columns: 1fr; } .duel-val { font-size: 1.7rem; } }
 
 /* onglets bonus Batterie (batterie.js) et Battre le marché (marches.js) */
 .bat-avant { margin: 0; color: var(--ink-2); font-size: 1.05rem; }

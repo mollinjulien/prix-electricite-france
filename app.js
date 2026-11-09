@@ -43,7 +43,7 @@ const TXT = {
     fourchette: "Fourchette indicative (80 % des écarts passés)",
     marche: "Marché (prix réel)", marche_court: "Marché",
     hier: "Prix de la veille (même quart d'heure)", hier_court: "Veille",
-    sem: "Prix du même jour de la semaine précédente (même quart d'heure)", sem_court: "Même jour sem. d'avant",
+    sem: "Prix du même jour de la semaine précédente (même quart d'heure)", sem_court: "Même jour sem. d'avant", sem_mini: "Sem. d'avant",
     heure: "Heure", prevu: "prévu", ecart: "écart", ecart_pc: "écart %", ns: "n.s.", ns_t: "Prix du marché inférieur à 20 €/MWh : un écart en % n'aurait pas de sens", biais_t: "Écart moyen prévu − marché (positif : prévision trop haute en moyenne)", err_rel_t: "Erreur moyenne rapportée au prix moyen du marché", moyenne: "Moyenne", min_t: "Prix le plus bas de la journée", max_t: "Prix le plus haut de la journée", min_c: "le plus bas", max_c: "le plus haut", erreur_abs: "Erreur moyenne",
     erreur_moy: "erreur moyenne",
     m_jour: "Un jour", m_plage: "Plusieurs jours",
@@ -88,15 +88,18 @@ const TXT = {
     duel_ecart: "écart au réel : {e} %", duel_faite: "prévision faite la veille vers 11 h 30", duel_rte_absent: "pas encore publiée",
     duel_rte_quand: "publiée la veille jusqu'à 18 h, trop tard pour l'enchère", duel_attente: "pas encore connu", duel_attente_d: "publié par RTE au fil de la journée",
     duel_mesure: "éCO2mix temps réel, valeurs provisoires", duel_rte_partiel: "{f} seulement : l'autre filière n'est pas publiée par RTE ce jour-là",
-    rte_hist_titre: "Sur tout l'historique : notre modèle contre RTE ({q}, {n} jours)",
+    rte_hist_titre: "Sur tout l'historique : notre modèle contre RTE et la veille ({q}, {n} jours)",
+    duel_veille: "Repère naïf : la veille", veille_prod_court: "Veille (repère naïf)", hist_mieux_v: "et que la veille {p} % des jours",
+    rte_veille_note: "Repère naïf « veille » : la production réelle de la veille, à la même heure. Elle n'est pas encore finie à 11 h, quand la prévision est faite : ce repère est donc un peu avantagé.",
     hist_det: "erreur journalière · horaire {h} % · biais {b} %", hist_mieux: "Notre modèle fait mieux que RTE", hist_jours: "des jours", hist_mieux_d: "{m} jours sur {n}",
     rte_court_note: "RTE publie sa prévision trop tard pour l'enchère du prix (jusqu'à 18 h la veille, contre 12 h 45) : nous devons donc prévoir nous-mêmes la production. Pourquoi RTE fait un peu mieux : voir en bas de page.",
-    rte_err_titre: "Erreur de chaque jour (écart entre le total prévu et le total réel, en %)",
+    rte_err_titre: "Erreur moyenne par semaine (écart entre le total prévu et le total réel de chaque jour, en %) : plus c'est bas, mieux c'est",
+    sem_du: "Semaine du {d} au {f} ({n} jours)",
     rte_pourquoi: "Pourquoi prévoir nous-mêmes alors que RTE publie une prévision ?",
-    rte_detail: "Détail par filière (erreur journalière, horaire, biais)",
+    rte_detail: "Détail par filière (erreur journalière, horaire, biais ; nous, RTE et la veille)",
     rte_t_jour: "Erreur journalière, solaire + éolien", rte_t_heure: "Erreur horaire, solaire + éolien", rte_t_mieux: "Jours où nous faisons mieux que RTE",
     rte_t_nous: "nous", rte_t_rte: "RTE : {v} %", rte_t_n: "sur {n} jours",
-    rte_cols: ["", "Erreur journalière : nous", "RTE", "Erreur horaire : nous", "RTE", "Biais : nous", "RTE", "Jours où nous faisons mieux"],
+    rte_cols: ["", "Erreur journalière : nous", "RTE", "Veille", "Erreur horaire : nous", "RTE", "Veille", "Biais : nous", "RTE", "Veille", "Jours mieux que RTE", "Jours mieux que la veille"],
     pas_de_prod: "Pas encore de prévision de production.",
     ck_prod_modeles: "Modèles de production réappris", nk_prod_modeles: "Réapprentissage des modèles de production",
     ck_prod_modeles_d: "avec la production réelle jusqu'au {d} inclus · solaire {s} arbres · éolien {e} arbres",
@@ -171,7 +174,7 @@ const TXT = {
     fourchette: "Indicative range (80% of past errors)",
     marche: "Market (actual price)", marche_court: "Market",
     hier: "Previous day's price (same quarter-hour)", hier_court: "Day before",
-    sem: "Price on the same weekday of the previous week (same quarter-hour)", sem_court: "Same day last week",
+    sem: "Price on the same weekday of the previous week (same quarter-hour)", sem_court: "Same day last week", sem_mini: "Last week",
     heure: "Time", prevu: "forecast", ecart: "error", ecart_pc: "error %", ns: "n.s.", ns_t: "Market price below 20 €/MWh: a percentage error would be meaningless", biais_t: "Average forecast − market gap (positive: forecast too high on average)", err_rel_t: "Mean error relative to the average market price", moyenne: "Average", min_t: "Lowest price of the day", max_t: "Highest price of the day", min_c: "lowest", max_c: "highest", erreur_abs: "Mean error",
     erreur_moy: "mean error",
     m_jour: "One day", m_plage: "Several days",
@@ -216,15 +219,18 @@ const TXT = {
     duel_ecart: "error vs actual: {e}%", duel_faite: "forecast made the day before around 11:30", duel_rte_absent: "not published yet",
     duel_rte_quand: "published up to 18:00 the day before, too late for the auction", duel_attente: "not known yet", duel_attente_d: "published by RTE during the day",
     duel_mesure: "éCO2mix real time, provisional values", duel_rte_partiel: "{f} only: RTE has not published the other technology for this day",
-    rte_hist_titre: "Over the whole history: our model against RTE ({q}, {n} days)",
+    rte_hist_titre: "Over the whole history: our model against RTE and the previous day ({q}, {n} days)",
+    duel_veille: "Naive benchmark: previous day", veille_prod_court: "Previous day (naive)", hist_mieux_v: "and the previous day on {p}% of days",
+    rte_veille_note: "Naive \"previous day\" benchmark: actual output of the previous day at the same hour. That day is not over yet at 11:00, when the forecast is made, so this benchmark is slightly favoured.",
     hist_det: "daily error · hourly {h}% · bias {b}%", hist_mieux: "Our model beats RTE", hist_jours: "of days", hist_mieux_d: "{m} days out of {n}",
     rte_court_note: "RTE publishes its forecast too late for the price auction (up to 18:00 the day before, versus 12:45): we therefore have to forecast output ourselves. Why RTE does slightly better: see the bottom of the page.",
-    rte_err_titre: "Error on each day (gap between forecast and actual daily totals, %)",
+    rte_err_titre: "Average error per week (gap between forecast and actual daily totals, %): lower is better",
+    sem_du: "Week of {d} to {f} ({n} days)",
     rte_pourquoi: "Why forecast ourselves when RTE publishes a forecast?",
-    rte_detail: "Detail by technology (daily error, hourly error, bias)",
+    rte_detail: "Detail by technology (daily error, hourly error, bias; us, RTE and previous day)",
     rte_t_jour: "Daily error, solar + wind", rte_t_heure: "Hourly error, solar + wind", rte_t_mieux: "Days we beat RTE",
     rte_t_nous: "us", rte_t_rte: "RTE: {v}%", rte_t_n: "over {n} days",
-    rte_cols: ["", "Daily error: us", "RTE", "Hourly error: us", "RTE", "Bias: us", "RTE", "Days we do better"],
+    rte_cols: ["", "Daily error: us", "RTE", "Previous day", "Hourly error: us", "RTE", "Previous day", "Bias: us", "RTE", "Previous day", "Days better than RTE", "Days better than previous day"],
     pas_de_prod: "No production forecast yet.",
     ck_prod_modeles: "Production models retrained", nk_prod_modeles: "Production model retraining",
     ck_prod_modeles_d: "with actual output up to {d} included · solar {s} trees · wind {e} trees",
@@ -279,7 +285,7 @@ const MODELES_ANCIENS = [                                             // toujour
 const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, selPrev: null, menuOuvert: false,
                visibles: { TOUT: true, TOUT0: false, EMT: false, EM: false, EP: false, EU: false, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: true, sem: true, bande: true },   // par défaut (Performance) : Zéphyr et les deux repères naïfs (09/11/2026)
-               prodVisibles: { sol: true, eol: true, rte: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
+               prodVisibles: { sol: true, eol: true, rte: true, veille: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", pasPerf: "quart", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
 
@@ -751,6 +757,11 @@ function lierNavigation(iso) {
   $("prev-prec").addEventListener("click", () => ouvrirJour(ajouterJours(iso, -1)));
   $("prev-suiv").addEventListener("click", () => ouvrirJour(ajouterJours(iso, 1)));
 }
+function resumeModeles(sel, max = 4) {                               // bouton du menu : une puce par modèle coché (trait de couleur + nom court)
+  if (!sel.length) return `<span class="resume-vide">–</span>`;
+  if (sel.length > max) return `<span class="puce-modele">${t("n_modeles", { n: sel.length })}</span>`;
+  return sel.map((c) => `<span class="puce-modele">${pastille(c)}${c === "sem" ? t("sem_mini") : courtModele(c)}</span>`).join("");
+}
 function menuModeles(p, j, pas) {                                    // menu déroulant à cases à cocher : principal mis en avant, meilleur du jour signalé
   const sel = selectionDuJour(j), best = meilleurDuJour(j, pas);
   const ligne = (m) => {
@@ -760,8 +771,7 @@ function menuModeles(p, j, pas) {                                    // menu dé
       + `<span class="menu-tags">${tagJour(m.code, j)}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
       + `${e ? `<span class="menu-err">${nombre(e.mae)} €</span>` : ""}</span></label>`;
   };
-  const resume = sel.map((c) => courtModele(c)).join(", ");
-  return `<details class="menu-modeles" id="${p}-menu"${etat.menuOuvert ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span> ${resume} ▾</summary>`
+  return `<details class="menu-modeles" id="${p}-menu"${etat.menuOuvert ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span>${resumeModeles(sel)}<span class="chevron" aria-hidden="true">▾</span></summary>`
     + `<div class="menu-liste">${modelesDispos(j).concat(REPERES.filter((r) => j[r]).map((r) => ({ code: r }))).map(ligne).join("")}<button type="button" class="bouton-discret" id="${p}-reset">${t("m_reset")}</button></div></details>`;
 }
 function rendreBlocJour(cote, iso, j, now) {
@@ -826,8 +836,7 @@ function menuPerf(id, codes, js) {                                   // même me
     + `<span class="menu-tags">${c === princ ? `<span class="etiquette principal">${t("tag_principal")}</span>` : ""}${c === best ? `<span class="etiquette meilleur">${t("m_meilleur_p")}</span>` : ""}`
     + `${err[c] ? `<span class="menu-err">${nombre(err[c].mae)} €</span>` : ""}</span></label>`;
   const sel = tous.filter((c) => etat.visibles[c]);
-  const resume = sel.length <= 3 ? sel.map((c) => courtModele(c)).join(", ") || "–" : t("n_modeles", { n: sel.length });
-  $(id).innerHTML = `<details class="menu-modeles" id="${id}-menu"${etat.menuPerf === id ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span> ${resume} ▾</summary>`
+  $(id).innerHTML = `<details class="menu-modeles" id="${id}-menu"${etat.menuPerf === id ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span>${resumeModeles(sel)}<span class="chevron" aria-hidden="true">▾</span></summary>`
     + `<div class="menu-liste">${tous.map(ligne).join("")}<button type="button" class="bouton-discret" id="${id}-tout">${t("m_tout")}</button></div></details>`;
   const menu = $(id + "-menu");
   menu.addEventListener("toggle", () => { etat.menuPerf = menu.open ? id : etat.menuPerf === id ? null : etat.menuPerf; });
@@ -945,7 +954,8 @@ const pastTech = (x) => `<span class="pastille" style="color:${css(x.c)}"></span
 function choixProd(id) {                                             // cases Solaire / Éolien de l'onglet Production (un seul état pour tout l'onglet)
   const el = $(id);
   el.innerHTML = `<span class="choix-titre">${t("afficher")}</span>` + TECHS.map((x) => `<label class="choix-item"><input type="checkbox" id="${id}-${x.k}" data-k="${x.k}"${etat.prodVisibles[x.k] ? " checked" : ""}>${pastTech(x)}<span>${t(x.lib)}</span></label>`).join("")
-    + (id === "prod-choix-regions" ? "" : `<label class="choix-item"><input type="checkbox" id="${id}-rte" data-k="rte"${etat.prodVisibles.rte ? " checked" : ""}><span class="trait-rte" aria-hidden="true"></span><span>${t("rte_court")}</span></label>`);   // RTE ne publie que pour la France entière
+    + (id === "prod-choix-regions" ? "" : `<label class="choix-item"><input type="checkbox" id="${id}-rte" data-k="rte"${etat.prodVisibles.rte ? " checked" : ""}>${id === "prod-choix-hist" ? trait("--p-rte", "points") : '<span class="trait-rte" aria-hidden="true"></span>'}<span>${t("rte_court")}</span></label>`)   // RTE ne publie que pour la France entière
+    + (id === "prod-choix-hist" ? `<label class="choix-item"><input type="checkbox" id="${id}-veille" data-k="veille"${etat.prodVisibles.veille ? " checked" : ""}>${trait("--p-veille", "tirets")}<span>${t("veille_prod_court")}</span></label>` : "");
   el.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => {
     etat.prodVisibles[inp.dataset.k] = inp.checked;
     rendreProduction();
@@ -1017,7 +1027,14 @@ function rendreProduction() {
   $("prod-regions").innerHTML = vus.length ? hr : "";
   if (vus.length) collerEntetes($("prod-regions"));
   // 2) tout l'historique : notre modèle contre RTE, mêmes jours (réel complet et prévision RTE des filières cochées connue)
-  const cr = complets.filter((x) => vus.length && vus.every((y) => x.prod[y.k + "_rte"]));
+  const parJour = new Map(js.map((x) => [x.jour, x.prod]));
+  const avecVeille = (x) => {                                                   // repère naïf : production réelle de la veille, même heure (jours de même longueur)
+    const q = parJour.get(ajouterJours(x.jour, -1));
+    if (!q || !q.reel_complet || q.heures.length !== x.prod.heures.length) return null;
+    return { ...x, prod: { ...x.prod, sol_veille: q.sol_reel, eol_veille: q.eol_reel } };
+  };
+  const cr = complets.filter((x) => vus.length && vus.every((y) => x.prod[y.k + "_rte"])).map(avecVeille).filter(Boolean);
+  const vOn = etat.prodVisibles.veille;
   const cle = (k, a) => (a === "" ? k : k + "_" + a);
   const serie = (k, a) => (k === "tot" ? (q) => q[cle("sol", a)].map((y, n) => y + q[cle("eol", a)][n]) : (q) => q[cle(k, a)]);
   const mes = (P_, R_, J) => {
@@ -1028,27 +1045,46 @@ function rendreProduction() {
   const kv = deux ? "tot" : vus.length ? vus[0].k : null;
   $("prod-rte-carte").hidden = !cr.length;
   if (cr.length) {
-    const n = mes(serie(kv, ""), serie(kv, "reel"), cr), r = mes(serie(kv, "rte"), serie(kv, "reel"), cr);
+    const n = mes(serie(kv, ""), serie(kv, "reel"), cr), r = mes(serie(kv, "rte"), serie(kv, "reel"), cr), w = mes(serie(kv, "veille"), serie(kv, "reel"), cr);
     const errJ = (x, a) => (100 * Math.abs(somme(serie(kv, a)(x.prod)) - somme(serie(kv, "reel")(x.prod)))) / somme(serie(kv, "reel")(x.prod));
-    const mieux = cr.filter((x) => errJ(x, "") < errJ(x, "rte")).length;
+    const mieux = cr.filter((x) => errJ(x, "") < errJ(x, "rte")).length, mieuxV = cr.filter((x) => errJ(x, "") < errJ(x, "veille")).length;
+    const best = Math.min(n.j, r.j, vOn ? w.j : Infinity);
     const quoi = (deux ? t("total_court") : t(vus[0].lib)).toLowerCase();
     $("prod-rte-titre").textContent = t("rte_hist_titre", { q: quoi, n: cr.length });
     const pc = (x) => `${nombre(x)} <small>%</small>`;
-    $("prod-rte-duel").innerHTML = cas("nous", trait("--ink-2", "tirets"), t("duel_nous"), pc(n.j), t("hist_det", { h: nombre(n.h), b: signe(n.b) }), n.j < r.j)
-      + cas("rte", trait("--muted", "points"), t("duel_rte"), pc(r.j), t("hist_det", { h: nombre(r.h), b: signe(r.b) }), r.j <= n.j)
-      + cas("reel", "", t("hist_mieux"), `${nombre((100 * mieux) / cr.length, 0)} <small>% ${t("hist_jours")}</small>`, t("hist_mieux_d", { m: mieux, n: cr.length }), false);
-    dessiner("prod-g-err", { type: "line", data: { labels: cr.map((x) => dateCourte(x.jour)), datasets: [
-      dsProd(t("duel_nous"), cr.map((x) => errJ(x, "")), "--s-em", { pointRadius: 2.5, borderWidth: 2 }),
-      dsProd(t("duel_rte"), cr.map((x) => errJ(x, "rte")), "--muted", { pointRadius: 2.5, borderDash: [2, 3], borderWidth: 2 })] }, options: optionsGW(10, "%"), plugins: [curseur] });
+    $("prod-rte-duel").innerHTML = cas("nous", trait("--p-nous", "plein"), t("duel_nous"), pc(n.j), t("hist_det", { h: nombre(n.h), b: signe(n.b) }), n.j === best)
+      + cas("rte", trait("--p-rte", "points"), t("duel_rte"), pc(r.j), t("hist_det", { h: nombre(r.h), b: signe(r.b) }), r.j === best && n.j !== best)
+      + (vOn ? cas("veille", trait("--p-veille", "tirets"), t("duel_veille"), pc(w.j), t("hist_det", { h: nombre(w.h), b: signe(w.b) }), false) : "")
+      + cas("reel", "", t("hist_mieux"), `${nombre((100 * mieux) / cr.length, 0)} <small>% ${t("hist_jours")}</small>`,
+        t("hist_mieux_d", { m: mieux, n: cr.length }) + (vOn ? " · " + t("hist_mieux_v", { p: nombre((100 * mieuxV) / cr.length, 0) }) : ""), false);
+    $("prod-rte-duel").classList.toggle("quatre", vOn);
+    // erreur moyenne par semaine (lundi → dimanche) : des barres groupées, plus lisibles que 60 jours en dents de scie
+    const sems = [];
+    for (const x of cr) {
+      const d = new Date(x.jour + "T12:00:00Z"), lundi = ajouterJours(x.jour, -((d.getUTCDay() + 6) % 7));
+      if (!sems.length || sems[sems.length - 1].lundi !== lundi) sems.push({ lundi, js: [] });
+      sems[sems.length - 1].js.push(x);
+    }
+    const moyS = (a) => sems.map((S) => S.js.reduce((u, x) => u + errJ(x, a), 0) / S.js.length);
+    const barre = (lib, a, c, extra = {}) => ({ type: "bar", label: lib, data: moyS(a), backgroundColor: css(c), borderColor: css("--surface"), borderWidth: { left: 1, right: 1 },
+      borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: "bottom", categoryPercentage: 0.78, barPercentage: 0.92, ...extra });
+    const dsE = [barre(t("duel_nous"), "", "--p-nous"), barre(t("duel_rte"), "rte", "--p-rte")];
+    if (vOn) dsE.push(barre(t("veille_prod_court"), "veille", "--p-veille-barre"));
+    const oE = optionsGW(12, "%");
+    oE.scales.y.min = 0; oE.scales.x.grid = { display: false };
+    Object.assign(oE.plugins.legend.labels, { boxWidth: 12, boxHeight: 12, useBorderRadius: true, borderRadius: 3 });
+    oE.plugins.tooltip.usePointStyle = false;
+    oE.plugins.tooltip.callbacks.title = (it) => { const S = sems[it[0].dataIndex]; return t("sem_du", { d: dateCourte(S.js[0].jour), f: dateCourte(S.js[S.js.length - 1].jour), n: S.js.length }); };
+    dessiner("prod-g-err", { type: "bar", data: { labels: sems.map((S) => dateCourte(S.js[0].jour)), datasets: dsE }, options: oE });
     const lignesR = vus.map((x) => [pastTech(x) + t(x.lib), x.k]).concat(deux ? [[t("total_court"), "tot"]] : []);
     let hrt = `<thead><tr>${t("rte_cols").map((c, q) => `<th${q === 0 ? "" : ' class="num"'}>${q === 0 ? t("jours_n", { n: cr.length }) : c}</th>`).join("")}</tr></thead><tbody>`;
     for (const [lib, k] of lignesR) {
-      const a = mes(serie(k, ""), serie(k, "reel"), cr), b = mes(serie(k, "rte"), serie(k, "reel"), cr);
+      const a = mes(serie(k, ""), serie(k, "reel"), cr), b = mes(serie(k, "rte"), serie(k, "reel"), cr), c = mes(serie(k, "veille"), serie(k, "reel"), cr);
       const e1 = (x, s) => Math.abs(somme(serie(k, s)(x.prod)) - somme(serie(k, "reel")(x.prod)));
-      const m = cr.filter((x) => e1(x, "") < e1(x, "rte")).length;
-      const g = (u, w) => (u < w ? ` class="positif"` : "");
-      hrt += `<tr><td>${lib}</td><td${g(a.j, b.j)}>${nombre(a.j)} %</td><td${g(b.j, a.j)}>${nombre(b.j)} %</td><td${g(a.h, b.h)}>${nombre(a.h)} %</td><td${g(b.h, a.h)}>${nombre(b.h)} %</td>`
-        + `<td>${signe(a.b)} %</td><td>${signe(b.b)} %</td><td>${nombre((100 * m) / cr.length, 0)} %</td></tr>`;
+      const m = cr.filter((x) => e1(x, "") < e1(x, "rte")).length, mv = cr.filter((x) => e1(x, "") < e1(x, "veille")).length;
+      const trio = (q) => [a[q], b[q], c[q]].map((u, z, l) => `<td${u === Math.min(...l) ? ' class="positif"' : ""}>${nombre(u)} %</td>`).join("");
+      hrt += `<tr><td>${lib}</td>${trio("j")}${trio("h")}<td>${signe(a.b)} %</td><td>${signe(b.b)} %</td><td>${signe(c.b)} %</td>`
+        + `<td>${nombre((100 * m) / cr.length, 0)} %</td><td>${nombre((100 * mv) / cr.length, 0)} %</td></tr>`;
     }
     $("prod-rte").innerHTML = hrt + "</tbody>";
   } else effacer("prod-g-err");
