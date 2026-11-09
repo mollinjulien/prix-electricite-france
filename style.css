@@ -460,3 +460,18 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 .perf-dates[hidden] { display: none; }
 .perf-dates label { display: inline-flex; gap: 6px; align-items: center; }
 .err-veille { display: block; margin-top: 2px; }
+
+/* onglet « Anciens modèles » : frise des modèles principaux et lignes devenues principal (09/11/2026) */
+.an-frise { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 8px; margin: 10px 0 22px; }
+.etape-frise { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 0; padding: 8px 10px; border: 1px solid var(--border); border-left: 4px solid var(--s-tout); border-radius: 8px; background: var(--surface); }
+.etape-frise.repere { border-left-color: var(--muted); }
+.etape-frise.actuel { background: var(--s-tout); border-color: var(--s-tout); color: #fff; }
+.etape-frise.actuel .date, .etape-frise.actuel .quoi { color: #fff; opacity: 0.9; }
+.etape-frise .date { font-size: 0.75rem; color: var(--muted); }
+.etape-frise .err { font-variant-numeric: tabular-nums; font-weight: 600; }
+.etape-frise .quoi { font-size: 0.78rem; color: var(--muted); }
+.fleche-frise { align-self: center; color: var(--muted); font-size: 1rem; flex: 0 0 auto; }
+#an-parcours tr.devenu-principal td { background: color-mix(in srgb, var(--s-tout) 14%, transparent); font-weight: 600; }
+#an-parcours tr.devenu-principal td:first-child { box-shadow: inset 4px 0 0 var(--s-tout); }
+#an-parcours tr.ligne-repere td { color: var(--muted); font-style: italic; }
+@media (max-width: 640px) { .an-frise { flex-wrap: wrap; } .fleche-frise { display: none; } .etape-frise { flex-basis: 100%; } }

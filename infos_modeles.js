@@ -180,12 +180,16 @@ window.RECETTE = {
       a_EU: "Toutes les heures depuis le 15/01/2020 jusqu'à minuit (heure de Paris) la veille du jour visé : environ 59 000 heures. Les données des voisins absentes au début (JAO n'existe que depuis juin 2022) restent vides : LightGBM sait faire avec.",
       a_arbres_EU: "Nombre d'arbres fixé une fois pour toutes ({a}) : appris jusqu'à fin 2024, arrêt quand l'erreur sur 2025 ne baisse plus, puis 10 % d'arbres en plus.",
       an_intro: "Une trentaine de modèles ont été construits et testés avant Zéphyr. Les anciens modèles du site tournent toujours chaque jour, pour comparaison, et sont réappris chaque matin comme Zéphyr. Chaque ligne du tableau ajoute une idée au modèle précédent ; l'erreur est toujours mesurée de la même façon : sur 2026, heure par heure, avec un modèle réappris chaque jour uniquement avec les données publiées avant l'enchère.",
+      an_frise_titre: "Les modèles principaux successifs (erreur moyenne par heure sur 2026, €/MWh)",
+      an_frise: [["16/10", "Repère « veille »", "27,9", "point de départ"], ["22/10", "GFS-G", "19,1", "météo GFS + gaz"], ["29/10", "EUR", "13,6", "+ marchés voisins, Grande-Bretagne, nucléaire"],
+                 ["30/10", "EUR-moy4", "13,29", "moyenne de 4 variantes"], ["03/11", "Zéphyr", "12,87", "+ toutes les données européennes"]],
+      an_legende: "★ en couleur : les modèles devenus le modèle principal du site. Les autres lignes sont des essais : gardés comme secours, ou écartés.",
       an_parcours: "Le chemin parcouru (erreur moyenne par heure sur 2026, €/MWh)",
       an_cols: ["Date", "Modèle", "Ce que fait ce modèle", "Erreur 2026", "Verdict"],
       an_lignes: [
-        ["16/10", "Repère « veille »", "Prix de demain = prix d'aujourd'hui à la même heure. Aucun calcul.", "27,9", "à battre"],
+        ["16/10", "Repère « veille »", "Prix de demain = prix d'aujourd'hui à la même heure. Aucun calcul.", "27,9", "point de départ : à battre", "repere"],
         ["16-21/10", "22 premières recettes", "Premiers modèles d'IA (LightGBM) : prix passés, météo, consommation, plus selon la recette gaz, CO₂, nucléaire ou production prévue.", "19,7 à 26,8*", "le gaz et le réapprentissage aident ; CO₂ et nucléaire : rien"],
-        ["22/10", "GFS-G", "Prix passés + météo prévue GFS + consommation prévue RTE + prix du gaz.", "19,1", "principal du 22 au 28/10"],
+        ["22/10", "GFS-G", "Prix passés + météo prévue GFS + consommation prévue RTE + prix du gaz.", "19,1", "★ devient le modèle principal (22 → 28/10)", "principal"],
         ["22/10", "GFS-G-P", "Comme GFS-G, mais le soleil et le vent bruts sont remplacés par notre production solaire et éolienne prévue.", "18,8**", "pas mieux que la météo seule"],
         ["23/10", "GFS-RG", "Comme GFS-G, mais prévoit le prix divisé par le coût du gaz, puis le remultiplie : suit mieux les hausses du gaz.", "18,5", "un peu mieux"],
         ["27/10", "+ voisins", "GFS-RG + prix de la veille en Allemagne, Belgique, Espagne, Italie, Suisse et échanges aux frontières (JAO).", "18,1", "un peu mieux"],
@@ -195,13 +199,13 @@ window.RECETTE = {
         ["28/10", "+ nucléaire et surplus", "+ nucléaire disponible demain et « surplus » = nucléaire + vent + soleil − consommation.", "13,7", "gros gain → secours n°1"],
         ["28/10", "+ météo Allemagne / Benelux", "+ vent et soleil prévus en Allemagne et au Benelux.", "≈ 13,7", "aucun gain : abandonnée"],
         ["28/10", "Élagage fort", "Le même modèle réduit à 29 variables.", "14,5", "pire : abandonné"],
-        ["28/10", "EUR", "Le même modèle réduit à 54 variables (données du jour inutiles retirées).", "13,6", "aussi bon et plus simple → principal le 29/10"],
+        ["28/10", "EUR", "Le même modèle réduit à 54 variables (données du jour inutiles retirées).", "13,6", "★ aussi bon et plus simple : devient le modèle principal (29/10)", "principal"],
         ["29/10", "Spécialiste des effondrements", "Un second modèle dédié aux heures sous 10 €, mélangé à EUR.", "≈ 13,6", "aucun gain : abandonné"],
         ["29/10", "Variante 1 (P)", "EUR, avec un surplus calculé à partir de notre production prévue.", "13,4", "un peu mieux"],
         ["29/10", "Variante 2 (Q)", "EUR + ce surplus ajouté comme variable.", "13,4", "un peu mieux"],
         ["29/10", "Variante 3 (F)", "EUR avec la météo GFS de 6 h, plus récente (publiée vers 10 h 45).", "13,5", "un peu mieux"],
         ["29/10", "EUR-moy2", "Moyenne des prix prévus par EUR et la variante 1.", "13,35", "secours n°1"],
-        ["29/10", "EUR-moy4", "Moyenne de EUR et des 3 variantes : leurs erreurs se compensent en partie.", "13,29", "meilleur → principal du 30/10 au 02/11, puis secours"],
+        ["29/10", "EUR-moy4", "Moyenne de EUR et des 3 variantes : leurs erreurs se compensent en partie.", "13,29", "★ le meilleur : devient le modèle principal (30/10 → 02/11), puis secours", "principal"],
         ["29/10", "EUR-moy4 allégé", "EUR-moy4 avec 45 variables au lieu de 54.", "13,37", "pas mieux : non retenu"],
         ["30/10", "Production de 6 h", "Production solaire et éolienne prévue avec la météo de 6 h au lieu de celle de minuit.", "≈ 13,2", "production plus juste ; prix presque inchangé"],
         ["31/10", "Surplus non exportable", "+ surplus moins ce qui peut partir à l'export.", "13,60", "aucun gain : abandonné"],
@@ -210,7 +214,7 @@ window.RECETTE = {
         ["02/11", "Zéphyr sur 2025", "Le même test refait sur 2025 (365 jours × 24 h = 8 760 heures).", "10,1 en 2025 (EUR-moy4 10,6)", "gain confirmé"],
         ["02/11", "EUR+Zéphyr", "Moyenne des prix prévus par EUR-moy4 et Zéphyr.", "12,82", "égal à Zéphyr : suivi"],
         ["02/11", "Zéphyr élagué", "Zéphyr avec 84 variables au lieu de 102 (choix fait sur 2024, règle fixée avant le calcul).", "12,78 (2025 : 10,37)", "pire sur 2025 : abandonné"],
-        ["02/11", "Zéphyr (version finale)", "+ notre production prévue avec la météo de 6 h.", "12,87", "→ principal depuis le 03/11"],
+        ["02/11", "Zéphyr (version finale)", "+ notre production prévue avec la météo de 6 h.", "12,87", "★ devient le modèle principal (depuis le 03/11)", "principal"],
       ],
       an_notes: "Test : du 01/01 au 28/10/2026, soit 300 jours × 24 h = 7 200 heures prévues une à une (301 jours = 7 224 heures pour les lignes du 29/10 ; 299 jours = 7 176 heures pour Zéphyr et ses variantes). * modèles réappris chaque mois. ** autre série de test : 291 jours = 6 984 heures.",
       an_perf: "Tous les modèles sur l'historique du site (erreur au quart d'heure, jours où le prix du marché est connu)",
@@ -391,12 +395,16 @@ window.RECETTE = {
       a_EU: "Every hour from 15/01/2020 up to midnight (Paris time) before the target day: about 59,000 hours. Neighbour data missing in the early years (JAO only exists since June 2022) are left empty: LightGBM handles it.",
       a_arbres_EU: "Number of trees fixed once and for all ({a}): trained up to end-2024, stopped when the 2025 error no longer falls, then 10% more trees.",
       an_intro: "About thirty models were built and tested before Zéphyr. The site's past models still run every day, for comparison, and are retrained every morning like Zéphyr. Each row of the table adds one idea to the previous model; the error is always measured the same way: over 2026, hour by hour, with a model retrained every day using only data published before the auction.",
+      an_frise_titre: "The successive main models (mean error per hour over 2026, €/MWh)",
+      an_frise: [["16/10", "\"Day before\" benchmark", "27.9", "starting point"], ["22/10", "GFS-G", "19.1", "GFS weather + gas"], ["29/10", "EUR", "13.6", "+ neighbouring markets, Great Britain, nuclear"],
+                 ["30/10", "EUR-moy4", "13.29", "average of 4 variants"], ["03/11", "Zéphyr", "12.87", "+ all European data"]],
+      an_legende: "★ highlighted: the models that became the site's main model. The other rows are trials: kept as fallbacks, or dropped.",
       an_parcours: "How we got here (mean error per hour over 2026, €/MWh)",
       an_cols: ["Date", "Model", "What this model does", "2026 error", "Verdict"],
       an_lignes: [
-        ["16/10", "\"Day before\" benchmark", "Tomorrow's price = today's price at the same hour. No computation.", "27.9", "to beat"],
+        ["16/10", "\"Day before\" benchmark", "Tomorrow's price = today's price at the same hour. No computation.", "27.9", "starting point: to beat", "repere"],
         ["16-21/10", "First 22 recipes", "First AI models (LightGBM): past prices, weather, load, plus, depending on the recipe, gas, CO₂, nuclear or forecast production.", "19.7 to 26.8*", "gas and retraining help; CO₂ and nuclear: nothing"],
-        ["22/10", "GFS-G", "Past prices + GFS weather forecast + RTE load forecast + gas price.", "19.1", "main model 22-28/10"],
+        ["22/10", "GFS-G", "Past prices + GFS weather forecast + RTE load forecast + gas price.", "19.1", "★ becomes the main model (22 → 28/10)", "principal"],
         ["22/10", "GFS-G-P", "Like GFS-G, but raw sun and wind are replaced by our solar and wind production forecast.", "18.8**", "no better than weather alone"],
         ["23/10", "GFS-RG", "Like GFS-G, but forecasts the price divided by the gas cost, then multiplies back: follows gas rises better.", "18.5", "slightly better"],
         ["27/10", "+ neighbours", "GFS-RG + previous-day prices in Germany, Belgium, Spain, Italy, Switzerland and cross-border flows (JAO).", "18.1", "slightly better"],
@@ -406,13 +414,13 @@ window.RECETTE = {
         ["28/10", "+ nuclear and surplus", "+ nuclear available tomorrow and \"surplus\" = nuclear + wind + sun − load.", "13.7", "big gain → fallback 1"],
         ["28/10", "+ Germany / Benelux weather", "+ forecast wind and sun in Germany and Benelux.", "≈ 13.7", "no gain: dropped"],
         ["28/10", "Strong pruning", "The same model cut down to 29 variables.", "14.5", "worse: dropped"],
-        ["28/10", "EUR", "The same model cut down to 54 variables (useless same-day data removed).", "13.6", "as good and simpler → main model on 29/10"],
+        ["28/10", "EUR", "The same model cut down to 54 variables (useless same-day data removed).", "13.6", "★ as good and simpler: becomes the main model (29/10)", "principal"],
         ["29/10", "Price-collapse specialist", "A second model for hours below €10, blended with EUR.", "≈ 13.6", "no gain: dropped"],
         ["29/10", "Variant 1 (P)", "EUR, with a surplus computed from our production forecast.", "13.4", "slightly better"],
         ["29/10", "Variant 2 (Q)", "EUR + this surplus added as a variable.", "13.4", "slightly better"],
         ["29/10", "Variant 3 (F)", "EUR with the 06Z GFS weather, more recent (out around 10:45).", "13.5", "slightly better"],
         ["29/10", "EUR-moy2", "Average of the prices forecast by EUR and variant 1.", "13.35", "fallback 1"],
-        ["29/10", "EUR-moy4", "Average of EUR and the 3 variants: their errors partly cancel out.", "13.29", "best → main model 30/10-02/11, then fallback"],
+        ["29/10", "EUR-moy4", "Average of EUR and the 3 variants: their errors partly cancel out.", "13.29", "★ the best: becomes the main model (30/10 → 02/11), then fallback", "principal"],
         ["29/10", "Lighter EUR-moy4", "EUR-moy4 with 45 variables instead of 54.", "13.37", "not better: not kept"],
         ["30/10", "06Z production", "Solar and wind production forecast with the 06Z weather instead of midnight's.", "≈ 13.2", "better production; price almost unchanged"],
         ["31/10", "Non-exportable surplus", "+ surplus minus what can be exported.", "13.60", "no gain: dropped"],
@@ -421,7 +429,7 @@ window.RECETTE = {
         ["02/11", "Zéphyr on 2025", "The same test run again on 2025 (365 days × 24 h = 8,760 hours).", "10.1 in 2025 (EUR-moy4 10.6)", "gain confirmed"],
         ["02/11", "EUR+Zéphyr", "Average of the prices forecast by EUR-moy4 and Zéphyr.", "12.82", "equal to Zéphyr: tracked"],
         ["02/11", "Pruned Zéphyr", "Zéphyr with 84 variables instead of 102 (chosen on 2024, rule set before computing).", "12.78 (2025: 10.37)", "worse on 2025: dropped"],
-        ["02/11", "Zéphyr (final version)", "+ our production forecast from the 06Z weather.", "12.87", "→ main model since 03/11"],
+        ["02/11", "Zéphyr (final version)", "+ our production forecast from the 06Z weather.", "12.87", "★ becomes the main model (since 03/11)", "principal"],
       ],
       an_notes: "Test: 01/01 to 28/10/2026, i.e. 300 days × 24 h = 7,200 hours forecast one by one (301 days = 7,224 hours for the 29/10 rows; 299 days = 7,176 hours for Zéphyr and its variants). * models retrained monthly. ** another test series: 291 days = 6,984 hours.",
       an_perf: "All models over the site's history (quarter-hour error, days when the market price is known)",
@@ -434,7 +442,7 @@ window.RECETTE = {
 (function () {                                                     // morceaux de page : onglets, sections, fiches de production
   const nav = document.querySelector(".onglets");
   nav.insertAdjacentHTML("beforeend", "      <button type=\"button\" role=\"tab\" id=\"tab-anciens\" data-onglet=\"anciens\" aria-controls=\"anciens\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 8h16v12H4zM3 4h18v4H3m6 5h6\"/></svg><span data-t=\"o_anciens\"></span></button>\n      <button type=\"button\" role=\"tab\" id=\"tab-apropos\" data-onglet=\"apropos\" aria-controls=\"apropos\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v6m0-10v1\"/></svg><span data-t=\"o_apropos\"></span></button>\n");
-  document.querySelector("main").insertAdjacentHTML("beforeend", "    <!-- ============================================================ ANCIENS MODÈLES -->\n    <section id=\"anciens\" role=\"tabpanel\" aria-labelledby=\"tab-anciens\" class=\"panneau\" hidden>\n      <div class=\"carte\">\n        <p class=\"intro\" id=\"an-intro\"></p>\n        <h3 class=\"petit-titre\" id=\"an-titre\"></h3>\n        <div class=\"cadre-table libre\"><table id=\"an-parcours\" class=\"table-donnees texte\"></table></div>\n        <p class=\"note\" id=\"an-notes\"></p>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" id=\"an-perf-titre\"></h3>\n        <div class=\"cadre-table libre\"><table id=\"an-perf\" class=\"table-donnees\"></table></div>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" id=\"an-fiches-titre\"></h3>\n        <div class=\"fiches\" id=\"an-fiches\"></div>\n      </div>\n    </section>\n\n    <!-- ============================================================ MODÈLES -->\n    <section id=\"apropos\" role=\"tabpanel\" aria-labelledby=\"tab-apropos\" class=\"panneau\" hidden>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" data-t=\"m_qui\"></h3>\n        <p class=\"intro\" data-t=\"m_tous_matin\"></p>\n        <div class=\"fiches\" id=\"m-fiches\"></div>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" data-t=\"m_chaine\"></h3>\n        <ol class=\"etapes\" id=\"m-etapes\"></ol>\n      </div>\n      <div class=\"deux-cartes\">\n        <div class=\"carte\">\n          <h3 class=\"petit-titre\" data-t=\"m_lexique\"></h3>\n          <dl class=\"lexique\" id=\"m-lexique\"></dl>\n        </div>\n        <div class=\"carte\">\n          <h3 class=\"petit-titre\" data-t=\"m_limites\"></h3>\n          <ul class=\"points\" id=\"m-limites\"></ul>\n        </div>\n      </div>\n      <h2 class=\"titre-section\" data-t=\"o_sources\"></h2>\n      <div class=\"carte\">\n        <p class=\"intro\" data-t=\"intro_sources\"></p>\n        <div class=\"sources\" id=\"s-liste\"></div>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" data-t=\"s_outils\"></h3>\n        <ul class=\"points\" id=\"s-outils\"></ul>\n      </div>\n    </section>\n");
+  document.querySelector("main").insertAdjacentHTML("beforeend", "    <!-- ============================================================ ANCIENS MODÈLES -->\n    <section id=\"anciens\" role=\"tabpanel\" aria-labelledby=\"tab-anciens\" class=\"panneau\" hidden>\n      <div class=\"carte\">\n        <p class=\"intro\" id=\"an-intro\"></p>\n        <h3 class=\"petit-titre\" id=\"an-frise-titre\"></h3>\n        <div class=\"an-frise\" id=\"an-frise\"></div>\n        <h3 class=\"petit-titre\" id=\"an-titre\"></h3>\n        <p class=\"note\" id=\"an-legende\"></p>\n        <div class=\"cadre-table libre\"><table id=\"an-parcours\" class=\"table-donnees texte\"></table></div>\n        <p class=\"note\" id=\"an-notes\"></p>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" id=\"an-perf-titre\"></h3>\n        <div class=\"cadre-table libre\"><table id=\"an-perf\" class=\"table-donnees\"></table></div>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" id=\"an-fiches-titre\"></h3>\n        <div class=\"fiches\" id=\"an-fiches\"></div>\n      </div>\n    </section>\n\n    <!-- ============================================================ MODÈLES -->\n    <section id=\"apropos\" role=\"tabpanel\" aria-labelledby=\"tab-apropos\" class=\"panneau\" hidden>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" data-t=\"m_qui\"></h3>\n        <p class=\"intro\" data-t=\"m_tous_matin\"></p>\n        <div class=\"fiches\" id=\"m-fiches\"></div>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" data-t=\"m_chaine\"></h3>\n        <ol class=\"etapes\" id=\"m-etapes\"></ol>\n      </div>\n      <div class=\"deux-cartes\">\n        <div class=\"carte\">\n          <h3 class=\"petit-titre\" data-t=\"m_lexique\"></h3>\n          <dl class=\"lexique\" id=\"m-lexique\"></dl>\n        </div>\n        <div class=\"carte\">\n          <h3 class=\"petit-titre\" data-t=\"m_limites\"></h3>\n          <ul class=\"points\" id=\"m-limites\"></ul>\n        </div>\n      </div>\n      <h2 class=\"titre-section\" data-t=\"o_sources\"></h2>\n      <div class=\"carte\">\n        <p class=\"intro\" data-t=\"intro_sources\"></p>\n        <div class=\"sources\" id=\"s-liste\"></div>\n      </div>\n      <div class=\"carte\">\n        <h3 class=\"petit-titre\" data-t=\"s_outils\"></h3>\n        <ul class=\"points\" id=\"s-outils\"></ul>\n      </div>\n    </section>\n");
   document.querySelector('#production [data-t="prod_note"]').insertAdjacentHTML("afterend", "        <details class=\"plus\"><summary data-t=\"prod_details\"></summary><div class=\"fiches\" id=\"prod-modeles\"></div></details>\n");
 })();
 
@@ -455,7 +463,10 @@ function rendreAnciens() {
   $("an-intro").textContent = t("an_intro");
   $("an-titre").textContent = t("an_parcours");
   $("an-parcours").innerHTML = `<thead><tr>${t("an_cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>`
-    + t("an_lignes").map((l) => `<tr>${l.map((c, i) => `<td${i === 3 ? ' class="reel"' : ""}>${c}</td>`).join("")}</tr>`).join("") + "</tbody>";
+    + t("an_lignes").map((l) => `<tr${l[5] === "principal" ? ' class="devenu-principal"' : l[5] === "repere" ? ' class="ligne-repere"' : ""}>${l.slice(0, 5).map((c, i) => `<td${i === 3 ? ' class="reel"' : ""}>${c}</td>`).join("")}</tr>`).join("") + "</tbody>";
+  $("an-frise-titre").textContent = t("an_frise_titre");                // l'histoire en un coup d'œil : les modèles principaux successifs (09/11/2026)
+  $("an-frise").innerHTML = t("an_frise").map(([d, m, e, q], i) => `${i ? '<span class="fleche-frise" aria-hidden="true">→</span>' : ""}<div class="etape-frise${i === 0 ? " repere" : ""}${i === t("an_frise").length - 1 ? " actuel" : ""}"><span class="date">${d}</span><b>${m}</b><span class="err">${e} €/MWh</span><span class="quoi">${q}</span></div>`).join("");
+  $("an-legende").textContent = t("an_legende");
   $("an-notes").textContent = t("an_notes");
   $("an-perf-titre").textContent = t("an_perf");
   const js = joursAvecPrix(), sh = stats(js, "hier"), ss = stats(js, "sem");
