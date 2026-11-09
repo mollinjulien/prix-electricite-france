@@ -43,6 +43,7 @@ const TXT = {
     fourchette: "Fourchette indicative (80 % des écarts passés)",
     marche: "Marché (prix réel)", marche_court: "Marché",
     hier: "Prix de la veille (même quart d'heure)", hier_court: "Veille",
+    sem: "Prix de la semaine d'avant (même jour, même quart d'heure)", sem_court: "Semaine d'avant",
     heure: "Heure", prevu: "prévu", ecart: "écart", ecart_pc: "écart %", ns: "n.s.", ns_t: "Prix du marché inférieur à 20 €/MWh : un écart en % n'aurait pas de sens", biais_t: "Écart moyen prévu − marché (positif : prévision trop haute en moyenne)", err_rel_t: "Erreur moyenne rapportée au prix moyen du marché", moyenne: "Moyenne", min_t: "Prix le plus bas de la journée", max_t: "Prix le plus haut de la journée", min_c: "le plus bas", max_c: "le plus haut", erreur_abs: "Erreur moyenne",
     erreur_moy: "erreur moyenne",
     m_jour: "Un jour", m_plage: "Plusieurs jours",
@@ -56,7 +57,7 @@ const TXT = {
     clic_jour: "Cliquez sur une ligne pour ouvrir ce jour dans le détail.",
     date: "Date", source: "Source", rejeu: "rejeu", direct: "direct", meilleur: "meilleur",
     prevu_moyen: "prévu", erreur_court: "erreur", moyenne_periode: "Moyenne de la période",
-    intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Le gain se mesure contre le repère naïf « même quart d'heure la veille ». La corrélation (de −1 à 1, 1 = parfait) dit si le modèle suit bien les hausses et les baisses du prix, sans tenir compte du niveau ; « dans la journée » = moyenne des corrélations de chaque jour sur ses quarts d'heure.",
+    intro_perf: "Erreur de chaque modèle par rapport au prix du marché, au quart d'heure. Plus c'est bas, mieux c'est. L'erreur relative rapporte la somme des erreurs à la somme des prix. Deux repères naïfs, sans modèle, servent de comparaison : « Veille » (même quart d'heure la veille) et « Semaine d'avant » (même quart d'heure, même jour de la semaine précédente). Le gain se mesure contre la veille. La corrélation (de −1 à 1, 1 = parfait) dit si le modèle suit bien les hausses et les baisses du prix, sans tenir compte du niveau ; « dans la journée » = moyenne des corrélations de chaque jour sur ses quarts d'heure.",
     pf_pas_titre: "Erreur calculée", pf_quart: "Au quart d'heure", pf_heure: "À l'heure", pf_jour: "Sur la journée", pf_note_pas: "Prévision et prix du marché sont moyennés par {u} avant de calculer l'écart : plus la durée est longue, plus les erreurs se compensent.", u_heure: "heure", u_jour: "journée", pf_tout: "Tout l'historique", pf_30: "30 derniers jours", pf_direct: "Depuis la mise en ligne",
     aucun_direct: "Pas encore de jour prévu en direct : les premières prévisions publiées commencent le {d}.",
     c_corr: "Corrélation", c_corr_j: "Corrél. jour", corr_court: "corrélation {r}",
@@ -67,7 +68,7 @@ const TXT = {
     perf_difficiles: "Les jours les plus difficiles pour nos modèles (classés selon l'erreur moyenne des modèles en service)",
     mise_en_ligne: "mise en ligne",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
-    tag_principal: "principal",
+    tag_principal: "principal", tag_secours_jour: "modèle de secours",
     pied: "Ces prévisions ne constituent pas un conseil d'investissement. Prix du marché : EPEX SPOT, données Bundesnetzagentur | SMARD.de (CC BY 4.0) via Energy-Charts.info (Fraunhofer ISE).",
     o_production: "Production (bonus)", ck_rejeu: "Prévision recalculée après coup", ck_rejeu_d: "le site a été mis en ligne le {m} : ce jour a été rejoué avec exactement la méthode du service. Le détail des étapes n'est enregistré que depuis le {d}.",
     prod_titre: "Bonus : notre prévision de production solaire et éolienne",
@@ -170,6 +171,7 @@ const TXT = {
     fourchette: "Indicative range (80% of past errors)",
     marche: "Market (actual price)", marche_court: "Market",
     hier: "Previous day's price (same quarter-hour)", hier_court: "Day before",
+    sem: "Previous week's price (same weekday, same quarter-hour)", sem_court: "Week before",
     heure: "Time", prevu: "forecast", ecart: "error", ecart_pc: "error %", ns: "n.s.", ns_t: "Market price below 20 €/MWh: a percentage error would be meaningless", biais_t: "Average forecast − market gap (positive: forecast too high on average)", err_rel_t: "Mean error relative to the average market price", moyenne: "Average", min_t: "Lowest price of the day", max_t: "Highest price of the day", min_c: "lowest", max_c: "highest", erreur_abs: "Mean error",
     erreur_moy: "mean error",
     m_jour: "One day", m_plage: "Several days",
@@ -183,7 +185,7 @@ const TXT = {
     clic_jour: "Click a row to open that day in detail.",
     date: "Date", source: "Source", rejeu: "replay", direct: "live", meilleur: "best",
     prevu_moyen: "forecast", erreur_court: "error", moyenne_periode: "Period average",
-    intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. The gain is measured against the naive \"same quarter-hour the day before\" benchmark. The correlation (−1 to 1, 1 = perfect) tells whether the model follows the price ups and downs, regardless of level; \"within-day\" = average of each day's correlation over its quarter-hours.",
+    intro_perf: "Error of each model against the market price, per quarter-hour. Lower is better. The relative error divides the sum of errors by the sum of prices. Two naive benchmarks, with no model, serve as references: \"Day before\" (same quarter-hour the day before) and \"Week before\" (same quarter-hour, same weekday of the previous week). The gain is measured against the day before. The correlation (−1 to 1, 1 = perfect) tells whether the model follows the price ups and downs, regardless of level; \"within-day\" = average of each day's correlation over its quarter-hours.",
     pf_pas_titre: "Error computed", pf_quart: "Per quarter-hour", pf_heure: "Per hour", pf_jour: "Per day", pf_note_pas: "Forecast and market price are averaged over each {u} before the gap is computed: the longer the span, the more the errors cancel out.", u_heure: "hour", u_jour: "day", pf_tout: "Full history", pf_30: "Last 30 days", pf_direct: "Since going live",
     aucun_direct: "No live day yet: the first published forecasts start on {d}.",
     c_corr: "Correlation", c_corr_j: "Daily correl.", corr_court: "correlation {r}",
@@ -194,7 +196,7 @@ const TXT = {
     perf_difficiles: "The hardest days for our models (ranked by the average error of the models in service)",
     mise_en_ligne: "live",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
-    tag_principal: "main",
+    tag_principal: "main", tag_secours_jour: "backup model",
     pied: "These forecasts are not investment advice. Market prices: EPEX SPOT, data Bundesnetzagentur | SMARD.de (CC BY 4.0) via Energy-Charts.info (Fraunhofer ISE).",
     o_production: "Production (bonus)", ck_rejeu: "Forecast recomputed afterwards", ck_rejeu_d: "the site went live on {m}: this day was replayed with exactly the service's method. Step details are only recorded since {d}.",
     prod_titre: "Bonus: our solar and wind production forecast",
@@ -276,7 +278,7 @@ const MODELES_ANCIENS = [                                             // toujour
 ];
 const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, selPrev: null, menuOuvert: false,
-               visibles: { TOUT: true, TOUT0: true, EMT: true, EM: true, EP: true, EU: true, EUC: true, GB: true, GR: true, TOUT: true, CR: true, GT: true, hier: false, bande: true },
+               visibles: { TOUT: true, TOUT0: false, EMT: false, EM: false, EP: false, EU: false, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: true, sem: true, bande: true },   // par défaut (Performance) : Zéphyr et les deux repères naïfs (09/11/2026)
                prodVisibles: { sol: true, eol: true, rte: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", pasPerf: "quart", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
@@ -312,16 +314,17 @@ function maintenantParis() {
 }
 const css = (nom) => getComputedStyle(document.documentElement).getPropertyValue(nom).trim();
 const moyenne = (a) => { const v = (a || []).filter((x) => x !== null && x !== undefined); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null; };
-const nomModele = (code) => (code === "hier" ? t("hier") : t("nom_" + code));
-const courtModele = (code) => (code === "hier" ? t("hier_court") : t("court_" + code));
+const REPERES = ["hier", "sem"];                                     // repères naïfs : veille et semaine d'avant
+const nomModele = (code) => (REPERES.includes(code) ? t(code) : t("nom_" + code));
+const courtModele = (code) => (REPERES.includes(code) ? t(code + "_court") : t("court_" + code));
 const jours = () => etat.d.jours;
 const joursAvecPrix = () => jours().filter((j) => j.reel);
 const jourDe = (iso) => jours().find((j) => j.jour === iso);
 const modelesDuJour = (j) => MODELES.filter((m) => j[m.code]);
 const visibles = (j) => TOUS.filter((m) => j[m.code] && etat.visibles[m.code]);
-const colonnes = (j) => visibles(j).map((m) => m.code).concat(etat.visibles.hier ? ["hier"] : []);   // séries cochées d'un jour, repère « veille » compris
+const colonnes = (j) => visibles(j).map((m) => m.code).concat(REPERES.filter((r) => etat.visibles[r] && j[r]));   // séries cochées d'un jour, repères naïfs compris
 function meilleur(j, parmi) {                                        // modèle à la plus petite erreur moyenne du jour (parmi les modèles en service, ou la liste `parmi`)
-  const c = TOUS.filter((m) => j[m.code]).map((m) => m.code).filter((k) => j.erreurs && j.erreurs[k] && (!parmi || parmi.includes(k)));
+  const c = (parmi || TOUS.map((m) => m.code)).filter((k) => j[k] && j.erreurs && j.erreurs[k]);
   return c.length ? c.reduce((a, b) => (j.erreurs[b].mae < j.erreurs[a].mae ? b : a)) : null;
 }
 
@@ -333,7 +336,7 @@ function parHeure(serie, heures) {                                   // moyenne 
 }
 function heuresLabels(heures) { return [...new Set(heures.map((h) => h.slice(0, 2)))].map((h) => h + (etat.langue === "fr" ? " h" : ":00")); }
 function series(j, pas) {                                           // séries d'un jour, au quart d'heure ou à l'heure
-  const cles = ["reel", "hier", "bas", "haut", ...TOUS.map((m) => m.code)];
+  const cles = ["reel", ...REPERES, "bas", "haut", ...TOUS.map((m) => m.code)];
   if (pas === "quart") return { labels: j.heures, ...Object.fromEntries(cles.map((k) => [k, j[k] || null])) };
   return { labels: heuresLabels(j.heures), ...Object.fromEntries(cles.map((k) => [k, parHeure(j[k], j.heures)])) };
 }
@@ -361,7 +364,7 @@ function stats(listeJours, cle) {                                    // erreurs 
 }
 function aggJours(liste, pas) {                                       // regroupe chaque jour par heure ou par journée entière (moyenne du prix et des prévisions), seulement si le prix du marché est connu sur tout le groupe
   if (pas === "quart") return liste;
-  const noms = ["reel", "hier", ...TOUS.map((m) => m.code)];
+  const noms = ["reel", ...REPERES, ...TOUS.map((m) => m.code)];
   return liste.map((j) => {
     const cle = j.heures.map((h) => (pas === "heure" ? h.slice(0, 2) : "j")), ks = [...new Set(cle)], o = { jour: j.jour, source: j.source, heures: ks };
     for (const nom of noms) {
@@ -403,6 +406,7 @@ function celluleEcart(p, r) {                                        // écart p
 function pastille(code) {
   if (code === "reel") return `<span class="pastille" style="color:${css("--ink")}"></span>`;
   if (code === "hier") return `<span class="pastille points" style="color:${css("--muted")}"></span>`;
+  if (code === "sem") return `<span class="pastille tirets" style="color:${css("--muted")}"></span>`;
   const m = TOUS.find((x) => x.code === code);
   return `<span class="pastille${m.tirets ? " tirets" : ""}" style="color:${css(m.couleur)}"></span>`;
 }
@@ -415,7 +419,7 @@ function segments(id, liste, valeur, rappel) {
 }
 function choixModeles(id, codes, fixes = [], bande = false) {         // cases à cocher des modèles (+ fourchette si elle existe, + légende des courbes toujours affichées)
   const el = $(id);
-  const cases = codes.concat(["hier"], bande ? ["bande"] : []).map((c) => `<label class="choix-item"><input type="checkbox" id="${id}-${c}" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>`
+  const cases = codes.concat(REPERES, bande ? ["bande"] : []).map((c) => `<label class="choix-item"><input type="checkbox" id="${id}-${c}" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>`
     + `${c === "bande" ? '<span class="pastille bande"></span>' : pastille(c)}<span>${c === "bande" ? t("fourchette") : nomModele(c)}</span></label>`);
   const leg = fixes.map(([c, lib]) => `<span class="choix-fixe">${c === "bande" ? '<span class="pastille bande"></span>' : pastille(c)}${lib}</span>`);
   el.innerHTML = `<span class="choix-titre">${t("afficher")}</span>${cases.join("")}${leg.length ? `<span class="choix-legende">${leg.join("")}</span>` : ""}`;
@@ -490,6 +494,8 @@ function dsModele(m, data, extra = {}) {
 }
 const dsMarche = (data) => ({ label: t("marche"), data, borderColor: css("--ink"), backgroundColor: css("--ink"), borderWidth: 2, fill: false, spanGaps: true, cubicInterpolationMode: "monotone" });
 const dsHier = (data, extra = {}) => ({ label: t("hier_court"), data, borderColor: css("--muted"), backgroundColor: css("--muted"), borderWidth: 1.5, borderDash: [2, 3], fill: false, ...extra });
+const dsSem = (data, extra = {}) => ({ label: t("sem_court"), data, borderColor: css("--muted"), backgroundColor: css("--muted"), borderWidth: 1.5, borderDash: [7, 4], fill: false, ...extra });
+const dsRepere = (r, data, extra = {}) => (r === "hier" ? dsHier : dsSem)(data, extra);
 function dsBande(bas, haut) {
   return [{ label: "_bas", data: bas, borderWidth: 0, pointRadius: 0, fill: false },
           { label: t("fourchette"), data: haut, borderWidth: 0, pointRadius: 0, backgroundColor: css("--bande"), borderColor: css("--bande"), fill: "-1" }];
@@ -501,7 +507,7 @@ function dsJour(s, j) {
   if (avecBande(s)) ds.push(...dsBande(s.bas, s.haut));
   if (s.reel) ds.push(dsMarche(s.reel));
   for (const m of visibles(j)) ds.push(dsModele(m, s[m.code], m.code === principalDe(j) ? { fill: "start", backgroundColor: degrade(css(m.couleur)) } : {}));
-  if (etat.visibles.hier) ds.push(dsHier(s.hier));
+  for (const r of REPERES) if (etat.visibles[r] && s[r]) ds.push(dsRepere(r, s[r]));
   return ds;
 }
 function legendeJour(s, j) {
@@ -638,15 +644,15 @@ function badgeJour(iso, now) {
 }
 const meilleurDuJour = (j, pas) => TOUS.map((m) => m.code).filter((k) => erreurJour(j, k, pas)).reduce((a, b) => (a === null || erreurJour(j, b, pas).mae < erreurJour(j, a, pas).mae ? b : a), null);
 const CHAINE = ["TOUT", "TOUT0", "EM", "EP", "EU", "GB", "GR"];                              // chaîne de repli du modèle publié
-const principalActuel = () => {                                       // premier modèle de la chaîne présent le dernier jour publié (EMT depuis le 03/11/2026, rejoué avant)
-  const d = [...jours()].reverse().find((j) => j.source === "direct" && j.principal) || {};
-  return CHAINE.find((k) => d[k]) || d.principal || "EM";
-};
-function principalDe(j) {                                             // le principal ACTUEL pour tous les jours ; s'il manque ce jour-là, le niveau suivant de la chaîne
-  const p = principalActuel(), L = [p, ...CHAINE.filter((c) => c !== p)];
-  return L.find((c) => j[c]) || (TOUS.find((m) => j[m.code]) || {}).code;
+const PRINCIPAL = "TOUT";                                              // Zéphyr est TOUJOURS le modèle principal (Julien, 09/11/2026) ; un autre modèle qui le remplace un jour est marqué « modèle de secours »
+const principalActuel = () => PRINCIPAL;
+function principalDe(j) {                                             // modèle affiché par défaut un jour donné : Zéphyr ; s'il manque ce jour-là, le premier secours disponible de la chaîne
+  return CHAINE.find((c) => j[c]) || (TOUS.find((m) => j[m.code]) || {}).code;
 }
-const etiquetteJour = (m, j) => ` <span class="etiquette${m.code === principalDe(j) ? " principal" : ""}">${t(m.code === principalDe(j) ? "tag_principal" : m.tag)}</span>`;
+const estSecours = (code, j) => code !== PRINCIPAL && code === principalDe(j);          // ce modèle remplace Zéphyr ce jour-là
+const tagJour = (code, j) => (code === PRINCIPAL ? `<span class="etiquette principal">${t("tag_principal")}</span>`
+  : estSecours(code, j) ? `<span class="etiquette secours">${t("tag_secours_jour")}</span>` : "");
+const etiquetteJour = (m, j) => " " + (tagJour(m.code, j) || `<span class="etiquette">${t(m.tag)}</span>`);
 function blocErreur(j, code, pas) {                                  // l'erreur de la prévision : valeur, part du prix moyen et repère « veille »
   const e = erreurJour(j, code, pas), titre = `<div class="petit">${t("err_titre")} <span class="err-pas">${t(pas === "heure" ? "err_heure" : "err_quart")}</span></div>`;
   if (!e) return `<div class="bloc-erreur" title="${t("err_aide")}">${titre}<div class="err-attente">${t("err_attente")}</div></div>`;
@@ -708,7 +714,7 @@ function tablePrix(id, s, j, pas) {                                       // tab
   collerEntetes($(id));
 }
 const SEUIL_PC = 20;                                                  // €/MWh : en dessous, un écart en % n'a pas de sens (même seuil que les Excel du bilan)
-const SEL_VIDE = () => Object.fromEntries(TOUS.map((m) => [m.code, false]).concat([["hier", false], ["bande", false]]));
+const SEL_VIDE = () => Object.fromEntries(TOUS.map((m) => [m.code, false]).concat(REPERES.map((r) => [r, false]), [["bande", false]]));
 const modeleParDefaut = (j) => principalDe(j);
 const modelesDispos = (j) => TOUS.filter((m) => j[m.code]);
 function selectionDuJour(j) {                                        // modèles cochés dans le menu (ceux qui existent ce jour-là), sinon le principal du jour
@@ -745,7 +751,7 @@ function menuModeles(p, j, pas) {                                    // menu dé
     const e = erreurJour(j, m.code, pas), pr = m.code === principalDe(j);
     return `<label class="menu-item${pr ? " principal" : ""}"><input type="checkbox" data-c="${m.code}"${sel.includes(m.code) ? " checked" : ""}>${pastille(m.code)}`
       + `<span class="menu-nom"><b>${courtModele(m.code)}</b><small>${nomModele(m.code)}</small></span>`
-      + `<span class="menu-tags">${pr ? `<span class="etiquette principal">${t("tag_principal")}</span>` : ""}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
+      + `<span class="menu-tags">${tagJour(m.code, j)}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
       + `${e ? `<span class="menu-err">${nombre(e.mae)} €</span>` : ""}</span></label>`;
   };
   const resume = sel.map((c) => courtModele(c)).join(", ");
@@ -806,7 +812,7 @@ function ouvrirJour(iso) { etat.jourPrev = iso; location.hash = "#prevision/" + 
 
 /* ---------------------------------------------------------------- onglet Performance */
 function menuPerf(id, codes, js) {                                   // même menu déroulant que l'onglet Prévision : principal mis en avant, meilleur de la période, erreur de chaque modèle
-  const tous = codes.concat(["hier"]), princ = principalActuel();
+  const tous = codes.concat(REPERES), princ = principalActuel();
   const err = Object.fromEntries(tous.map((c) => [c, js.length ? stats(js, c) : null]));
   const avec = codes.filter((c) => err[c]), best = avec.length ? avec.reduce((a, b) => (err[b].mae < err[a].mae ? b : a)) : null;
   const ligne = (c) => `<label class="menu-item${c === princ ? " principal" : ""}"><input type="checkbox" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>${pastille(c)}`
@@ -840,20 +846,21 @@ function rendrePerformance() {
     return;
   }
   const vus = codes.filter((c) => etat.visibles[c]), sh = stats(jp, "hier");
-  const victoires = Object.fromEntries(codes.map((c) => [c, 0]));
+  const vusR = REPERES.filter((r) => etat.visibles[r]);                       // repères naïfs cochés
+  const victoires = Object.fromEntries(codes.concat(REPERES).map((c) => [c, 0]));
   let nj = 0;
-  for (const j of js) { const b = meilleur(j, vus); if (b) { nj++; victoires[b]++; } }          // « meilleur du jour » parmi les modèles cochés : le total fait 100 %
+  for (const j of js) { const b = meilleur(j, vus.concat(vusR)); if (b) { nj++; victoires[b]++; } }   // « meilleur du jour » parmi les séries cochées (repères compris) : le total fait 100 %
   const st = vus.map((c) => [c, stats(jp, c)]).filter(([, s]) => s);
   const best = st.length ? st.reduce((a, b) => (b[1].mae < a[1].mae ? b : a))[0] : null;
   let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
-  for (const [c, s] of st.concat(etat.visibles.hier ? [["hier", sh]] : [])) {
+  for (const [c, s] of st.concat(vusR.map((r) => [r, r === "hier" ? sh : stats(jp, r)]).filter(([, s]) => s))) {
     const m = TOUS.find((x) => x.code === c);
     h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(jp, c).r, 2)}</td><td>${etat.pasPerf === "jour" ? "–" : nombre(correlations(jp, c).rj, 2)}</td>`
-      + `<td>${c === "hier" ? "–" : nombre((100 * victoires[c]) / nj, 0) + " %"}</td><td>${c === "hier" ? "–" : `<span class="positif">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
+      + `<td>${nj ? nombre((100 * victoires[c]) / nj, 0) + " %" : "–"}</td><td>${c === "hier" ? "–" : `<span class="${s.mae < sh.mae ? "positif" : ""}">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
   }
   resume.innerHTML = h + "</tbody>";
   const ds = TOUS.filter((m) => etat.visibles[m.code] && js.some((j) => j.erreurs[m.code])).map((m) => dsModele(m, js.map((j) => (j.erreurs[m.code] ? j.erreurs[m.code].mae : null)), { pointRadius: 2 }));
-  if (etat.visibles.hier) ds.push(dsHier(js.map((j) => j.erreurs.hier.mae)));
+  for (const r of vusR) ds.push(dsRepere(r, js.map((j) => (j.erreurs[r] ? j.erreurs[r].mae : null)), { spanGaps: true }));
   const o = options(8, true), iDirect = js.findIndex((j) => j.source === "direct");
   o.plugins.marqueur = { index: iDirect > 0 ? iDirect : null, texte: t("mise_en_ligne") };
   dessiner("perf-jours", { type: "line", data: { labels: js.map((j) => dateCourte(j.jour)), datasets: ds }, options: o, plugins: [curseur, marqueur] });
@@ -861,7 +868,7 @@ function rendrePerformance() {
   for (const j of js) {
     j.heures.forEach((hq, i) => {
       const k = hq.slice(0, 2);
-      for (const c of [...codes, "hier"]) {
+      for (const c of [...codes, ...REPERES]) {
         const p = j[c];
         if (!p || p[i] === null || j.reel[i] === null) continue;
         somme[c] = somme[c] || {}; nb[c] = nb[c] || {};
@@ -872,9 +879,9 @@ function rendrePerformance() {
   const hs = [...Array(24).keys()].map((x) => String(x).padStart(2, "0"));
   const serieH = (c) => hs.map((k) => (nb[c] && nb[c][k] ? somme[c][k] / nb[c][k] : null));
   const dh = TOUS.filter((m) => etat.visibles[m.code] && somme[m.code]).map((m) => dsModele(m, serieH(m.code), { pointRadius: 2 }));
-  if (etat.visibles.hier) dh.push(dsHier(serieH("hier")));
+  for (const r of vusR) if (somme[r]) dh.push(dsRepere(r, serieH(r)));
   dessiner("perf-heures", { type: "line", data: { labels: hs.map((k) => k + (etat.langue === "fr" ? " h" : ":00")), datasets: dh }, options: options(12, true), plugins: [curseur] });
-  const cols = vus.concat(etat.visibles.hier ? ["hier"] : []);
+  const cols = vus.concat(vusR);
   const errMoy = (j) => moyenne(codes.filter((c) => j.erreurs[c]).map((c) => j.erreurs[c].mae));
   const dur = js.filter((j) => errMoy(j) !== null).sort((a, b) => errMoy(b) - errMoy(a)).slice(0, 8);
   let hd = `<thead><tr><th>${t("date")}</th><th>${pastille("reel")} ${t("marche_moyen")}</th>`

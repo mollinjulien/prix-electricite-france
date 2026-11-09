@@ -337,6 +337,7 @@ details.compact summary { cursor: pointer; }
 .tuile .valeur .attente { font-size: 0.85rem; font-weight: 400; color: var(--muted); }
 .tuile.principal { border-color: var(--s-tout); box-shadow: inset 3px 0 0 var(--s-tout); }
 .etiquette.principal { background: var(--s-tout); border-color: var(--s-tout); color: #fff; }
+.etiquette.secours { background: var(--alerte); border-color: var(--alerte); color: #3a2400; }
 .etiquette.meilleur { border-color: var(--ok); color: var(--ok-texte); }
 .menu-modeles { position: relative; }
 .menu-modeles > summary { list-style: none; cursor: pointer; font-size: 0.86rem; padding: 6px 12px; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
