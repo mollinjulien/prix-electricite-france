@@ -355,15 +355,15 @@ function erreurJour(j, code, pas) {                                 // erreur mo
   p.forEach((x, i) => { if (x !== null && r[i] !== null) { n++; sa += Math.abs(x - r[i]); } });
   return n ? { mae: sa / n } : null;
 }
-function stats(listeJours, cle) {                                    // erreurs au quart d'heure sur plusieurs jours
+function stats(listeJours, cle, pas) {                               // erreurs sur plusieurs jours : au quart d'heure, ou à l'heure (pas = "heure" : moyennes horaires du prévu et du marché)
   let n = 0, sa = 0, s = 0, s2 = 0, sr = 0;
   for (const j of listeJours) {
-    const p = j[cle];
-    if (!p || !j.reel) continue;
+    if (!j[cle] || !j.reel) continue;
+    const p = pas === "heure" ? parHeure(j[cle], j.heures) : j[cle], r = pas === "heure" ? parHeure(j.reel, j.heures) : j.reel;
     for (let i = 0; i < p.length; i++) {
-      if (p[i] === null || j.reel[i] === null) continue;
-      const e = p[i] - j.reel[i];
-      n++; sa += Math.abs(e); s += e; s2 += e * e; sr += Math.abs(j.reel[i]);
+      if (p[i] === null || r[i] === null) continue;
+      const e = p[i] - r[i];
+      n++; sa += Math.abs(e); s += e; s2 += e * e; sr += Math.abs(r[i]);
     }
   }
   return n ? { mae: sa / n, biais: s / n, rmse: Math.sqrt(s2 / n), rel: (100 * sa) / sr, n } : null;

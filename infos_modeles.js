@@ -224,7 +224,7 @@ window.RECETTE = {
         ["02/11", "Zéphyr (version finale)", "+ notre production prévue avec la météo de 6 h.", "12,87", "★ devient le modèle principal (depuis le 03/11)", "principal"],
       ],
       an_notes: "Test : du 01/01 au 28/10/2026, soit 300 jours × 24 h = 7 200 heures prévues une à une (301 jours = 7 224 heures pour les lignes du 29/10 ; 299 jours = 7 176 heures pour Zéphyr et ses variantes). * modèles réappris chaque mois. ** autre série de test : 291 jours = 6 984 heures. *** appris jusqu'au 31/12/2025 sans réapprentissage, test du 01/01 au 18/10/2026 : 290 jours × 24 h = 6 960 heures.",
-      an_perf: "Tous les modèles sur l'historique du site (erreur au quart d'heure, jours où le prix du marché est connu)",
+      an_perf: "Tous les modèles sur l'historique du site (erreur à l'heure, comme les autres prévisions publiées ; jours où le prix du marché est connu)",
       an_fiches: "Les anciens modèles, toujours calculés chaque jour",
     },
     en: {
@@ -446,7 +446,7 @@ window.RECETTE = {
         ["02/11", "Zéphyr (final version)", "+ our production forecast from the 06Z weather.", "12.87", "★ becomes the main model (since 03/11)", "principal"],
       ],
       an_notes: "Test: 01/01 to 28/10/2026, i.e. 300 days × 24 h = 7,200 hours forecast one by one (301 days = 7,224 hours for the 29/10 rows; 299 days = 7,176 hours for Zéphyr and its variants). * models retrained monthly. ** another test series: 291 days = 6,984 hours. *** trained up to 31/12/2025 without retraining, test 01/01 to 18/10/2026: 290 days × 24 h = 6,960 hours.",
-      an_perf: "All models over the site's history (quarter-hour error, days when the market price is known)",
+      an_perf: "All models over the site's history (hourly error, like other published forecasts; days when the market price is known)",
       an_fiches: "The past models, still computed every day",
     },
   },
@@ -483,8 +483,8 @@ function rendreAnciens() {
   $("an-legende").textContent = t("an_legende");
   $("an-notes").textContent = t("an_notes");
   $("an-perf-titre").textContent = t("an_perf");
-  const js = joursAvecPrix(), sh = stats(js, "hier"), ss = stats(js, "sem");
-  const st = TOUS.map((m) => [m.code, stats(js, m.code)]).filter(([, x]) => x).sort((a, b) => a[1].mae - b[1].mae);
+  const js = joursAvecPrix(), sh = stats(js, "hier", "heure"), ss = stats(js, "sem", "heure");
+  const st = TOUS.map((m) => [m.code, stats(js, m.code, "heure")]).filter(([, x]) => x).sort((a, b) => a[1].mae - b[1].mae);
   let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_n", { n: js.length })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
   for (const [c, x] of st.concat(sh ? [["hier", sh]] : [], ss ? [["sem", ss]] : [])) {
     const m = TOUS.find((y) => y.code === c);
