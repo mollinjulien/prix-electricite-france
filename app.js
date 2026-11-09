@@ -65,7 +65,7 @@ const TXT = {
     jours_n: "{n} jours",
     perf_jours: "Erreur moyenne de chaque jour (€/MWh)",
     perf_heures: "À quelle heure se trompe-t-on ? Erreur moyenne par heure de la journée (€/MWh)",
-    perf_difficiles: "Les jours les plus difficiles pour nos modèles (classés selon l'erreur moyenne des modèles en service)",
+    perf_difficiles: "Les jours les plus difficiles pour Zéphyr (classés selon son erreur moyenne)",
     mise_en_ligne: "mise en ligne",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     tag_principal: "principal", tag_secours_jour: "modèle de secours",
@@ -196,7 +196,7 @@ const TXT = {
     jours_n: "{n} days",
     perf_jours: "Mean error of each day (€/MWh)",
     perf_heures: "When are we wrong? Mean error by hour of the day (€/MWh)",
-    perf_difficiles: "The hardest days for our models (ranked by the average error of the models in service)",
+    perf_difficiles: "The hardest days for Zéphyr (ranked by its average error)",
     mise_en_ligne: "live",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     tag_principal: "main", tag_secours_jour: "backup model",
@@ -896,9 +896,7 @@ function rendrePerformance() {
   resume.innerHTML = h + "</tbody>";
   const ds = TOUS.filter((m) => etat.visibles[m.code] && js.some((j) => j.erreurs[m.code])).map((m) => dsModele(m, js.map((j) => (j.erreurs[m.code] ? j.erreurs[m.code].mae : null)), { pointRadius: 2 }));
   for (const r of vusR) ds.push(dsRepere(r, js.map((j) => (j.erreurs[r] ? j.erreurs[r].mae : null)), { spanGaps: true }));
-  const o = options(8, true), iDirect = js.findIndex((j) => j.source === "direct");
-  o.plugins.marqueur = { index: iDirect > 0 ? iDirect : null, texte: t("mise_en_ligne") };
-  dessiner("perf-jours", { type: "line", data: { labels: js.map((j) => dateCourte(j.jour)), datasets: ds }, options: o, plugins: [curseur, marqueur] });
+  dessiner("perf-jours", { type: "line", data: { labels: js.map((j) => dateCourte(j.jour)), datasets: ds }, options: options(8, true), plugins: [curseur] });   // plus de trait « mise en ligne » (Julien, 09/11/2026)
   const somme = {}, nb = {};
   for (const j of js) {
     j.heures.forEach((hq, i) => {
@@ -917,8 +915,8 @@ function rendrePerformance() {
   for (const r of vusR) if (somme[r]) dh.push(dsRepere(r, serieH(r)));
   dessiner("perf-heures", { type: "line", data: { labels: hs.map((k) => k + (etat.langue === "fr" ? " h" : ":00")), datasets: dh }, options: options(12, true), plugins: [curseur] });
   const cols = vus.concat(vusR);
-  const errMoy = (j) => moyenne(codes.filter((c) => j.erreurs[c]).map((c) => j.erreurs[c].mae));
-  const dur = js.filter((j) => errMoy(j) !== null).sort((a, b) => errMoy(b) - errMoy(a)).slice(0, 8);
+  const errZ = (j) => { const c = j.erreurs[PRINCIPAL] ? PRINCIPAL : principalDe(j); return c && j.erreurs[c] ? j.erreurs[c].mae : null; };   // Zéphyr (ou son secours ce jour-là)
+  const dur = js.filter((j) => errZ(j) !== null).sort((a, b) => errZ(b) - errZ(a)).slice(0, 8);
   let hd = `<thead><tr><th>${t("date")}</th><th>${pastille("reel")} ${t("marche_moyen")}</th>`
     + cols.map((c) => `<th class="modele" title="${nomModele(c)}">${pastille(c)} ${courtModele(c)} · ${t("erreur_moy")}</th>`).join("") + "</tr></thead><tbody>";
   for (const j of dur) {
