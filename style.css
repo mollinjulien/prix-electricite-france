@@ -342,7 +342,7 @@ details.compact summary { cursor: pointer; }
 .etiquette.principal { background: var(--s-tout); border-color: var(--s-tout); color: #fff; }
 .etiquette.secours { background: var(--alerte); border-color: var(--alerte); color: #3a2400; }
 .etiquette.meilleur { border-color: var(--ok); color: var(--ok-texte); }
-.menu-modeles { position: relative; }
+.menu-modeles { position: relative; flex: 0 0 auto; max-width: 100%; }
 .menu-modeles > summary { list-style: none; cursor: pointer; font-size: 0.86rem; padding: 5px 10px; display: inline-flex; flex-wrap: nowrap; align-items: center; gap: 6px; max-width: 100%; white-space: nowrap; }
 @media (max-width: 600px) { .menu-modeles > summary { flex-wrap: wrap; white-space: normal; } }
 .menu-modeles > summary .choix-titre { margin-right: 2px; }

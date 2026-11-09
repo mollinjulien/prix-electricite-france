@@ -261,7 +261,7 @@ details.plus > summary { min-height: 34px; padding-top: 7px; color: var(--action
   .tuile { padding: 18px 16px; }
   .bloc-jour > .carte { padding: 18px; }
   .outils-gauche { gap: 8px; }
-  .menu-modeles > summary { max-width: 190px; }
+  .menu-modeles > summary { max-width: 100%; flex-wrap: wrap; white-space: normal; }
   .deux-cartes { grid-template-columns: minmax(0,1fr); gap: 0; }
 }
 @media (max-width: 980px) {
