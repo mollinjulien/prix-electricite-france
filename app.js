@@ -63,6 +63,7 @@ const TXT = {
     c_corr: "Corrélation", c_corr_j: "Corrél. jour", corr_court: "corrélation {r}",
     c_modele: "Modèle", c_mae: "Erreur moyenne", c_rel: "Erreur relative", c_biais: "Biais", c_rmse: "Erreur quadratique", c_meilleur: "Meilleur du jour", c_gain: "Gain contre la veille",
     jours_n: "{n} jours",
+    perf_courbe: "Prix prévu et prix du marché sur la période (€/MWh)", perf_courbe_note: "Toute la période choisie plus haut, d'un seul tenant, au pas choisi (quart d'heure, heure ou moyenne de la journée). Passez la souris sur la courbe pour lire les prix. Les jours d'avant la mise en ligne sont rejoués a posteriori.", pf_7: "7 derniers jours",
     perf_jours: "Erreur moyenne de chaque jour (€/MWh)",
     perf_heures: "À quelle heure se trompe-t-on ? Erreur moyenne par heure de la journée (€/MWh)",
     perf_difficiles: "Les jours les plus difficiles pour Zéphyr (classés selon son erreur moyenne)",
@@ -194,6 +195,7 @@ const TXT = {
     c_corr: "Correlation", c_corr_j: "Daily correl.", corr_court: "correlation {r}",
     c_modele: "Model", c_mae: "Mean error", c_rel: "Relative error", c_biais: "Bias", c_rmse: "Root mean square error", c_meilleur: "Best of the day", c_gain: "Gain over the day before",
     jours_n: "{n} days",
+    perf_courbe: "Forecast and market price over the period (€/MWh)", perf_courbe_note: "The whole period chosen above, in one piece, at the chosen step (quarter-hour, hour or daily average). Hover over the curve to read the prices. Days before going live are replayed after the fact.", pf_7: "Last 7 days",
     perf_jours: "Mean error of each day (€/MWh)",
     perf_heures: "When are we wrong? Mean error by hour of the day (€/MWh)",
     perf_difficiles: "The hardest days for Zéphyr (ranked by its average error)",
@@ -861,10 +863,33 @@ function periodePrecise() {                                          // « Dates
   });
   changer("perfDu", "perf-du"); changer("perfAu", "perf-au");
 }
+function courbePeriode(js, codes, vusR) {                            // prix prévu et prix du marché sur toute la période, d'un seul tenant (demande de Julien, 11/11/2026)
+  const pas = etat.pasPerf, fr = etat.langue === "fr", jc = aggJours(js, pas);
+  const cles = ["reel", ...REPERES, ...codes], val = Object.fromEntries(cles.map((c) => [c, []])), labels = [], debut = new Map();
+  jc.forEach((j, n) => {
+    if (n && jc[n - 1].jour !== ajouterJours(j.jour, -1)) { labels.push(""); for (const c of cles) val[c].push(null); }   // jour absent : la courbe s'interrompt
+    debut.set(labels.length, j.jour);
+    j.heures.forEach((h, i) => {
+      labels.push(pas === "jour" ? dateMoyenne(j.jour) : `${dateMoyenne(j.jour)} · ${pas === "heure" ? h + (fr ? " h" : ":00") : h}`);
+      for (const c of cles) val[c].push(j[c] && j[c][i] !== undefined ? j[c][i] : null);
+    });
+  });
+  const ordre = [...debut.keys()], saut = Math.max(1, Math.ceil(ordre.length / (innerWidth < 600 ? 4 : 10)));
+  const montres = new Set(ordre.filter((_, k) => k % saut === 0)), lignes = ordre.length <= 31 ? new Set(ordre) : montres;
+  const lisse = { spanGaps: false, cubicInterpolationMode: "default", borderWidth: pas === "quart" && jc.length > 14 ? 1.5 : 2 };
+  const ds = [{ ...dsMarche(val.reel), ...lisse }];
+  for (const m of TOUS) if (etat.visibles[m.code] && codes.includes(m.code)) ds.push(dsModele(m, val[m.code], lisse));
+  for (const r of vusR) ds.push(dsRepere(r, val[r], { spanGaps: false, borderWidth: 1.2 }));
+  const o = options(10, true);
+  o.scales.x.ticks = { ...o.scales.x.ticks, autoSkip: false, callback: (v, i) => (montres.has(i) ? dateCourte(debut.get(i)) : null) };
+  o.scales.x.grid = pas === "jour" ? { display: false } : { display: true, drawTicks: false, color: (c) => (lignes.has(c.index) ? css("--grid") : "transparent") };
+  dessiner("perf-courbe", { type: "line", data: { labels, datasets: ds }, options: o, plugins: [curseur] });
+}
 function rendrePerformance() {
-  segments("perf-periode", [["tout", t("pf_tout")], ["30", t("pf_30")], ["direct", t("pf_direct")], ["dates", t("pf_dates")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
+  segments("perf-periode", [["tout", t("pf_tout")], ["7", t("pf_7")], ["30", t("pf_30")], ["direct", t("pf_direct")], ["dates", t("pf_dates")]], etat.periodePerf, (v) => { etat.periodePerf = v; rendrePerformance(); });
   periodePrecise();
   let js = joursAvecPrix();
+  if (etat.periodePerf === "7") js = js.slice(-7);
   if (etat.periodePerf === "30") js = js.slice(-30);
   if (etat.periodePerf === "direct") js = js.filter((j) => j.source === "direct");
   if (etat.periodePerf === "dates") js = js.filter((j) => j.jour >= etat.perfDu && j.jour <= etat.perfAu);
@@ -876,7 +901,7 @@ function rendrePerformance() {
   const resume = $("perf-resume");
   if (!js.length) {
     resume.innerHTML = `<tbody><tr><td>${t("aucun_direct", { d: dateLongue(etat.d.debut_direct) })}</td></tr></tbody>`;
-    for (const id of ["perf-jours", "perf-heures"]) effacer(id);
+    for (const id of ["perf-jours", "perf-heures", "perf-courbe"]) effacer(id);
     $("perf-difficiles").innerHTML = "";
     return;
   }
@@ -894,6 +919,7 @@ function rendrePerformance() {
       + `<td>${nj ? nombre((100 * victoires[c]) / nj, 0) + " %" : "–"}</td><td>${c === "hier" ? "–" : `<span class="${s.mae < sh.mae ? "positif" : ""}">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
   }
   resume.innerHTML = h + "</tbody>";
+  courbePeriode(js, codes, vusR);
   const ds = TOUS.filter((m) => etat.visibles[m.code] && js.some((j) => j.erreurs[m.code])).map((m) => dsModele(m, js.map((j) => (j.erreurs[m.code] ? j.erreurs[m.code].mae : null)), { pointRadius: 2 }));
   for (const r of vusR) ds.push(dsRepere(r, js.map((j) => (j.erreurs[r] ? j.erreurs[r].mae : null)), { spanGaps: true }));
   dessiner("perf-jours", { type: "line", data: { labels: js.map((j) => dateCourte(j.jour)), datasets: ds }, options: options(8, true), plugins: [curseur] });   // plus de trait « mise en ligne » (Julien, 09/11/2026)
