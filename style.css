@@ -13,6 +13,8 @@
   --s-emt: #5b5fc7;
   --s-em: #9a6b4f;
   --s-tout: #d6336c;
+  --s-e1: #7a1fa2;
+  --s-s0: #2f9e44;
   --s-ep: #0f9ab0;
   --s-eu: #2a78d6;
   --s-euc: #8a4fd1;
@@ -41,7 +43,7 @@
     --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
     --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10); --wash: rgba(255, 255, 255, 0.05);
     --surbrillance: rgba(57, 135, 229, 0.18);
-    --s-emt: #8b8ff0; --s-em: #c4957a; --s-tout: #e8618f; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
+    --s-emt: #8b8ff0; --s-em: #c4957a; --s-tout: #e8618f; --s-e1: #c77dff; --s-s0: #5fd17a; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
     --s-sol: #c08a0c; --s-eol: #9479e6;
     --s-sol-reel: #f5cc55; --s-sol-rte: #9a7426; --s-eol-reel: #cbbcff; --s-eol-rte: #6c58a8;
     --p-nous: #2fbf8a; --p-nous-aire: rgba(47, 191, 138, 0.13); --p-rte: #4d95ec; --p-veille: #8f8d86; --p-veille-barre: #5a5955;
@@ -55,7 +57,7 @@
   --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
   --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10); --wash: rgba(255, 255, 255, 0.05);
   --surbrillance: rgba(57, 135, 229, 0.18);
-  --s-emt: #8b8ff0; --s-em: #c4957a; --s-tout: #e8618f; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
+  --s-emt: #8b8ff0; --s-em: #c4957a; --s-tout: #e8618f; --s-e1: #c77dff; --s-s0: #5fd17a; --s-ep: #27b6cc; --s-eu: #3987e5; --s-euc: #a072e6; --s-gb: #d4a20f; --s-gr: #8e9aab; --s-cr: #d95926; --s-gt: #199e70; --bande: rgba(57, 135, 229, 0.18);
   --s-sol: #c08a0c; --s-eol: #9479e6;
     --s-sol-reel: #f5cc55; --s-sol-rte: #9a7426; --s-eol-reel: #cbbcff; --s-eol-rte: #6c58a8;
     --p-nous: #2fbf8a; --p-nous-aire: rgba(47, 191, 138, 0.13); --p-rte: #4d95ec; --p-veille: #8f8d86; --p-veille-barre: #5a5955;
