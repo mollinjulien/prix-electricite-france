@@ -492,3 +492,5 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 #an-parcours tr.devenu-principal td:first-child { box-shadow: inset 4px 0 0 var(--s-tout); }
 #an-parcours tr.ligne-repere td { color: var(--muted); font-style: italic; }
 
+
+.avis-source { margin: 10px 0; padding: 10px 14px; border-left: 4px solid #e8a317; background: rgba(232, 163, 23, 0.12); border-radius: 6px; font-size: 0.92rem; }

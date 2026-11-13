@@ -114,6 +114,7 @@ const TXT = {
     court_EM: "EUR-moy4", court_EP: "EUR-moy2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
     tag_s1: "secours n°3", tag_s2: "secours n°4", tag_s3: "secours n°5", tag_s4: "dernier recours", tag_suivi: "suivi", tag_ancien: "ancien",
     ck_modele_manque_src: "pas de prévision : une source de données était en erreur (enchères de capacité suisses absentes chez ENTSO-E)",
+    tag_non_calcule: "non calculé", avis_manque: "{m} : ce jour-là n'a pas pu être calculé, une erreur est survenue chez notre fournisseur de données. La prévision a été assurée par le modèle de secours ({p}).",
     ck_suisse: "Marché suisse : capacités et prix", ck_suisse_ok: "capacités et prix suisse du jour reçus", ck_suisse_cap: "capacités reçues, prix suisse pas encore publié", ck_suisse_echec: "données suisses indisponibles",
     ck_europe: "Marchés voisins, échanges, nucléaire et prix britannique", nk_europe: "Marchés voisins et prix britannique",
     ck_europe_d: "prix britannique de demain publié le {d}", ck_europe_echec: "en panne : {l}", ck_europe_avant: "pas encore utilisés ce jour-là (modèle Europe en service depuis le 29/10/2026)",
@@ -252,6 +253,7 @@ const TXT = {
     court_EM: "EUR-avg4", court_EP: "EUR-avg2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
     tag_s1: "fallback 3", tag_s2: "fallback 4", tag_s3: "fallback 5", tag_s4: "last resort", tag_suivi: "tracked", tag_ancien: "past",
     ck_modele_manque_src: "no forecast: a data source was in error (Swiss capacity auctions missing at ENTSO-E)",
+    tag_non_calcule: "not computed", avis_manque: "{m}: this day could not be computed, an error occurred at our data provider. The forecast was provided by the fallback model ({p}).",
     ck_suisse: "Swiss market: capacities and price", ck_suisse_ok: "capacities and Swiss day price received", ck_suisse_cap: "capacities received, Swiss price not yet published", ck_suisse_echec: "Swiss data unavailable",
     ck_europe: "Neighbouring markets, flows, nuclear and British price", nk_europe: "Neighbouring markets and British price",
     ck_europe_d: "tomorrow's British price published on {d}", ck_europe_echec: "down: {l}", ck_europe_avant: "not used yet on that day (Europe model in service since 29/10/2026)",
@@ -747,9 +749,10 @@ function tablePrix(id, s, j, pas) {                                       // tab
 const SEUIL_PC = 20;                                                  // €/MWh : en dessous, un écart en % n'a pas de sens (même seuil que les Excel du bilan)
 const SEL_VIDE = () => Object.fromEntries(TOUS.map((m) => [m.code, false]).concat(REPERES.map((r) => [r, false]), [["bande", false]]));
 const modeleParDefaut = (j) => principalDe(j);
-const modelesDispos = (j) => TOUS.filter((m) => j[m.code]);
+const manque = (j, c) => Boolean(j.manques && j.manques[c]);          // modèle non calculé ce jour-là (source de données en erreur) : sélectionnable, mais sans courbe
+const modelesDispos = (j) => TOUS.filter((m) => j[m.code] || manque(j, m.code));
 function selectionDuJour(j) {                                        // modèles cochés dans le menu (ceux qui existent ce jour-là), sinon le principal du jour
-  const sel = (etat.selPrev || []).filter((c) => j[c]);
+  const sel = (etat.selPrev || []).filter((c) => j[c] || manque(j, c));
   return sel.length ? sel : [modeleParDefaut(j)];
 }
 function rendreBloc(cote, iso, j, now) {                              // un seul graphique : les modèles choisis (par défaut le principal du jour) et le marché
@@ -787,7 +790,7 @@ function menuModeles(p, j, pas) {                                    // menu dé
     const e = erreurJour(j, m.code, pas), pr = m.code === principalDe(j);
     return `<label class="menu-item${pr ? " principal" : ""}"><input type="checkbox" data-c="${m.code}"${sel.includes(m.code) ? " checked" : ""}>${pastille(m.code)}`
       + `<span class="menu-nom"><b>${courtModele(m.code)}</b><small>${nomModele(m.code)}</small></span>`
-      + `<span class="menu-tags">${tagJour(m.code, j)}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
+      + `<span class="menu-tags">${manque(j, m.code) ? `<span class="etiquette secours">${t("tag_non_calcule")}</span>` : tagJour(m.code, j)}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
       + `${e ? `<span class="menu-err">${nombre(e.mae)} €</span>` : ""}</span></label>`;
   };
   return `<details class="menu-modeles" id="${p}-menu"${etat.menuOuvert ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span>${resumeModeles(sel)}<span class="chevron" aria-hidden="true">▾</span></summary>`
@@ -809,10 +812,12 @@ function rendreBlocJour(cote, iso, j, now) {
   const bloc = !etapes ? "" : `<details class="replie compact" id="${p}-details"${etat.etapesOuvertes ? " open" : ""}><summary><span class="petit-titre">${t("etapes_titre")}</span>${resumeEtapes(etapes)}</summary>${etapes}</details>`;
   const s = series(j, pas);
   const legende = legendeJour(s, j).map(([code, libelle]) => `<li>${pastille(code)}${libelle}</li>`).join("");
+  const sans = selectionDuJour(j).filter((c) => manque(j, c));                   // 06/11/2026 : modèle choisi mais non calculé ce jour-là : un message à la place de la courbe
+  const avis = sans.length ? `<p class="avis-source">${t("avis_manque", { m: sans.map(courtModele).join(", "), p: courtModele(principalDe(j)) })}</p>` : "";
   el.innerHTML = tete("") + bloc
     + `<div class="tuiles">${tuilesJour(j, pas)}</div>`
     + `<div class="carte"><div class="barre-outils"><div class="outils-gauche">${nav}${menuModeles(p, j, pas)}</div><div class="segments" id="${p}-pas" role="group"></div></div>`
-    + `<ul class="legende-courbes">${legende}</ul>`
+    + avis + `<ul class="legende-courbes">${legende}</ul>`
     + `<div class="duo"><div class="cadre-table"><table id="${p}-table" class="table-donnees"></table></div>`
     + `<div class="graphique"><canvas id="${p}-graphique" role="img" aria-label="${t("prix_du", { d: dateLongue(iso) })}"></canvas></div></div>`
     + `<p class="note">${t("prix_du_jour")} · ${t(j.reel ? "note_prev_reel" : "note_prev_attente")} <span class="leg-mm"><i class="mn"></i>${t("min_c")} <i class="mx"></i>${t("max_c")}</span></p></div>`;
