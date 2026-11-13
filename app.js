@@ -457,6 +457,7 @@ function tuile(lib, val, det, titre) {
   return `<div class="tuile"${titre ? ` title="${titre}"` : ""}><div class="libelle">${lib}</div><div class="valeur">${val}</div><div class="detail">${det}</div></div>`;
 }
 const enEuros = (v) => `${nombre(v)} <small>${t("unite")}</small>`;
+const enEuros2 = (v) => `${nombre(v, 2)} <small>${t("unite")}</small>`;       // erreur moyenne : deux décimales (Julien, 13/11/2026)
 function collerEntetes(tab) {                                         // deuxième ligne d'en-tête collée sous la première (le pied est collé en bas par le CSS)
   const h = tab.tHead ? [...tab.tHead.rows] : [];
   if (h.length > 1) [...h[1].cells].forEach((c) => { c.style.top = h[0].offsetHeight + "px"; });
@@ -644,7 +645,7 @@ function etapesJour(j) {
   else if (now.date === veille && now.hm < "15:45") ajout("resultat", "attente", t("nk_reel"), t("ck_reel_cours"));
   else ajout("resultat", "alerte", t("nk_reel"), t("ck_reel_retard"));
   const b = meilleur(j);
-  if (b) ajout("resultat", "ok", t("ck_ecarts"), t("ck_ecarts_d", { m: courtModele(b), x: nombre(j.erreurs[b].mae) }));
+  if (b) ajout("resultat", "ok", t("ck_ecarts"), t("ck_ecarts_d", { m: courtModele(b), x: nombre(j.erreurs[b].mae, 2) }));
   else ajout("resultat", "attente", t("nk_ecarts"), t("ck_ecarts_att"));
   return groupesEtapes(G);
 }
@@ -684,14 +685,14 @@ function blocErreur(j, code, pas) {                                  // l'erreur
   const e = erreurJour(j, code, pas), titre = `<div class="petit">${t("err_titre")} <span class="err-pas">${t(pas === "heure" ? "err_heure" : "err_quart")}</span></div>`;
   if (!e) return `<div class="bloc-erreur" title="${t("err_aide")}">${titre}<div class="err-attente">${t("err_attente")}</div></div>`;
   const pc = (100 * e.mae) / moyenne(j.reel);
-  return `<div class="bloc-erreur" title="${t("err_aide")}">${titre}<div class="valeur erreur">${enEuros(e.mae)}</div>`
-    + `<div class="err-detail"><span>${t("err_pct", { p: nombre(pc, 1) })}</span>${comparaisonVeille(j, code, e, pas)}</div></div>`;
+  return `<div class="bloc-erreur" title="${t("err_aide")}">${titre}<div class="valeur erreur">${enEuros2(e.mae)}</div>`
+    + `<div class="err-detail"><span>${t("err_pct", { p: nombre(pc, 2) })}</span>${comparaisonVeille(j, code, e, pas)}</div></div>`;
 }
 function comparaisonVeille(j, code, e, pas) {                         // le modèle contre le repère naïf « veille » (même quart d'heure la veille), le même jour
   const v = REPERES.includes(code) ? null : erreurJour(j, "hier", pas);
   if (!v || !v.mae) return "";
   const g = (100 * (v.mae - e.mae)) / v.mae;
-  return `<span class="err-veille ${g > 0 ? "positif" : ""}">${t("err_veille", { x: nombre(v.mae), g: t(g > 0 ? "err_mieux" : "err_moins", { p: nombre(Math.abs(g), 0) }) })}</span>`;
+  return `<span class="err-veille ${g > 0 ? "positif" : ""}">${t("err_veille", { x: nombre(v.mae, 2), g: t(g > 0 ? "err_mieux" : "err_moins", { p: nombre(Math.abs(g), 0) }) })}</span>`;
 }
 function tuileModele(m, j, best, pas) {
   const e = erreurJour(j, m.code, pas);
@@ -740,7 +741,7 @@ function tablePrix(id, s, j, pas) {                                       // tab
     }).join("") + `</tr>`
     + (R ? `<tr><td>${t(pas === "heure" ? "t_erreur_heure" : "t_erreur_quart")}</td><td class="reel">–</td>${cols.map((c) => {
       const e = erreurJour(j, c, pas), P = paires(c), rm = P.length ? moyenne(P.map(([, r]) => Math.abs(r))) : null;
-      return `<td class="groupe">–</td><td>${e ? nombre(e.mae) : "–"}</td><td title="${t("err_rel_t")}">${e && rm ? nombre((100 * e.mae) / rm, 0) + " %" : "–"}</td>`;
+      return `<td class="groupe">–</td><td>${e ? nombre(e.mae, 2) : "–"}</td><td title="${t("err_rel_t")}">${e && rm ? nombre((100 * e.mae) / rm, 2) + " %" : "–"}</td>`;
     }).join("")}</tr>` : "")
     + `</tfoot>`;
   $(id).innerHTML = h;
@@ -791,7 +792,7 @@ function menuModeles(p, j, pas) {                                    // menu dé
     return `<label class="menu-item${pr ? " principal" : ""}"><input type="checkbox" data-c="${m.code}"${sel.includes(m.code) ? " checked" : ""}>${pastille(m.code)}`
       + `<span class="menu-nom"><b>${courtModele(m.code)}</b><small>${nomModele(m.code)}</small></span>`
       + `<span class="menu-tags">${manque(j, m.code) ? `<span class="etiquette secours">${t("tag_non_calcule")}</span>` : tagJour(m.code, j)}${m.code === best ? `<span class="etiquette meilleur">${t("m_meilleur")}</span>` : ""}`
-      + `${e ? `<span class="menu-err">${nombre(e.mae)} €</span>` : ""}</span></label>`;
+      + `${e ? `<span class="menu-err">${nombre(e.mae, 2)} €</span>` : ""}</span></label>`;
   };
   return `<details class="menu-modeles" id="${p}-menu"${etat.menuOuvert ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span>${resumeModeles(sel)}<span class="chevron" aria-hidden="true">▾</span></summary>`
     + `<div class="menu-liste">${modelesDispos(j).concat(REPERES.filter((r) => j[r]).map((r) => ({ code: r }))).map(ligne).join("")}<button type="button" class="bouton-discret" id="${p}-reset">${t("m_reset")}</button></div></details>`;
@@ -858,7 +859,7 @@ function menuPerf(id, codes, js) {                                   // même me
   const ligne = (c) => `<label class="menu-item${c === princ ? " principal" : ""}"><input type="checkbox" data-c="${c}"${etat.visibles[c] ? " checked" : ""}>${pastille(c)}`
     + `<span class="menu-nom"><b>${courtModele(c)}</b><small>${nomModele(c)}</small></span>`
     + `<span class="menu-tags">${c === princ ? `<span class="etiquette principal">${t("tag_principal")}</span>` : ""}${c === best ? `<span class="etiquette meilleur">${t("m_meilleur_p")}</span>` : ""}`
-    + `${err[c] ? `<span class="menu-err">${nombre(err[c].mae)} €</span>` : ""}</span></label>`;
+    + `${err[c] ? `<span class="menu-err">${nombre(err[c].mae, 2)} €</span>` : ""}</span></label>`;
   const sel = tous.filter((c) => etat.visibles[c]);
   $(id).innerHTML = `<details class="menu-modeles" id="${id}-menu"${etat.menuPerf === id ? " open" : ""}><summary class="bouton"><span class="choix-titre">${t("modeles_menu")}</span>${resumeModeles(sel)}<span class="chevron" aria-hidden="true">▾</span></summary>`
     + `<div class="menu-liste">${tous.map(ligne).join("")}<button type="button" class="bouton-discret" id="${id}-tout">${t("m_tout")}</button></div></details>`;
@@ -937,7 +938,7 @@ function rendrePerformance() {
   let h = `<thead><tr><th>${t("c_modele")} · ${t("jours_h", { n: js.length, h: nombre(js.reduce((a, j) => a + j.heures.length, 0) / 4, 0) })}</th><th>${t("c_mae")}</th><th>${t("c_rel")}</th><th>${t("c_biais")}</th><th>${t("c_rmse")}</th><th>${t("c_corr")}</th><th>${t("c_corr_j")}</th><th>${t("c_meilleur")}</th><th>${t("c_gain")}</th></tr></thead><tbody>`;
   for (const [c, s] of st.concat(vusR.map((r) => [r, r === "hier" ? sh : stats(jp, r)]).filter(([, s]) => s))) {
     const m = TOUS.find((x) => x.code === c);
-    h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae)} ${t("unite")}</td><td>${nombre(s.rel, 0)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(jp, c).r, 2)}</td><td>${etat.pasPerf === "jour" ? "–" : nombre(correlations(jp, c).rj, 2)}</td>`
+    h += `<tr${c === best ? ' class="meilleur"' : ""}><td><span class="nom-modele" title="${nomModele(c)}">${pastille(c)}${courtModele(c)}${m ? etiquette(m) : ""}</span></td><td>${nombre(s.mae, 2)} ${t("unite")}</td><td>${nombre(s.rel, 2)} %</td><td>${signe(s.biais)}</td><td>${nombre(s.rmse)}</td><td>${nombre(correlations(jp, c).r, 2)}</td><td>${etat.pasPerf === "jour" ? "–" : nombre(correlations(jp, c).rj, 2)}</td>`
       + `<td>${nj ? nombre((100 * victoires[c]) / nj, 0) + " %" : "–"}</td><td>${c === "hier" ? "–" : `<span class="${s.mae < sh.mae ? "positif" : ""}">${signe((100 * (sh.mae - s.mae)) / sh.mae, 0)} %</span>`}</td></tr>`;
   }
   resume.innerHTML = h + "</tbody>";
@@ -968,7 +969,7 @@ function rendrePerformance() {
   let hd = `<thead><tr><th>${t("date")}</th><th>${pastille("reel")} ${t("marche_moyen")}</th>`
     + cols.map((c) => `<th class="modele" title="${nomModele(c)}">${pastille(c)} ${courtModele(c)} · ${t("erreur_moy")}</th>`).join("") + "</tr></thead><tbody>";
   for (const j of dur) {
-    hd += `<tr data-jour="${j.jour}"><td>${dateMoyenne(j.jour)}</td><td>${nombre(moyenne(j.reel))}</td>` + cols.map((c) => `<td>${j.erreurs[c] ? nombre(j.erreurs[c].mae) : "–"}</td>`).join("") + "</tr>";
+    hd += `<tr data-jour="${j.jour}"><td>${dateMoyenne(j.jour)}</td><td>${nombre(moyenne(j.reel))}</td>` + cols.map((c) => `<td>${j.erreurs[c] ? nombre(j.erreurs[c].mae, 2) : "–"}</td>`).join("") + "</tr>";
   }
   $("perf-difficiles").innerHTML = hd + "</tbody>";
   $("perf-difficiles").querySelectorAll("tbody tr").forEach((r) => r.addEventListener("click", () => ouvrirJour(r.dataset.jour)));
