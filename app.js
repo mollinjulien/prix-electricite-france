@@ -286,9 +286,9 @@ const MODELES_ANCIENS = [                                             // toujour
 ];
 const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, selPrev: null, menuOuvert: false,
-               visibles: { TOUT: true, TOUT0: false, EMT: false, EM: false, EP: false, EU: false, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: true, sem: true, bande: true },   // par défaut (Performance) : Zéphyr et les deux repères naïfs (09/11/2026)
+               visibles: { TOUT: true, TOUT0: false, EMT: false, EM: false, EP: false, EU: false, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: true, sem: false, bande: true },   // par défaut (Performance) : Zéphyr et les deux repères naïfs (09/11/2026)
                prodVisibles: { sol: true, eol: true, rte: true, veille: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
-               pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "tout", pasPerf: "quart", jourProd: null,
+               pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "7", pasPerf: "heure", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
 
 /* ---------------------------------------------------------------- outils */
