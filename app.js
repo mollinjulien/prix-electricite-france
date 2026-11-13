@@ -113,6 +113,7 @@ const TXT = {
     tag_s0: "secours n°1", tag_z: "secours n°2", tag_s5: "secours n°6", tag_ete: "secours d'été",
     court_EM: "EUR-moy4", court_EP: "EUR-moy2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
     tag_s1: "secours n°3", tag_s2: "secours n°4", tag_s3: "secours n°5", tag_s4: "dernier recours", tag_suivi: "suivi", tag_ancien: "ancien",
+    ck_modele_manque_src: "pas de prévision : une source de données était en erreur (enchères de capacité suisses absentes chez ENTSO-E)",
     ck_suisse: "Marché suisse : capacités et prix", ck_suisse_ok: "capacités et prix suisse du jour reçus", ck_suisse_cap: "capacités reçues, prix suisse pas encore publié", ck_suisse_echec: "données suisses indisponibles",
     ck_europe: "Marchés voisins, échanges, nucléaire et prix britannique", nk_europe: "Marchés voisins et prix britannique",
     ck_europe_d: "prix britannique de demain publié le {d}", ck_europe_echec: "en panne : {l}", ck_europe_avant: "pas encore utilisés ce jour-là (modèle Europe en service depuis le 29/10/2026)",
@@ -250,6 +251,7 @@ const TXT = {
     tag_s5: "fallback 6", tag_ete: "summer fallback",
     court_EM: "EUR-avg4", court_EP: "EUR-avg2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
     tag_s1: "fallback 3", tag_s2: "fallback 4", tag_s3: "fallback 5", tag_s4: "last resort", tag_suivi: "tracked", tag_ancien: "past",
+    ck_modele_manque_src: "no forecast: a data source was in error (Swiss capacity auctions missing at ENTSO-E)",
     ck_suisse: "Swiss market: capacities and price", ck_suisse_ok: "capacities and Swiss day price received", ck_suisse_cap: "capacities received, Swiss price not yet published", ck_suisse_echec: "Swiss data unavailable",
     ck_europe: "Neighbouring markets, flows, nuclear and British price", nk_europe: "Neighbouring markets and British price",
     ck_europe_d: "tomorrow's British price published on {d}", ck_europe_echec: "down: {l}", ck_europe_avant: "not used yet on that day (Europe model in service since 29/10/2026)",
@@ -620,6 +622,7 @@ function etapesJour(j) {
     else ajout("calculs", "info", t("nk_prod"), t("ck_inconnu"));
   }
   for (const m of MODELES) {
+    if (j.manques && j.manques[m.code]) { ajout("calculs", "alerte", t("nk_modele", { m: courtModele(m.code) }), t("ck_modele_manque_src")); continue; }   // 06/11/2026 : source de données en erreur
     if (m.code === "TOUT0" && !j.TOUT0) continue;                       // secours d'été : affiché seulement le jour où il sert
     const nom = courtModele(m.code), cm = (c.modeles || {})[m.code];
     const ce = (c.europe || {})[m.code];
