@@ -118,7 +118,7 @@ const TXT = {
     ck_suisse: "Marché suisse : capacités et prix", ck_suisse_ok: "capacités et prix suisse du jour reçus", ck_suisse_cap: "capacités reçues, prix suisse pas encore publié", ck_suisse_echec: "données suisses indisponibles",
     ck_europe: "Marchés voisins, échanges, nucléaire et prix britannique", nk_europe: "Marchés voisins et prix britannique",
     ck_europe_d: "prix britannique de demain publié le {d}", ck_europe_echec: "en panne : {l}", ck_europe_avant: "pas encore utilisés ce jour-là (modèle Europe en service depuis le 29/10/2026)",
-    ck_modele_rejeu_eu: "recalculé a posteriori (modèle mis en service le 29/10/2026)", ck_modele_manque: "non calculé : données manquantes ({l})",
+    ck_modele_rejeu_eu: "recalculé après coup, sans voir le prix du jour (modèle mis en service plus tard)", ck_modele_manque: "non calculé : données manquantes ({l})",
     chargement: "Impossible de charger les données.",
     unite: "€/MWh",
       // recette masquée (07/11/2026) : noms et textes neutres, remplacés par ceux de infos_modeles.js quand ce fichier est chargé
@@ -259,7 +259,7 @@ const TXT = {
     ck_suisse: "Swiss market: capacities and price", ck_suisse_ok: "capacities and Swiss day price received", ck_suisse_cap: "capacities received, Swiss price not yet published", ck_suisse_echec: "Swiss data unavailable",
     ck_europe: "Neighbouring markets, flows, nuclear and British price", nk_europe: "Neighbouring markets and British price",
     ck_europe_d: "tomorrow's British price published on {d}", ck_europe_echec: "down: {l}", ck_europe_avant: "not used yet on that day (Europe model in service since 29/10/2026)",
-    ck_modele_rejeu_eu: "computed afterwards (model in service since 29/10/2026)", ck_modele_manque: "not computed: missing data ({l})",
+    ck_modele_rejeu_eu: "computed afterwards, without seeing that day's price (model put in service later)", ck_modele_manque: "not computed: missing data ({l})",
     chargement: "Could not load the data.",
     unite: "€/MWh",
       // recette masquée (07/11/2026) : noms et textes neutres, remplacés par ceux de infos_modeles.js quand ce fichier est chargé
