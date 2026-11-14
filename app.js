@@ -107,12 +107,12 @@ const TXT = {
     ck_prod_modeles_echec: "échec : modèles de la veille utilisés", ck_prod_modeles_fige: "prévision faite avant la mise en place du réapprentissage quotidien (le 23/10 au soir) : production apprise jusqu'au 31/08/2026",
     court_EMT: "EUR+Zéphyr",
     court_EMT0: "EUR+Zéphyr (été)",
-    court_E1: "E1", court_S0: "S0",
+    court_E2: "E2", court_S1: "S1", court_E1: "E1", court_S0: "S0",
     court_TOUT: "Zéphyr",
     court_TOUT0: "Zéphyr (été)",
-    tag_s0: "secours n°1", tag_z: "secours n°2", tag_s5: "secours n°6", tag_ete: "secours d'été",
+    tag_s1b: "secours n°1", tag_e1: "secours n°2", tag_s0: "secours n°3", tag_z: "secours n°4", tag_s5: "secours n°8", tag_ete: "secours d'été",
     court_EM: "EUR-moy4", court_EP: "EUR-moy2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
-    tag_s1: "secours n°3", tag_s2: "secours n°4", tag_s3: "secours n°5", tag_s4: "dernier recours", tag_suivi: "suivi", tag_ancien: "ancien",
+    tag_s1: "secours n°5", tag_s2: "secours n°6", tag_s3: "secours n°7", tag_s4: "dernier recours", tag_suivi: "suivi", tag_ancien: "ancien",
     ck_modele_manque_src: "pas de prévision : une source de données était en erreur (enchères de capacité suisses absentes chez ENTSO-E)",
     tag_non_calcule: "non calculé", avis_manque: "{m} : ce jour-là n'a pas pu être calculé, une erreur est survenue chez notre fournisseur de données. La prévision a été assurée par le modèle de secours ({p}).",
     ck_suisse: "Marché suisse : capacités et prix", ck_suisse_ok: "capacités et prix suisse du jour reçus", ck_suisse_cap: "capacités reçues, prix suisse pas encore publié", ck_suisse_echec: "données suisses indisponibles",
@@ -122,14 +122,16 @@ const TXT = {
     chargement: "Impossible de charger les données.",
     unite: "€/MWh",
       // recette masquée (07/11/2026) : noms et textes neutres, remplacés par ceux de infos_modeles.js quand ce fichier est chargé
-    nom_E1: "Modèle principal",
-    nom_S0: "Modèle de secours n°1",
-    nom_TOUT: "Modèle de secours n°2",
+    nom_E2: "Modèle principal",
+    nom_S1: "Modèle de secours n°1",
+    nom_E1: "Modèle de secours n°2",
+    nom_S0: "Modèle de secours n°3",
+    nom_TOUT: "Modèle de secours n°4",
     nom_TOUT0: "Secours d'été du modèle de secours n°2",
-    nom_EM: "Modèle de secours n°3",
-    nom_EP: "Modèle de secours n°4",
-    nom_EU: "Modèle de secours n°5",
-    nom_GB: "Modèle de secours n°6",
+    nom_EM: "Modèle de secours n°5",
+    nom_EP: "Modèle de secours n°6",
+    nom_EU: "Modèle de secours n°7",
+    nom_GB: "Modèle de secours n°8",
     nom_GR: "Modèle de dernier recours",
     nom_EMT: "Modèle suivi n°1",
     nom_EMT0: "Secours d'été du modèle suivi n°1",
@@ -245,13 +247,13 @@ const TXT = {
     ck_prod_modeles_echec: "failed: previous day's models used", ck_prod_modeles_fige: "forecast made before daily retraining was set up (evening of 23/10): output learned up to 31/08/2026",
     court_EMT: "EUR+Zéphyr",
     court_EMT0: "EUR+Zéphyr (summer)",
-    court_E1: "E1", court_S0: "S0",
+    court_E2: "E2", court_S1: "S1", court_E1: "E1", court_S0: "S0",
     court_TOUT: "Zéphyr",
     court_TOUT0: "Zéphyr (summer)",
-    tag_s0: "fallback 1", tag_z: "fallback 2",
-    tag_s5: "fallback 6", tag_ete: "summer fallback",
+    tag_s1b: "fallback 1", tag_e1: "fallback 2", tag_s0: "fallback 3", tag_z: "fallback 4",
+    tag_s5: "fallback 8", tag_ete: "summer fallback",
     court_EM: "EUR-avg4", court_EP: "EUR-avg2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
-    tag_s1: "fallback 3", tag_s2: "fallback 4", tag_s3: "fallback 5", tag_s4: "last resort", tag_suivi: "tracked", tag_ancien: "past",
+    tag_s1: "fallback 5", tag_s2: "fallback 6", tag_s3: "fallback 7", tag_s4: "last resort", tag_suivi: "tracked", tag_ancien: "past",
     ck_modele_manque_src: "no forecast: a data source was in error (Swiss capacity auctions missing at ENTSO-E)",
     tag_non_calcule: "not computed", avis_manque: "{m}: this day could not be computed, an error occurred at our data provider. The forecast was provided by the fallback model ({p}).",
     ck_suisse: "Swiss market: capacities and price", ck_suisse_ok: "capacities and Swiss day price received", ck_suisse_cap: "capacities received, Swiss price not yet published", ck_suisse_echec: "Swiss data unavailable",
@@ -261,14 +263,16 @@ const TXT = {
     chargement: "Could not load the data.",
     unite: "€/MWh",
       // recette masquée (07/11/2026) : noms et textes neutres, remplacés par ceux de infos_modeles.js quand ce fichier est chargé
-    nom_E1: "Main model",
-    nom_S0: "Fallback model 1",
-    nom_TOUT: "Fallback model 2",
+    nom_E2: "Main model",
+    nom_S1: "Fallback model 1",
+    nom_E1: "Fallback model 2",
+    nom_S0: "Fallback model 3",
+    nom_TOUT: "Fallback model 4",
     nom_TOUT0: "Summer fallback of fallback model 2",
-    nom_EM: "Fallback model 3",
-    nom_EP: "Fallback model 4",
-    nom_EU: "Fallback model 5",
-    nom_GB: "Fallback model 6",
+    nom_EM: "Fallback model 5",
+    nom_EP: "Fallback model 6",
+    nom_EU: "Fallback model 7",
+    nom_GB: "Fallback model 8",
     nom_GR: "Last-resort model",
     nom_EMT: "Tracked model 1",
     nom_EMT0: "Summer fallback of tracked model 1",
@@ -283,25 +287,21 @@ const TXT = {
 if (window.RECETTE) for (const l of ["fr", "en"]) Object.assign(TXT[l], window.RECETTE.txt[l]);   // recette masquée sur le site public (07/11/2026) : textes complets seulement avec infos_modeles.js
 
 const MODELES = [                                                     // modèles en service depuis le 29/10/2026 : principal puis secours
-  { code: "E1", couleur: "--s-e1", tirets: null, tag: "tag_principal" },
-  { code: "S0", couleur: "--s-s0", tirets: null, tag: "tag_s0" },
+  { code: "E2", couleur: "--s-e2", tirets: null, tag: "tag_principal" },
+  { code: "S1", couleur: "--s-s1", tirets: null, tag: "tag_s1b" },
+  { code: "E1", couleur: "--s-e1", tirets: [6, 4], tag: "tag_e1" },
+  { code: "S0", couleur: "--s-s0", tirets: [6, 4], tag: "tag_s0" },
   { code: "TOUT", couleur: "--s-tout", tirets: null, tag: "tag_z" },
   { code: "TOUT0", couleur: "--s-tout", tirets: [6, 4], tag: "tag_ete" },
   { code: "EM", couleur: "--s-em", tirets: null, tag: "tag_s1" },
   { code: "EP", couleur: "--s-ep", tirets: [6, 4], tag: "tag_s2" },
   { code: "EU", couleur: "--s-eu", tirets: null, tag: "tag_s3" },
-  { code: "GB", couleur: "--s-gb", tirets: [2, 3], tag: "tag_s5" },
   { code: "GR", couleur: "--s-gr", tirets: null, tag: "tag_s4" },
-  { code: "EMT", couleur: "--s-emt", tirets: [2, 3], tag: "tag_suivi" },
-  { code: "EUC", couleur: "--s-euc", tirets: [6, 4], tag: "tag_suivi" },
 ];
-const MODELES_ANCIENS = [                                             // toujours calculés, montrés dans l'onglet « Anciens modèles »
-  { code: "CR", couleur: "--s-cr", tirets: null, tag: "tag_ancien" },
-  { code: "GT", couleur: "--s-gt", tirets: [6, 4], tag: "tag_ancien" },
-];
+const MODELES_ANCIENS = [];                                           // CR, GT, EUC, GB, EMT retirés le 14/11/2026 (plus calculés ni exportés)
 const TOUS = MODELES.concat(MODELES_ANCIENS);
 const etat = { d: null, langue: "fr", onglet: "prevision", jourPrev: null, selPrev: null, menuOuvert: false,
-               visibles: { E1: true, S0: false, TOUT: true, TOUT0: false, EMT: false, EM: false, EP: false, EU: false, EUC: false, GB: false, GR: false, CR: false, GT: false, hier: true, sem: false, bande: true },   // par défaut (Performance) : Zéphyr et les deux repères naïfs (09/11/2026)
+               visibles: { E2: true, S1: false, E1: false, S0: false, TOUT: true, TOUT0: false, EM: false, EP: false, EU: false, GR: false, hier: true, sem: false, bande: true },   // par défaut (Performance) : Zéphyr et les deux repères naïfs (09/11/2026)
                prodVisibles: { sol: true, eol: true, rte: true, veille: true },                          // cases Solaire / Éolien de l'onglet Production          // cases à cocher, communes à tous les tableaux et graphiques
                pasPrev: { haut: "quart", bas: "quart" }, pasHist: "quart", pasPlage: "heure", periodePerf: "7", pasPerf: "heure", jourProd: null,
                etapesOuvertes: false, cleAccueil: null, graphiques: {} };
@@ -671,8 +671,9 @@ function badgeJour(iso, now) {
   return "b_passe";
 }
 const meilleurDuJour = (j, pas) => TOUS.map((m) => m.code).filter((k) => erreurJour(j, k, pas)).reduce((a, b) => (a === null || erreurJour(j, b, pas).mae < erreurJour(j, a, pas).mae ? b : a), null);
-const CHAINE = ["E1", "S0", "TOUT", "TOUT0", "EM", "EP", "EU", "GB", "GR"];                              // chaîne de repli du modèle publié
-const PRINCIPAL = "E1";                                                // (13/11/2026) E1 est le modèle principal (avant : Zéphyr, « TOUT ») ; Zéphyr est le secours n°2 ; un autre modèle qui le remplace un jour est marqué « modèle de secours »
+const CHAINE = ["E2", "S1", "E1", "S0", "TOUT", "TOUT0", "EM", "EP", "EU", "GR"];                              // chaîne de repli du modèle publié
+const PRINCIPAL = "E2";                                                // (14/11/2026) E2 principal, S1 secours n°1 (connu à 11 h), E1 secours n°2 (gardé en secours, décision de Julien), S0 n°3, Zéphyr n°4
+// ancien : const PRINCIPAL = "E1";                                                // (13/11/2026) E1 est le modèle principal (avant : Zéphyr, « TOUT ») ; Zéphyr est le secours n°2 ; un autre modèle qui le remplace un jour est marqué « modèle de secours »
 const principalActuel = () => PRINCIPAL;
 function principalDe(j) {                                             // modèle affiché par défaut un jour donné : Zéphyr ; s'il manque ce jour-là, le premier secours disponible de la chaîne
   return CHAINE.find((c) => j[c]) || (TOUS.find((m) => j[m.code]) || {}).code;
