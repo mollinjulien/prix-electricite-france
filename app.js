@@ -70,6 +70,8 @@ const TXT = {
     mise_en_ligne: "mise en ligne",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     tag_principal: "principal", tag_secours_jour: "modèle de secours",
+    conf_haute: "Confiance haute", conf_moyenne: "Confiance moyenne", conf_basse: "Confiance basse", conf_detail: "jours comparables : {x} €/MWh d'erreur en moyenne ({n} jours)",
+    conf_aide: "Indice calculé au moment de la prévision, avant de connaître le prix : plus nos modèles sont d'accord entre eux, plus la confiance est haute. Fonction à l'essai.",
     pied: "Ces prévisions ne constituent pas un conseil d'investissement. Prix du marché : EPEX SPOT, données Bundesnetzagentur | SMARD.de (CC BY 4.0) via Energy-Charts.info (Fraunhofer ISE).",
     o_production: "Production (bonus)", ck_rejeu: "Prévision recalculée après coup", ck_rejeu_d: "le site a été mis en ligne le {m} : ce jour a été rejoué avec exactement la méthode du service. Le détail des étapes n'est enregistré que depuis le {d}.",
     prod_titre: "Bonus : notre prévision de production solaire et éolienne",
@@ -210,6 +212,8 @@ const TXT = {
     mise_en_ligne: "live",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     tag_principal: "main", tag_secours_jour: "backup model",
+    conf_haute: "High confidence", conf_moyenne: "Medium confidence", conf_basse: "Low confidence", conf_detail: "comparable days: {x} €/MWh mean error ({n} days)",
+    conf_aide: "Computed when the forecast is made, before the price is known: the more our models agree with each other, the higher the confidence. Trial feature.",
     pied: "These forecasts are not investment advice. Market prices: EPEX SPOT, data Bundesnetzagentur | SMARD.de (CC BY 4.0) via Energy-Charts.info (Fraunhofer ISE).",
     o_production: "Production (bonus)", ck_rejeu: "Forecast recomputed afterwards", ck_rejeu_d: "the site went live on {m}: this day was replayed with exactly the service's method. Step details are only recorded since {d}.",
     prod_titre: "Bonus: our solar and wind production forecast",
@@ -695,13 +699,20 @@ function comparaisonVeille(j, code, e, pas) {                         // le mod�
   const g = (100 * (v.mae - e.mae)) / v.mae;
   return `<span class="err-veille ${g > 0 ? "positif" : ""}">${t("err_veille", { x: nombre(v.mae, 2), g: t(g > 0 ? "err_mieux" : "err_moins", { p: nombre(Math.abs(g), 0) }) })}</span>`;
 }
+function blocConfiance(code, j) {                                     // (15/11/2026, essai) pastille de confiance du jour, pour E2 seulement (calculée par site_web.confiance)
+  const c = j.confiance;
+  if (code !== "E2" || !c || !j.E2) return "";
+  const s = etat.d && etat.d.confiance ? etat.d.confiance[c.niveau] : null;
+  return `<div class="confiance-ligne" title="${t("conf_aide")}"><span class="confiance ${c.niveau}">${t("conf_" + c.niveau)}</span>`
+    + (s ? `<span class="confiance-detail">${t("conf_detail", { x: nombre(s.mae, 1), n: s.n })}</span>` : "") + `</div>`;
+}
 function tuileModele(m, j, best, pas) {
   const e = erreurJour(j, m.code, pas);
   const principal = m.code === principalDe(j);
   const titre = principal ? `<h3 class="titre-prevision">${t("prevision_modele")}</h3>` : "";
   return `<div class="tuile modele${principal ? " principal" : ""}" title="${nomModele(m.code)}">${titre}<div class="libelle">${pastille(m.code)}${courtModele(m.code)}${etiquetteJour(m, j)}${etiquetteMeilleur(m.code === best)}</div>`
     + `<div class="duo-valeurs"><div><div class="petit">${t("prix_moyen")}</div><div class="valeur">${enEuros(moyenne(j[m.code]))}</div></div>`
-    + blocErreur(j, m.code, pas) + `</div></div>`;
+    + blocErreur(j, m.code, pas) + `</div>` + blocConfiance(m.code, j) + `</div>`;
 }
 function tuilesJour(j, pas) {
   const T = [], b = meilleurDuJour(j, pas);
