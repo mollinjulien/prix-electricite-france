@@ -505,3 +505,9 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 .confiance.moyenne::before { background: var(--alerte); }
 .confiance.basse::before { background: var(--echec); }
 .confiance-detail { font-size: 0.76rem; color: var(--muted); }
+
+/* licence et conditions d'utilisation (16/11/2026) */
+.pied .mentions a { color: inherit; text-decoration: underline; }
+.pied .conditions { font-size: 0.78rem; color: var(--muted); margin: 6px 0 10px; }
+.pied .conditions summary { cursor: pointer; text-decoration: underline; width: fit-content; }
+.pied .conditions p { margin: 6px 0; max-width: 72ch; }
