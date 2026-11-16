@@ -10,7 +10,7 @@ const TXT = {
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
     retard: "La prévision du {d} n'est pas encore publiée : elle l'est normalement vers 11 h 15.",
-    attente_d: "Le calcul démarre vers 11 h 30 (après la publication du prix britannique) et dure une quinzaine de minutes. Cette page se met à jour toute seule.",
+    attente_d: "Le calcul se fait en fin de matinée, avant la clôture de l'enchère de midi. Cette page se met à jour toute seule.",
     etapes_titre: "Étapes de la prévision",
     etapes_voir: "Étapes de la prévision de ce jour",
     g_donnees: "Données reçues", g_calculs: "Calculs", g_resultat: "Publication et vérification", g_donnees_c: "Données", g_calculs_c: "Calculs", g_resultat_c: "Publication",
@@ -21,9 +21,9 @@ const TXT = {
     afficher: "Afficher :",
     ck_prix: "Prix des jours passés reçus", nk_prix: "Prix des jours passés", ck_prix_d: "connus jusqu'au {d}",
     ck_conso: "Prévision de consommation RTE reçue", nk_conso: "Prévision de consommation RTE", ck_conso_d: "{x} GW en moyenne sur la journée",
-    ck_gaz: "Données gaz reçues (prix TTF)", nk_gaz: "Données gaz (prix TTF)", ck_gaz_d: "clôture du {d} · source : {s}",
+    ck_gaz: "Données gaz reçues (prix TTF)", nk_gaz: "Données gaz (prix TTF)", ck_gaz_d: "clôture du {d}",
     ck_gaz_orange: "Données gaz un peu anciennes", ck_gaz_rouge: "Données gaz manquantes",
-    ck_meteo: "Données météo reçues (GFS, NOAA)", nk_meteo: "Données météo (GFS, NOAA)", ck_meteo_trou: "Données météo incomplètes",
+    ck_meteo: "Données météo reçues", nk_meteo: "Données météo", ck_meteo_trou: "Données météo incomplètes",
     ck_meteo_d: "run du {d} à 00 h UTC · {h} heures sur {n}",
     ck_prod: "Production solaire et éolienne prévue", nk_prod: "Prévision de production solaire et éolienne", ck_prod_d: "solaire {s} GWh · éolien {e} GWh sur la journée",
     ck_prod_run_06Z: " · météo du run de 6 h", ck_prod_run_00Z: " · météo du run de 0 h (run de 6 h indisponible : secours)",
@@ -115,12 +115,11 @@ const TXT = {
     tag_s1b: "secours n°1", tag_e1: "secours n°2", tag_s0: "secours n°3", tag_z: "secours n°4", tag_s5: "secours n°8", tag_ete: "secours d'été",
     court_EM: "EUR-moy4", court_EP: "EUR-moy2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
     tag_s1: "secours n°5", tag_s2: "secours n°6", tag_s3: "secours n°7", tag_s4: "dernier recours", tag_suivi: "suivi", tag_ancien: "ancien",
-    ck_modele_manque_src: "pas de prévision : une source de données était en erreur (enchères de capacité suisses absentes chez ENTSO-E)",
+    ck_modele_manque_src: "pas de prévision : une source de données était en erreur",
     tag_non_calcule: "non calculé", avis_manque: "{m} : ce jour-là n'a pas pu être calculé, une erreur est survenue chez notre fournisseur de données. La prévision a été assurée par le modèle de secours ({p}).",
-    ck_suisse: "Marché suisse : capacités et prix", ck_suisse_ok: "capacités et prix suisse du jour reçus", ck_suisse_cap: "capacités reçues, prix suisse pas encore publié", ck_suisse_echec: "données suisses indisponibles",
-    ck_europe: "Marchés voisins, échanges, nucléaire et prix britannique", nk_europe: "Marchés voisins et prix britannique",
-    ck_europe_d: "prix britannique de demain publié le {d}", ck_europe_echec: "en panne : {l}", ck_europe_avant: "pas encore utilisés ce jour-là (modèle Europe en service depuis le 29/10/2026)",
-    ck_modele_rejeu_eu: "recalculé après coup, sans voir le prix du jour (modèle mis en service plus tard)", ck_modele_manque: "non calculé : données manquantes ({l})",
+    ck_europe: "Données de marché européennes reçues", nk_europe: "Données de marché européennes",
+    ck_europe_d: "", ck_europe_echec: "une partie des données était indisponible", ck_europe_avant: "pas encore utilisées ce jour-là",
+    ck_modele_rejeu_eu: "recalculé après coup, sans voir le prix du jour (modèle mis en service plus tard)", ck_modele_manque: "non calculé : données manquantes",
     chargement: "Impossible de charger les données.",
     unite: "€/MWh",
       // recette masquée (07/11/2026) : noms et textes neutres, remplacés par ceux de infos_modeles.js quand ce fichier est chargé
@@ -152,7 +151,7 @@ const TXT = {
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
     retard: "The forecast for {d} is not published yet: it normally is around 11:15.",
-    attente_d: "The computation starts around 11:30 (after the British price is published) and takes about fifteen minutes. This page updates by itself.",
+    attente_d: "The computation runs in the late morning, before the noon auction closes. This page updates by itself.",
     etapes_titre: "Forecast steps",
     etapes_voir: "Forecast steps for this day",
     g_donnees: "Data received", g_calculs: "Computations", g_resultat: "Publication and check", g_donnees_c: "Data", g_calculs_c: "Models", g_resultat_c: "Publication",
@@ -163,9 +162,9 @@ const TXT = {
     afficher: "Show:",
     ck_prix: "Past prices received", nk_prix: "Past prices", ck_prix_d: "known up to {d}",
     ck_conso: "RTE load forecast received", nk_conso: "RTE load forecast", ck_conso_d: "{x} GW on average over the day",
-    ck_gaz: "Gas data received (TTF price)", nk_gaz: "Gas data (TTF price)", ck_gaz_d: "close of {d} · source: {s}",
+    ck_gaz: "Gas data received (TTF price)", nk_gaz: "Gas data (TTF price)", ck_gaz_d: "close of {d}",
     ck_gaz_orange: "Gas data slightly old", ck_gaz_rouge: "Gas data missing",
-    ck_meteo: "Weather data received (GFS, NOAA)", nk_meteo: "Weather data (GFS, NOAA)", ck_meteo_trou: "Weather data incomplete",
+    ck_meteo: "Weather data received", nk_meteo: "Weather data", ck_meteo_trou: "Weather data incomplete",
     ck_meteo_d: "run of {d} 00 UTC · {h} hours out of {n}",
     ck_prod: "Solar and wind output forecast", nk_prod: "Solar and wind output forecast", ck_prod_d: "solar {s} GWh · wind {e} GWh over the day",
     ck_prod_run_06Z: " · 06:00 UTC run weather", ck_prod_run_00Z: " · 00:00 UTC run weather (06:00 run unavailable: fallback)",
@@ -258,12 +257,11 @@ const TXT = {
     tag_s5: "fallback 8", tag_ete: "summer fallback",
     court_EM: "EUR-avg4", court_EP: "EUR-avg2", court_EU: "EUR", court_EUC: "EUR+", court_GB: "EUR-GB",
     tag_s1: "fallback 5", tag_s2: "fallback 6", tag_s3: "fallback 7", tag_s4: "last resort", tag_suivi: "tracked", tag_ancien: "past",
-    ck_modele_manque_src: "no forecast: a data source was in error (Swiss capacity auctions missing at ENTSO-E)",
+    ck_modele_manque_src: "no forecast: a data source was in error",
     tag_non_calcule: "not computed", avis_manque: "{m}: this day could not be computed, an error occurred at our data provider. The forecast was provided by the fallback model ({p}).",
-    ck_suisse: "Swiss market: capacities and price", ck_suisse_ok: "capacities and Swiss day price received", ck_suisse_cap: "capacities received, Swiss price not yet published", ck_suisse_echec: "Swiss data unavailable",
-    ck_europe: "Neighbouring markets, flows, nuclear and British price", nk_europe: "Neighbouring markets and British price",
-    ck_europe_d: "tomorrow's British price published on {d}", ck_europe_echec: "down: {l}", ck_europe_avant: "not used yet on that day (Europe model in service since 29/10/2026)",
-    ck_modele_rejeu_eu: "computed afterwards, without seeing that day's price (model put in service later)", ck_modele_manque: "not computed: missing data ({l})",
+    ck_europe: "European market data received", nk_europe: "European market data",
+    ck_europe_d: "", ck_europe_echec: "part of the data was unavailable", ck_europe_avant: "not used yet on that day",
+    ck_modele_rejeu_eu: "computed afterwards, without seeing that day's price (model put in service later)", ck_modele_manque: "not computed: missing data",
     chargement: "Could not load the data.",
     unite: "€/MWh",
       // recette masquée (07/11/2026) : noms et textes neutres, remplacés par ceux de infos_modeles.js quand ce fichier est chargé
@@ -614,12 +612,7 @@ function etapesJour(j) {
     else ajout("calculs", "info", t("nk_prod_modeles"), t("ck_prod_modeles_fige"));
     const ed = c.europe_donnees;
     if (ed && !ed.sans_maj) {
-      const panne = [["prix_voisins", "Energy-Charts"], ["jao", "JAO"], ["entsoe", "ENTSO-E"], ["gb", "Nord Pool"]].filter(([k]) => !(ed[k] && ed[k].ok)).map(([, n]) => n);
-      ajout("donnees", panne.length ? "alerte" : "ok", t("ck_europe"), panne.length ? t("ck_europe_echec", { l: panne.join(", ") })
-            : ed.gb && ed.gb.publie ? t("ck_europe_d", { d: dateHeure(ed.gb.publie.replace(" ", "T")) }) : "");
-      const su = ed.suisse;                                                // (13/11/2026) capacités des enchères suisses (vers 10 h 30) et prix suisse (vers 11 h 50) : modèles E1 et S0
-      if (su) ajout("donnees", su.capacites && su.capacites.ok ? (su.prix_suisse && su.prix_suisse.ok && su.prix_suisse.detail >= 23 ? "ok" : "info") : "alerte", t("ck_suisse"),
-                    su.capacites && su.capacites.ok ? t(su.prix_suisse && su.prix_suisse.detail >= 23 ? "ck_suisse_ok" : "ck_suisse_cap") : t("ck_suisse_echec"));
+      ajout("donnees", ed.ok ? "ok" : "alerte", t("ck_europe"), ed.ok ? "" : t("ck_europe_echec"));   // (16/11/2026) anonymisé : aucune source détaillée
     } else if (!ed) ajout("donnees", "info", t("nk_europe"), t("ck_europe_avant"));
     const p = c.production_GWh;
     const p6 = c.production_06z && c.production_06z.modeles;
@@ -634,7 +627,7 @@ function etapesJour(j) {
     const nom = courtModele(m.code), cm = (c.modeles || {})[m.code];
     const ce = (c.europe || {})[m.code];
     if (j[m.code] && (j.rejeu_modeles || []).includes(m.code)) ajout("calculs", "info", t("ck_modele", { m: nom }), t("ck_modele_rejeu_eu"));
-    else if (!j[m.code] && ce && ce.donnees_manquantes) ajout("calculs", "alerte", t("ck_modele_absent", { m: nom }), t("ck_modele_manque", { l: Object.keys(ce.donnees_manquantes).join(", ") }));
+    else if (!j[m.code] && ce && ce.donnees_manquantes) ajout("calculs", "alerte", t("ck_modele_absent", { m: nom }), t("ck_modele_manque"));
     else if (j[m.code]) ajout("calculs", "ok", t("ck_modele", { m: nom }), rejeu ? t("ck_modele_rejeu") : cm ? t("ck_modele_d", { v: dateCourte(veille), h: cm.heures, a: nombre(cm.arbres, 0) }) : t("ck_modele_d_simple", { v: dateCourte(veille) }));
     else ajout("calculs", rejeu ? "info" : "echec", t("ck_modele_absent", { m: nom }),
                m.code === "GT" && j.gaz && j.gaz.niveau === "rouge" ? t("ck_modele_sans_gaz") : t("ck_modele_absent_d"));
