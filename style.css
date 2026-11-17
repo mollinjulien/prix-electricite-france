@@ -38,6 +38,7 @@
   --echec-bg: #f9dede; --echec-texte: #8f1d1d;
   --ecart-rgb: 11, 11, 11;
   --rayon: 10px;
+  --hz-1: #6a1194; --hz-2: #7f2aa8; --hz-3: #9442ba; --hz-4: #a85bca; --hz-5: #b26fd2; --hz-6: #bd84da; --hz-7: #c79ae0;   /* onglet 7 jours : un horizon = une teinte, plus pâle quand le jour est loin */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -51,7 +52,7 @@
     --p-nous: #2fbf8a; --p-nous-aire: rgba(47, 191, 138, 0.13); --p-rte: #4d95ec; --p-veille: #8f8d86; --p-veille-barre: #5a5955;
     --ok-texte: #0ca30c;
     --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
-    --ecart-rgb: 240, 239, 236;
+    --ecart-rgb: 240, 239, 236; --hz-1: #e6c2ff; --hz-2: #d8a6fb; --hz-3: #c98cf2; --hz-4: #b873e6; --hz-5: #a55dd6; --hz-6: #9049c2; --hz-7: #7d3bab;
   }
 }
 :root[data-theme="dark"] {
@@ -65,7 +66,7 @@
     --p-nous: #2fbf8a; --p-nous-aire: rgba(47, 191, 138, 0.13); --p-rte: #4d95ec; --p-veille: #8f8d86; --p-veille-barre: #5a5955;
   --ok-texte: #0ca30c;
   --alerte-bg: #3a2414; --alerte-texte: #f4b183; --echec-bg: #3a1616; --echec-texte: #f1a3a3;
-  --ecart-rgb: 240, 239, 236;
+  --ecart-rgb: 240, 239, 236; --hz-1: #e6c2ff; --hz-2: #d8a6fb; --hz-3: #c98cf2; --hz-4: #b873e6; --hz-5: #a55dd6; --hz-6: #9049c2; --hz-7: #7d3bab;
 }
 
 * { box-sizing: border-box; }
@@ -519,3 +520,21 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 @media (max-width: 600px) { #semaine .tuiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } #semaine .tuile .valeur { font-size: 1.1rem; } }
 #semaine td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sem-essai { background: var(--wash); border: 1px dashed var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; color: var(--ink-2); font-size: 0.9rem; }
+
+/* onglet « 7 jours » refait (17/11/2026) */
+.sem-jours { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin: 12px 0 18px; }
+@media (max-width: 700px) { .sem-jours { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(118px, 1fr); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; } .sem-jour { scroll-snap-align: start; } }
+.sem-jour { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--c); border-radius: 8px; padding: 8px 10px; cursor: pointer; min-width: 0; overflow: hidden; }
+.sem-jour:hover { background: var(--wash); }
+.sem-jour[aria-pressed="true"] { background: var(--surbrillance); border-color: var(--axis); border-top-color: var(--c); }
+.sem-jour:focus-visible { outline: 2px solid var(--s-eu); outline-offset: 2px; }
+.sem-jour .sem-date { font-size: 0.82rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.sem-jour .sem-prix { font-size: 1.3rem; font-weight: 600; white-space: nowrap; }
+.sem-jour .sem-prix small { font-size: 0.72rem; font-weight: 400; color: var(--muted); }
+.sem-jour .sem-mm, .sem-jour .sem-reel { font-size: 0.74rem; color: var(--muted); white-space: nowrap; }
+.sem-jour .sem-reel { color: var(--ink-2); }
+.sem-hz { display: inline-block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em; color: var(--surface); background: var(--c); border-radius: 999px; padding: 1px 8px; vertical-align: middle; }
+.titre-jour h2 .sem-hz { font-size: 0.8rem; margin-left: 6px; }
+#semaine tr.cliquable { cursor: pointer; }
+#semaine tr.cliquable.actif { background: var(--surbrillance); }
+#sem-cible { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 8px; padding: 5px 10px; margin-left: 6px; }
