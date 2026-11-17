@@ -243,7 +243,7 @@ window.SEMAINE = (() => {
       const b = nb(h);
       html += `<tr><td>${pastH(h)} <strong>${HZ(h)}</strong> <small class="note">(${t.nj} j)</small></td><td><strong>${nombre(t.mae, 2)}</strong> €/MWh</td><td>${nombre(t.rel, 1)} %</td><td>${signe(t.biais)}</td><td>${nombre(t.rmse)}</td><td>${nombre(t.r, 2)}</td>`
         + `<td>${pas === "jour" ? "–" : nombre(t.rj, 2)}</td><td>${N[h] ? nombre(N[h].mae, 2) : "–"}</td>`
-        + `<td><span class="${t.mae < b ? "positif" : ""}">${isFinite(b) ? signe(-100 * (1 - t.mae / b), 0) + " %" : "–"}</span></td></tr>`;
+        + `<td><span class="${t.mae < b ? "positif" : ""}">${isFinite(b) ? signe(100 * (1 - t.mae / b), 0) + " %" : "–"}</span></td></tr>`;
     }
     const ligneMoy = (lib, hs) => {
       if (!hs.every((h) => T[h])) return "";
@@ -251,7 +251,7 @@ window.SEMAINE = (() => {
       return `<tr class="meilleur"><td><strong>${lib}</strong></td><td><strong>${nombre(m, 2)}</strong> €/MWh</td><td>${nombre(moy(hs.map((h) => T[h].rel)), 1)} %</td><td>${signe(moy(hs.map((h) => T[h].biais)))}</td>`
         + `<td>${nombre(moy(hs.map((h) => T[h].rmse)))}</td><td>${nombre(moy(hs.map((h) => T[h].r)), 2)}</td><td>${pas === "jour" ? "–" : nombre(moy(hs.map((h) => T[h].rj)), 2)}</td>`
         + `<td>${nombre(moy(hs.map((h) => (N[h] ? N[h].mae : null))), 2)}</td>`
-        + `<td><span class="positif">${signe(-100 * (1 - m / mb), 0)} %</span></td></tr>`;
+        + `<td><span class="positif">${signe(100 * (1 - m / mb), 0)} %</span></td></tr>`;
     };
     html += `</tbody><tfoot>${ligneMoy(L("Moyenne J+1 à J+7", "Average D+1 to D+7"), HS)}${ligneMoy(L("Moyenne J+2 à J+7", "Average D+2 to D+7"), HS.slice(1))}</tfoot>`;
     $("sem-resume").innerHTML = html;
@@ -352,7 +352,7 @@ window.SEMAINE = (() => {
     lier(dessiner("sem-pc", { type: "line", data: { labels, datasets: ds }, options: options(12, true), plugins: [curseur] }), "sem-pc-t");
     const ea = (x) => (x ? moy(x.map((p, i) => (vide(p) || vide(r[i]) ? null : Math.abs(p - r[i])))) : null);
     const err = (h) => ea(P[h]), errN = (h) => ea(Nv[h]), mr = moy(r.map((x) => (vide(x) ? null : Math.abs(x))));
-    const gain = (h) => { const a = err(h), b = errN(h); return vide(a) || vide(b) || !b ? "–" : `<span class="${a < b ? "positif" : ""}">${signe(-100 * (1 - a / b), 0)} %</span>`; };
+    const gain = (h) => { const a = err(h), b = errN(h); return vide(a) || vide(b) || !b ? "–" : `<span class="${a < b ? "positif" : ""}">${signe(100 * (1 - a / b), 0)} %</span>`; };
     let html = `<thead><tr><th>${L("Heure", "Time")}</th><th>${pastR()} ${L("Marché", "Market")}</th>${vus.map((h) => `<th>${pastH(h)} ${HZ(h)}</th>`).join("")}</tr></thead><tbody>`;
     labels.forEach((x, i) => { html += `<tr data-i="${i}"><td>${x}</td><td class="reel">${nombre(r[i])}</td>${vus.map((h) => celluleEcartPrix(P[h][i], r[i])).join("")}</tr>`; });
     html += `</tbody><tfoot><tr><td>${L("Moyenne", "Average")}</td><td class="reel">${nombre(moy(r))}</td>${vus.map((h) => `<td>${nombre(moy(P[h]))}</td>`).join("")}</tr>`
