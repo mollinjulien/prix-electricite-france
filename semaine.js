@@ -145,15 +145,20 @@ window.SEMAINE = (() => {
   function choisir(k) { E.k = k; rendre(); }
   function vuePrevision(corps) {
     const M = EM(), J = M.jours, ems = S.emissions || [M], ie = ems.indexOf(M), j = J[E.k], derniere = ie === ems.length - 1;
-    const libEm = (x) => `${L("émise le", "issued on")} ${dateMoyenne(x.jour_emission)}${x.simulee ? " · " + L("simulée", "simulated") : ""}`;
+    // (17/11/2026, Julien) chaque prévision est désignée par les jours qu'elle couvre, puis par son jour d'émission
+    const dJ = (iso, opt) => { const t = dateObj(iso).toLocaleDateString(loc(), opt); return etat.langue === "fr" ? t.replace(/(^|\s)1(\s|$)/, "$11er$2") : t; };
+    const couvre = (x) => { const a = x.jours[0].jour, b = x.jours[x.jours.length - 1].jour, m = a.slice(5, 7) === b.slice(5, 7);
+      return `${dJ(a, m ? { day: "numeric" } : { day: "numeric", month: "short" })} → ${dJ(b, { day: "numeric", month: "short" })}`; };
+    const libEm = (x) => `${couvre(x)} · ${L("émise le", "issued")} ${dJ(x.jour_emission, { day: "numeric", month: "short" })}${x.simulee ? " · " + L("simulée", "simulated") : ""}`;
+    const titreEm = `${L("Prix prévus du", "Forecast prices from")} ${dJ(J[0].jour, { weekday: "short", day: "numeric", month: "short" })} ${L("au", "to")} ${dJ(J[J.length - 1].jour, { weekday: "short", day: "numeric", month: "short" })}`;
     corps.innerHTML = (M.note ? `<div class="sem-essai">${M.note[etat.langue]}</div>` : "")
       + (M.simulee ? `<div class="sem-essai">${L(`Prévision simulée après coup : ce jour-là la prévision à 7 jours n'était pas encore publiée. Même calcul que le service, avec seulement ce qui était connu à midi le ${dateLongue(M.jour_emission)}.`,
         `Forecast simulated afterwards: the 7-day forecast was not published yet that day. Same computation as the live service, using only what was known at noon on ${dateLongue(M.jour_emission)}.`)}</div>` : "")
-      + `<div class="carte"><div class="barre-outils"><h3 class="petit-titre">${derniere ? L("Prix prévus pour les 7 prochains jours", "Forecast prices for the next 7 days") : L("Prix prévus pour 7 jours", "Forecast prices for 7 days")}</h3>`
+      + `<div class="carte"><div class="barre-outils"><h3 class="petit-titre">${titreEm}</h3>`
       + `<div class="outils-gauche"><button type="button" class="bouton" id="sem-em-av" ${ie > 0 ? "" : "disabled"} aria-label="${L("Prévision précédente", "Previous forecast")}">‹</button>`
       + `<select id="sem-em">${ems.map((x, i) => `<option value="${i}"${i === ie ? " selected" : ""}>${libEm(x)}</option>`).reverse().join("")}</select>`
       + `<button type="button" class="bouton" id="sem-em-ap" ${derniere ? "disabled" : ""} aria-label="${L("Prévision suivante", "Next forecast")}">›</button></div></div>`
-      + `<p class="note">${M.simulee ? "" : L(`Prévision publiée le ${dateHeure(M.emis)}. `, `Forecast published on ${dateHeure(M.emis)}. `)}${L("Mise à jour chaque jour vers midi. Prix moyen de chaque journée en €/MWh, heure de Paris. Cliquer sur un jour pour le détail ; les flèches remontent les prévisions passées.",
+      + `<p class="note">${M.simulee ? L(`Prévision émise le ${dateLongue(M.jour_emission)} (simulée). `, `Forecast issued on ${dateLongue(M.jour_emission)} (simulated). `) : L(`Prévision publiée le ${dateHeure(M.emis)}. `, `Forecast published on ${dateHeure(M.emis)}. `)}${L("Mise à jour chaque jour vers midi. Prix moyen de chaque journée en €/MWh, heure de Paris. Cliquer sur un jour pour le détail ; les flèches remontent les prévisions passées.",
         "Updated every day around noon. Daily average price in €/MWh, Paris time. Click a day for details; the arrows go back through past forecasts.")}</p>`
       + `<div class="sem-jours" role="group">${J.map(carteJour).join("")}</div>` + caseBande()
       + `<div class="graphique haut"><canvas id="sem-g" role="img" aria-label="${L("Prix prévus heure par heure sur 7 jours", "Hourly forecast prices over 7 days")}"></canvas></div></div>`
