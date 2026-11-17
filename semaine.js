@@ -8,7 +8,7 @@
    (provisoire, en attendant le test de la forme au quart d'heure). S'appuie sur les utilitaires d'app.js. Site anonymisé : ni modèle, ni source. */
 window.SEMAINE = (() => {
   let S = null, demande = false, charge = 0;
-  const E = { vue: "prevision", k: 0, pas: "heure", em: null, bande: false,
+  const E = { vue: "prevision", k: 0, pas: "heure", em: null, bande: false, vj: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true },
               per: "tout", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: false, rw: true, cible: null };
   const L = (fr, en) => (etat.langue === "fr" ? fr : en);
   const HS = [1, 2, 3, 4, 5, 6, 7];
@@ -100,31 +100,47 @@ window.SEMAINE = (() => {
     const q = Boolean(c && jd[c]);
     return { labels, p: q ? jd[c] : interp(j.prix), r: mq || (jd && jd.reel) || null, b: interp(j.bas), hh: interp(j.haut), quart: q };
   }
+  function previsionsDe(jour) {                                       // (17/11/2026) toutes les prévisions faites pour un jour visé, jusqu'à l'émission affichée : de J+7 à la dernière
+    const ems = S.emissions || [EM()], ie = ems.indexOf(EM()), vus = {};
+    ems.slice(0, ie + 1).forEach((m) => (m.jours || []).forEach((x) => { if (x.jour === jour) vus[x.h] = { h: x.h, j: x, em: m.jour_emission }; }));
+    return Object.values(vus).sort((a, b) => b.h - a.h);
+  }
   function detailJour() {
     const j = EM().jours[E.k], s = serieJour(j, E.pas), R = s.r && s.r.some((x) => !vide(x)) ? s.r : null;
-    const a = imin(s.p), b = imax(s.p);
-    let h = `<thead><tr><th>${L("Heure", "Time")}</th><th>${pastH(j.h)} ${L("Prévu", "Forecast")}</th>${R ? `<th>${pastR()} ${L("Marché", "Market")}</th><th>${L("Écart", "Gap")}</th>` : ""}</tr></thead><tbody>`;
+    const F = previsionsDe(j.jour).filter((f) => f.h !== j.h), n = s.labels.length;
+    const Sf = F.map((f) => { const x = serieJour(f.j, E.pas); return x.p && x.p.length === n ? { ...f, p: x.p } : null; }).filter(Boolean);
+    const a = imin(s.p), b = imax(s.p), em = (d) => `<small class="sem-em">${L("émise le", "issued")} ${dateCourte(d)}</small>`;
+    const err = (p) => (R ? moy(p.map((x, i) => (vide(x) || vide(R[i]) ? null : Math.abs(x - R[i])))) : null);
+    $("sem-vj").innerHTML = [...Sf, { h: j.h, em: EM().jour_emission }].map((f) => `<label class="choix-item"><input type="checkbox" class="sem-vj" data-h="${f.h}"${E.vj[f.h] ? " checked" : ""}>${pastH(f.h)}<span>${L("Prévu à", "Forecast at")} ${HZ(f.h)} (${dateCourte(f.em)})</span></label>`).join("");
+    $("sem-vj").querySelectorAll(".sem-vj").forEach((c) => c.addEventListener("change", () => { E.vj[+c.dataset.h] = c.checked; detailJour(); }));
+    let h = `<thead><tr><th>${L("Heure", "Time")}</th>${Sf.map((f) => `<th>${pastH(f.h)} ${HZ(f.h)}${em(f.em)}</th>`).join("")}`
+      + `<th class="sem-der">${pastH(j.h)} ${HZ(j.h)} · ${L("dernière", "latest")}${em(EM().jour_emission)}</th>${R ? `<th>${pastR()} ${L("Marché", "Market")}</th><th>${L("Écart", "Gap")}</th>` : ""}</tr></thead><tbody>`;
     s.labels.forEach((lab, i) => {
       const k = i === a ? "mn" : i === b ? "mx" : "";
-      h += `<tr data-i="${i}"><td>${lab}</td><td class="${k}">${nombre(s.p[i])}</td>${R ? `<td class="reel">${nombre(R[i])}</td>${celluleEcart(s.p[i], R[i])}` : ""}</tr>`;
+      h += `<tr data-i="${i}"><td>${lab}</td>${Sf.map((f) => (R ? celluleEcartPrix(f.p[i], R[i]) : `<td>${nombre(f.p[i])}</td>`)).join("")}`
+        + `<td class="sem-der ${k}">${nombre(s.p[i])}</td>${R ? `<td class="reel">${nombre(R[i])}</td>${celluleEcart(s.p[i], R[i])}` : ""}</tr>`;
     });
     const P = R ? s.p.map((p, i) => [p, R[i]]).filter(([p, r]) => !vide(p) && !vide(r)) : [];
-    h += `</tbody><tfoot><tr><td>${L("Moyenne", "Average")}</td><td>${nombre(moy(s.p))}</td>${R ? `<td class="reel">${nombre(moy(R))}</td><td>${P.length ? signe(moy(P.map(([p, r]) => p - r))) : "–"}</td>` : ""}</tr>`
-      + (P.length ? `<tr><td>${L("Erreur moyenne", "Mean error")}</td><td>–</td><td class="reel">–</td><td>${nombre(moy(P.map(([p, r]) => Math.abs(p - r))), 2)}</td></tr>` : "") + `</tfoot>`;
+    h += `</tbody><tfoot><tr><td>${L("Moyenne", "Average")}</td>${Sf.map((f) => `<td>${nombre(moy(f.p))}</td>`).join("")}<td class="sem-der">${nombre(moy(s.p))}</td>${R ? `<td class="reel">${nombre(moy(R))}</td><td>${P.length ? signe(moy(P.map(([p, r]) => p - r))) : "–"}</td>` : ""}</tr>`
+      + (P.length ? `<tr><td>${L("Erreur moyenne", "Mean error")}</td>${Sf.map((f) => `<td>${nombre(err(f.p), 2)}</td>`).join("")}<td class="sem-der">${nombre(err(s.p), 2)}</td><td class="reel">–</td><td>–</td></tr>` : "") + `</tfoot>`;
     $("sem-jt").innerHTML = h;
     collerEntetes($("sem-jt"));
     const ds = E.bande && s.b && s.hh ? dsBande(s.b, s.hh) : [];
     if (R) ds.push(dsMarche(R));
-    ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(j.h)}`, data: s.p, borderColor: couleurH(j.h), backgroundColor: degrade(couleurH(j.h)), fill: E.bande ? false : "start", cubicInterpolationMode: "monotone" });
+    if (E.vj[j.h]) ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(j.h)} (${L("dernière", "latest")})`, data: s.p, borderColor: couleurH(j.h), backgroundColor: degrade(couleurH(j.h)), borderWidth: 2.5, fill: E.bande || Sf.length ? false : "start", cubicInterpolationMode: "monotone" });
+    for (const f of Sf) if (E.vj[f.h]) ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(f.h)} (${dateCourte(f.em)})`, data: f.p, borderColor: couleurH(f.h), backgroundColor: couleurH(f.h), borderWidth: 1.5, borderDash: [5, 3], fill: false, cubicInterpolationMode: "monotone" });
     const oj = options(13);
     if (s.b && s.hh) infobulleBande(oj, s.b, s.hh);
     lier(dessiner("sem-jg", { type: "line", data: { labels: s.labels, datasets: ds }, options: oj, plugins: [curseur] }), "sem-jt");
-    const n = [];
-    if (E.pas === "quart" && !s.quart) n.push(L(`De J+2 à J+7 la prévision est faite heure par heure ; au quart d'heure, la courbe est interpolée entre les heures (la moyenne de chaque heure ne change pas).`,
+    const nt = [];
+    if (Sf.length) nt.push(L(`Une colonne par prévision faite pour ce jour, de la plus ancienne (7 jours avant) à la dernière ; case d'autant plus foncée que l'écart au marché est grand.`,
+      `One column per forecast made for this day, from the oldest (7 days before) to the latest; the darker the cell, the larger the gap to the market.`));
+    if (F.length < 6 && j.h < 7) nt.push(L(`Certaines prévisions manquent (jours où la prévision à 7 jours n'a pas été émise).`, `Some forecasts are missing (days when the 7-day forecast was not issued).`));
+    if (E.pas === "quart" && !s.quart) nt.push(L(`De J+2 à J+7 la prévision est faite heure par heure ; au quart d'heure, la courbe est interpolée entre les heures (la moyenne de chaque heure ne change pas).`,
       `From D+2 to D+7 the forecast is hourly; at quarter-hour resolution the curve is interpolated between hours (each hour's average is unchanged).`));
-    if (j.h === 1) n.push(L(`J+1 : la prévision de l'onglet « Prévision ».`, `D+1: the forecast of the “Forecast” tab.`));
-    if (!R) n.push(L("Prix du marché pas encore connu (publié la veille vers 13 h).", "Market price not known yet (published the day before around 1 pm)."));
-    $("sem-jn").textContent = n.join(" ");
+    if (j.h === 1) nt.push(L(`J+1 : la prévision de l'onglet « Prévision ».`, `D+1: the forecast of the “Forecast” tab.`));
+    if (!R) nt.push(L("Prix du marché pas encore connu (publié la veille vers 13 h).", "Market price not known yet (published the day before around 1 pm)."));
+    $("sem-jn").textContent = nt.join(" ");
   }
   function tableSemaine() {
     const tete = [L("Jour", "Day"), L("Horizon", "Horizon"), L("Moyenne", "Average"), L("Nuit (0-8 h)", "Night (0-8)"), L("Journée (8-20 h)", "Day (8-20)"),
@@ -158,7 +174,8 @@ window.SEMAINE = (() => {
       + `<div class="carte"><div class="titre-jour"><h2>${L("Prix du", "Prices for")} ${dateLongue(j.jour)} <span class="sem-hz" style="--c:${couleurH(j.h)}">${HZ(j.h)}</span></h2></div>`
       + `<div class="barre-outils"><div class="outils-gauche"><button type="button" class="bouton" id="sem-av" ${E.k ? "" : "disabled"} aria-label="${L("Jour précédent", "Previous day")}">‹</button>`
       + `<button type="button" class="bouton" id="sem-ap" ${E.k < J.length - 1 ? "" : "disabled"} aria-label="${L("Jour suivant", "Next day")}">›</button></div><div class="segments" id="sem-pas" role="group"></div></div>`
-      + caseBande() + `<div class="duo"><div class="cadre-table"><table id="sem-jt" class="table-donnees"></table></div><div class="graphique"><canvas id="sem-jg" role="img" aria-label="${dateLongue(j.jour)}"></canvas></div></div>`
+      + caseBande() + `<div class="choix" id="sem-vj"></div><div class="graphique haut"><canvas id="sem-jg" role="img" aria-label="${dateLongue(j.jour)}"></canvas></div>`
+      + `<div class="cadre-table grand"><table id="sem-jt" class="table-donnees"></table></div>`
       + `<p class="note" id="sem-jn"></p></div>`
       + `<div class="carte"><h3 class="petit-titre">${L("Jour par jour", "Day by day")}</h3><p class="note">${L("Prix en €/MWh, heure de Paris ; erreur moyenne à l'heure.", "Prices in €/MWh, Paris time; mean hourly error.")}</p><div class="cadre-table libre"><table id="sem-table" class="table-donnees"></table></div></div>`;
     corps.querySelectorAll(".sem-jour").forEach((b) => b.addEventListener("click", () => choisir(+b.dataset.k)));

@@ -547,3 +547,8 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 #semaine .perf-dates { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0; }
 #semaine .perf-dates input { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 8px; padding: 4px 8px; }
 #semaine .positif { color: var(--s-s1); font-weight: 600; }
+
+/* (17/11/2026) onglet 7 jours : détail d'un jour avec toutes les prévisions faites pour lui */
+.cadre-table.grand { max-height: 780px; margin-top: 12px; }
+.table-donnees th .sem-em { display: block; font-weight: 400; color: var(--muted); font-size: .78em; }
+.table-donnees .sem-der { font-weight: 700; }
