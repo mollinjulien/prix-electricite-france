@@ -27,7 +27,9 @@ window.SEMAINE = (() => {
   const pastR = () => `<span class="pastille" style="color:${css("--ink")}"></span>`;
   const pastN = (tir) => `<span class="pastille ${tir ? "tirets" : "points"}" style="color:${css("--muted")}"></span>`;
   const sep = () => (etat.langue === "fr" ? " : " : ": ");
-  const EM = () => (S.emissions && S.emissions.length ? S.emissions[E.em === null ? S.emissions.length - 1 : E.em] : S);   // émission affichée (la dernière par défaut)
+  const HIST = () => (S.historique || []).filter((d) => d.j >= "2026-09-01");   // même début que l'historique de J+1 (01/09/2026)
+  const EM = () => (S.emissions && S.emissions.length ? S.emissions[E.em === null ? S.emissions.length - 1 : E.em] : S);
+  // émissions consultables à partir du 31/08 (J+1 = 01/09, même début que l'historique) ; celles du 25 au 30/08 servent seulement aux horizons longs de début septembre   // émission affichée (la dernière par défaut)
   const LIB_B = () => L("Fourchette à 80 % (8 cas sur 10)", "80 % range (8 cases in 10)");
   const LIB_N = () => L("Dernier jour connu", "Last known day");
   const LIB_W = () => L("Même jour sem. d'avant", "Same day last week");
@@ -211,10 +213,9 @@ window.SEMAINE = (() => {
     return moy(p.map((x, i) => (vide(x) || vide(r[i]) ? null : Math.abs(x - r[i]))));
   }
   function joursPeriode() {
-    const H = S.historique || [];
+    const H = HIST();
     if (E.per === "7") return H.slice(-7);
     if (E.per === "30") return H.slice(-30);
-    if (E.per === "sept") return H.filter((d) => d.j >= "2026-09-01");
     if (E.per === "direct") return H.filter((d) => d.s === "direct");
     if (E.per === "dates") return H.filter((d) => d.j >= E.du && d.j <= E.au);
     return H;
@@ -337,7 +338,7 @@ window.SEMAINE = (() => {
     dessiner("sem-ph2", { type: "line", data: { labels: hs.map(heure), datasets: ds }, options: o, plugins: [curseur] });
   }
   function convergence() {                                             // un jour visé : la prévision faite 7, 6 ... 1 jour avant, et le prix du marché
-    const H = S.historique || [], cp = E.cpas, pas = cp === "jour" ? "heure" : cp;
+    const H = HIST(), cp = E.cpas, pas = cp === "jour" ? "heure" : cp;
     segments("sem-cpas", [["quart", L("Quart d'heure", "Quarter-hour")], ["heure", L("Heure", "Hour")], ["jour", L("Par jour", "Daily")]], cp, (v) => { E.cpas = v; convergence(); });
     if (!E.cible || !H.find((d) => d.j === E.cible)) { const c = [...H].reverse().find((d) => Object.keys(d.p).length === 7); E.cible = c ? c.j : H.length ? H[H.length - 1].j : null; }
     const d = H.find((x) => x.j === E.cible), sel = $("sem-cible");
@@ -379,16 +380,15 @@ window.SEMAINE = (() => {
     return `<td style="background-color:rgba(var(--ecart-rgb),${a.toFixed(3)})" title="${L("écart", "gap")} ${signe(p - r)}">${nombre(p)}</td>`;
   }
   function vuePerformance(corps) {
-    const H = S.historique || [];
+    const H = HIST();
     if (H.length && (!E.du || !E.au)) { E.du = H[0].j; E.au = H[H.length - 1].j; }
     const js = joursPeriode();
     const carte = (titre, contenu, note = "") => `<div class="carte"><h3 class="petit-titre">${titre}</h3>${note ? `<p class="note">${note}</p>` : ""}${contenu}</div>`;
-    corps.innerHTML = `<div class="carte"><div class="barre-outils"><div class="segments" id="sem-per" role="group"></div><div class="segments" id="sem-ppas" role="group"></div></div>`
-      + `<div class="perf-dates" id="sem-dates"${E.per === "dates" ? "" : " hidden"}><label>${L("Du", "From")} <input type="date" id="sem-du" min="${H.length ? H[0].j : ""}" max="${H.length ? H[H.length - 1].j : ""}" value="${E.du || ""}"></label>`
-      + `<label>${L("au", "to")} <input type="date" id="sem-au" min="${H.length ? H[0].j : ""}" max="${H.length ? H[H.length - 1].j : ""}" value="${E.au || ""}"></label></div>`
-      + `<p class="note">${L(`Pour chaque jour visé, la prévision faite 1, 2 ... 7 jours avant (à midi le jour d'émission) est comparée au prix du marché. Du 01/09/2026 au ${dateCourte(ajouterJours(S.debut_direct || "2026-11-16", -3))}/2026 : chaque jour, prévisions simulées après coup avec le même calcul que le service ; avant le 01/09/2026 : un jour sur trois de 2025-2026, recalculé de la même façon ; à partir du ${dateLongue(S.debut_direct || "2026-11-16")} : prévisions publiées. Repère naïf : le prix du dernier jour connu à l'émission (même heure), le plus précis des repères simples.`,
-        `For each target day, the forecast made 1, 2 ... 7 days before (at noon on the issue day) is compared with the market price. From 01/09/2026: forecasts simulated afterwards every day with the same computation as the live service; before 01/09/2026: one day in three of 2025-2026, recomputed the same way; from ${dateLongue(S.debut_direct || "2026-11-16")}: published forecasts. Naive benchmark: the price of the last day known at issue time (same hour), the most accurate simple benchmark.`)}`
-      + (E.ppas === "quart" ? " " + L("Au quart d'heure : jours depuis le 01/10/2025 seulement (marché au quart d'heure) ; J+1 = prévision du site ; J+2 à J+7 = courbe interpolée entre les heures.", "Quarter-hour: days since 01/10/2025 only (quarter-hour market); D+1 = the site's forecast; D+2 to D+7 = curve interpolated between hours.") : "")
+    corps.innerHTML = `<div class="carte"><div class="sem-outils"><div class="segments" id="sem-per" role="group"></div><div class="perf-dates" id="sem-dates"${E.per === "dates" ? "" : " hidden"}><label>${L("Du", "From")} <input type="date" id="sem-du" min="${H.length ? H[0].j : ""}" max="${H.length ? H[H.length - 1].j : ""}" value="${E.du || ""}"></label>`
+      + `<label>${L("au", "to")} <input type="date" id="sem-au" min="${H.length ? H[0].j : ""}" max="${H.length ? H[H.length - 1].j : ""}" value="${E.au || ""}"></label></div><div class="segments" id="sem-ppas" role="group"></div></div>`
+      + `<p class="note">${L(`Pour chaque jour visé, la prévision faite 1, 2 ... 7 jours avant (à midi le jour d'émission) est comparée au prix du marché. Du 01/09/2026 à la mise en ligne : prévisions simulées après coup chaque jour avec le même calcul que le service ; à partir du ${dateLongue(S.debut_direct || "2026-11-16")} : prévisions publiées. Repère naïf : le prix du dernier jour connu à l'émission (même heure), le plus précis des repères simples.`,
+        `For each target day, the forecast made 1, 2 ... 7 days before (at noon on the issue day) is compared with the market price. From 01/09/2026 until going live: forecasts simulated afterwards every day with the same computation as the live service; from ${dateLongue(S.debut_direct || "2026-11-16")}: published forecasts. Naive benchmark: the price of the last day known at issue time (same hour), the most accurate simple benchmark.`)}`
+      + (E.ppas === "quart" ? " " + L("Au quart d'heure : J+1 = prévision du site ; J+2 à J+7 = courbe interpolée entre les heures.", "Quarter-hour: D+1 = the site's forecast; D+2 to D+7 = curve interpolated between hours.") : "")
       + (E.ppas === "jour" ? " " + L("Par jour : erreur sur le prix moyen de chaque journée.", "Daily: error on each day's average price.") : "") + `</p>`
       + (js.length ? "" : `<p class="avis-source">${L("Aucun jour visé dont le prix est connu sur cette période.", "No target day with a known price in this period.")}</p>`)
       + `<div class="tuiles" id="sem-tuiles"></div><div class="cadre-table libre"><table id="sem-resume" class="table-donnees"></table></div>`
@@ -399,9 +399,9 @@ window.SEMAINE = (() => {
       + `<div class="deux-cartes">` + carte(L("Erreur jour par jour", "Error day by day"), `<div class="graphique"><canvas id="sem-pj" role="img" aria-label="${L("Erreur jour par jour", "Error day by day")}"></canvas></div><p class="note" id="sem-pj-n"></p>`)
       + carte(L("Erreur selon l'heure de la journée", "Error by hour of day"), `<div class="graphique"><canvas id="sem-ph2" role="img" aria-label="${L("Erreur selon l'heure", "Error by hour")}"></canvas></div>`) + `</div>`
       + carte(L("Comment la prévision d'un jour a évolué", "How the forecast of one day evolved"),
-        `<div class="barre-outils"><label>${L("Jour visé", "Target day")} <select id="sem-cible"></select></label><div class="segments" id="sem-cpas" role="group"></div></div>`
+        `<div class="sem-outils"><label>${L("Jour visé", "Target day")} <select id="sem-cible"></select></label><div class="segments" id="sem-cpas" role="group"></div></div>`
         + `<div class="graphique haut"><canvas id="sem-pc" role="img" aria-label="${L("Prévisions successives d'un jour", "Successive forecasts of one day")}"></canvas></div><div class="cadre-table grand"><table id="sem-pc-t" class="table-donnees"></table></div><p class="note" id="sem-pc-n"></p>`);
-    segments("sem-per", [["tout", L("Tout", "All")], ["7", L("7 derniers jours", "Last 7 days")], ["30", L("30 derniers jours", "Last 30 days")], ["sept", L("Depuis le 1er sept.", "Since 1 Sept.")], ["direct", L("En direct", "Live")], ["dates", L("Dates précises", "Custom dates")]],
+    segments("sem-per", [["tout", L("Tout l'historique", "Full history")], ["7", L("7 derniers jours", "Last 7 days")], ["30", L("30 derniers jours", "Last 30 days")], ["direct", L("Depuis la mise en ligne", "Since going live")], ["dates", L("Dates précises", "Custom dates")]],
       E.per, (v) => { E.per = v; rendre(); });
     segments("sem-ppas", [["quart", L("Quart d'heure", "Quarter-hour")], ["heure", L("Heure", "Hour")], ["jour", L("Par jour", "Daily")]], E.ppas, (v) => { E.ppas = v; rendre(); });
     const date = (cle, id) => $(id).addEventListener("change", (e) => { const v = e.target.value; if (!v) return; E[cle] = v; if (E.du > E.au) { if (cle === "du") E.au = v; else E.du = v; } rendre(); });
@@ -418,7 +418,7 @@ window.SEMAINE = (() => {
       if (!demande) {
         demande = true;
         fetch("data/semaine.json?" + Date.now()).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-          .then((d) => { const neuf = !S || S.emis !== d.emis; S = d; charge = Date.now(); demande = false; if (neuf) { E.em = null; E.k = Math.min(E.k, S.jours.length - 1); } if (etat.onglet === "semaine") rendre(); })
+          .then((d) => { if (d.emissions) d.emissions = d.emissions.filter((e) => e.jour_emission >= "2026-08-31"); const neuf = !S || S.emis !== d.emis; S = d; charge = Date.now(); demande = false; if (neuf) { E.em = null; E.k = Math.min(E.k, S.jours.length - 1); } if (etat.onglet === "semaine") rendre(); })
           .catch(() => { demande = false; if (!S) corps.innerHTML = `<div class="carte"><p class="note">${L("La prévision à 7 jours n'est pas encore disponible.", "The 7-day forecast is not available yet.")}</p></div>`; });
       }
       if (!S) return;

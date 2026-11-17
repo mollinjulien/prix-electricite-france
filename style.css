@@ -552,3 +552,5 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 .cadre-table.grand { max-height: 470px; margin-top: 12px; }
 .table-donnees th .sem-em { display: block; font-weight: 400; color: var(--muted); font-size: .78em; }
 .table-donnees .sem-der { font-weight: 700; }
+#semaine .sem-outils { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+#semaine .sem-outils .perf-dates { margin: 0; }
