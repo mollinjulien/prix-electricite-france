@@ -59,12 +59,13 @@ window.SEMAINE = (() => {
 
   /* ------------------------------------------------------------ vue Prévision */
   function carteJour(j, k) {
-    const m = moy(j.prix), r = j.reel ? moy(j.reel) : null, a = imin(j.prix), b = imax(j.prix), hs = heuresDe(j);
+    const m = moy(j.prix), r = j.reel ? moy(j.reel) : null;
+    const e = j.reel ? moy(j.prix.map((x, i) => (vide(x) || vide(j.reel[i]) ? null : Math.abs(x - j.reel[i])))) : null;   // erreur moyenne à l'heure (17/11/2026, à la place de min / max)
     return `<button type="button" class="sem-jour" data-k="${k}" aria-pressed="${k === E.k}" style="--c:${couleurH(j.h)}">`
       + `<span class="sem-hz">${HZ(j.h)}</span><span class="sem-date">${dateMoyenne(j.jour)}</span>`
       + `<span class="sem-prix">${nombre(m)}</span>`
-      + `<span class="sem-mm">${L("min", "min")} ${heure(hs[a])}</span><span class="sem-mm">${L("max", "max")} ${heure(hs[b])}</span>`
-      + (r !== null ? `<span class="sem-reel">${L("marché", "market")} ${nombre(r)}</span>` : "") + `</button>`;
+      + (r !== null ? `<span class="sem-reel">${L("marché", "market")} ${nombre(r)}</span>` : "")
+      + (e !== null ? `<span class="sem-mm">${L("erreur/h", "error/h")} ${nombre(e, 1)} €</span><span class="sem-mm">${L("soit", "i.e.")} ${nombre(100 * e / Math.abs(r), 1)} %</span>` : `<span class="sem-mm">${L("en attente du prix", "awaiting price")}</span>`) + `</button>`;
   }
   const zone = {                                                       // jour choisi : fond gris léger sur la courbe de la semaine
     id: "zone",
@@ -129,15 +130,13 @@ window.SEMAINE = (() => {
     $("sem-jn").textContent = n.join(" ");
   }
   function tableSemaine() {
-    const tete = [L("Jour", "Day"), L("Horizon", "Horizon"), L("Moyenne", "Average"), L("Nuit (0-8 h)", "Night (0-8)"), L("Journée (8-20 h)", "Day (8-20)"),
-      L("Soir (20-24 h)", "Evening (20-24)"), L("Heure la moins chère", "Cheapest hour"), L("Heure la plus chère", "Dearest hour"), L("Marché", "Market"), L("Écart", "Gap"), L("Erreur moyenne", "Mean error")];
+    const tete = [L("Jour", "Day"), L("Horizon", "Horizon"), L("Moyenne", "Average"), L("Heure la moins chère", "Cheapest hour"), L("Heure la plus chère", "Dearest hour"), L("Marché", "Market"), L("Écart", "Gap"), L("Erreur à l'heure (€/MWh)", "Hourly error (€/MWh)"), L("Erreur à l'heure (% du prix moyen)", "Hourly error (% of average price)")];
     const lignes = EM().jours.map((j, k) => {
       const p = j.prix, a = imin(p), b = imax(p), hs = heuresDe(j), r = j.reel ? moy(j.reel) : null;
       const e = j.reel ? moy(p.map((x, i) => (vide(x) || vide(j.reel[i]) ? null : Math.abs(x - j.reel[i])))) : null;
       return `<tr data-k="${k}" class="cliquable${k === E.k ? " actif" : ""}"><th scope="row">${dateMoyenne(j.jour)}</th><td>${pastH(j.h)} ${HZ(j.h)}</td><td class="num"><strong>${nombre(moy(p))}</strong></td>`
-        + `<td class="num">${nombre(tranche(j, 0, 8))}</td><td class="num">${nombre(tranche(j, 8, 20))}</td><td class="num">${nombre(tranche(j, 20, 24))}</td>`
         + `<td class="num">${heure(hs[a])} · ${nombre(p[a], 0)}</td><td class="num">${heure(hs[b])} · ${nombre(p[b], 0)}</td><td class="num">${r !== null ? nombre(r) : "–"}</td>`
-        + (r !== null ? celluleEcart(moy(p), r) : "<td>–</td>") + `<td class="num">${e !== null ? nombre(e, 2) : "–"}</td></tr>`;
+        + (r !== null ? celluleEcart(moy(p), r) : "<td>–</td>") + `<td class="num">${e !== null ? nombre(e, 2) : "–"}</td><td class="num">${e !== null && r ? nombre(100 * e / Math.abs(r), 1) + " %" : "–"}</td></tr>`;
     });
     $("sem-table").innerHTML = `<thead><tr>${tete.map((x) => `<th scope="col">${x}</th>`).join("")}</tr></thead><tbody>${lignes.join("")}</tbody>`;
     $("sem-table").querySelectorAll("tbody tr").forEach((tr) => tr.addEventListener("click", () => choisir(+tr.dataset.k)));
