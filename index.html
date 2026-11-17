@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="design.css?v=14">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
   <script src="semaine.js?v=13" defer></script>
-  <script src="app.js?v=88" defer></script>
+  <script src="app.js?v=89" defer></script>
   <script src="design.js?v=4" defer></script>
   <!-- onglets bonus retirés le 03/11/2026 (batterie.js, marches.js gardés pour plus tard) -->
 </head>
@@ -24,7 +24,7 @@
     <nav class="onglets" role="tablist" aria-label="Sections" aria-orientation="vertical">
       <button type="button" role="tab" id="tab-prevision" data-onglet="prevision" aria-controls="prevision"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16M7 14l4-5 4 3 5-7"/></svg><span data-t="o_prevision"></span></button>
       <button type="button" role="tab" id="tab-semaine" data-onglet="semaine" aria-controls="semaine"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 7v12h16V7M8 4v5m8-5v5M8 13h2m3 0h3m-8 3h2"/></svg><span><span class="texte-fr">Prévision J+7</span><span class="texte-en">Forecast D+7</span></span></button>
-      <button type="button" role="tab" id="tab-performance" data-onglet="performance" aria-controls="performance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10m7 10V4m7 16v-7"/></svg><span data-t="o_performance"></span></button>
+      <button type="button" role="tab" id="tab-performance" data-onglet="performance" aria-controls="performance" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10m7 10V4m7 16v-7"/></svg><span data-t="o_performance"></span></button>
       <button type="button" role="tab" id="tab-production" data-onglet="production" aria-controls="production"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg><span data-t="o_production"></span></button>
     </nav>
     <details class="parametres">
@@ -55,6 +55,7 @@
   <main id="contenu" tabindex="-1">
     <!-- ============================================================ PRÉVISION -->
     <section id="prevision" role="tabpanel" aria-labelledby="tab-prevision" class="panneau">
+      <div class="segments grands" id="vue-j1-a" role="group"></div>
       <div id="bandeau-retard" class="alerte echec" hidden></div>
       <p id="maj" class="maj"></p>
       <div id="prev-haut" class="bloc-jour"></div>
@@ -66,7 +67,8 @@
     </section>
 
     <!-- ============================================================ PERFORMANCE -->
-    <section id="performance" role="tabpanel" aria-labelledby="tab-performance" class="panneau" hidden>
+    <section id="performance" role="tabpanel" aria-labelledby="tab-prevision" class="panneau" hidden>
+      <div class="segments grands" id="vue-j1-b" role="group"></div>
       <div class="carte">
         <p class="intro" data-t="intro_perf"></p>
         <div class="segments" id="perf-periode" role="group"></div>

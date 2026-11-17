@@ -6,7 +6,7 @@ const TXT = {
     titre: "Prédiction du prix de l’électricité à J+1",
     prevision_modele: "Prévision de notre modèle",
     legende_prevision: "Notre prévision ({m})",
-    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", contact: "Contact", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_meilleur_p: "meilleur de la période", m_tout: "Tout cocher", n_modeles: "{n} modèles", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_erreur_quart: "Erreur au quart d'heure", t_erreur_heure: "Erreur à l'heure", t_attente: "en attente du prix", err_titre: "Erreur moyenne", err_quart: "au quart d'heure", err_heure: "à l'heure", err_pct: "{p} % du prix moyen", err_veille: "Repère « veille » : {x} € · {g}", err_mieux: "{p} % d'erreur en moins", err_moins: "{p} % d'erreur en plus", err_attente: "Calculée dès que le prix du marché est publié (vers 13 h 45)", err_aide: "Écart moyen, en valeur absolue, entre notre prévision et le prix fixé par le marché", o_prevision: "Prévision J+1", o_historique: "Historique", o_performance: "Performance", maj: "Site mis à jour le {d}",
+    jour_prec: "Jour précédent", jour_suiv: "Jour suivant", modele_aff: "Modèle affiché", contact: "Contact", modeles_menu: "Modèles", m_meilleur: "meilleur du jour", m_meilleur_p: "meilleur de la période", m_tout: "Tout cocher", n_modeles: "{n} modèles", m_reset: "Revenir au modèle principal", t_moyenne: "Prix moyen", t_erreur: "Erreur moyenne", t_erreur_quart: "Erreur au quart d'heure", t_erreur_heure: "Erreur à l'heure", t_attente: "en attente du prix", err_titre: "Erreur moyenne", err_quart: "au quart d'heure", err_heure: "à l'heure", err_pct: "{p} % du prix moyen", err_veille: "Repère « veille » : {x} € · {g}", err_mieux: "{p} % d'erreur en moins", err_moins: "{p} % d'erreur en plus", err_attente: "Calculée dès que le prix du marché est publié (vers 13 h 45)", err_aide: "Écart moyen, en valeur absolue, entre notre prévision et le prix fixé par le marché", o_prevision: "Prévision J+1", o_historique: "Historique", o_performance: "Performance", vue_prev: "Prévision", vue_perf: "Performance / historique", maj: "Site mis à jour le {d}",
     prix_du: "Prix du {d}",
     b_demain: "demain", b_aujourdhui: "aujourd'hui", b_hier: "hier", b_passe: "jour passé", b_reel: "prix réel connu", b_calcul: "calcul en cours",
     retard: "La prévision du {d} n'est pas encore publiée : elle l'est normalement vers 11 h 15.",
@@ -150,7 +150,7 @@ const TXT = {
     titre: "Next-day electricity price forecast",
     prevision_modele: "Our model’s forecast",
     legende_prevision: "Our forecast ({m})",
-    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", contact: "Contact", modeles_menu: "Models", m_meilleur: "best of the day", m_meilleur_p: "best of the period", m_tout: "Select all", n_modeles: "{n} models", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_erreur_quart: "Quarter-hour error", t_erreur_heure: "Hourly error", t_attente: "awaiting price", err_titre: "Mean error", err_quart: "per quarter-hour", err_heure: "per hour", err_pct: "{p} % of the average price", err_veille: "\"Day before\" benchmark: €{x} · {g}", err_mieux: "{p} % less error", err_moins: "{p} % more error", err_attente: "Computed as soon as the market price is published (around 13:45)", err_aide: "Average absolute gap between our forecast and the price set by the market", o_prevision: "Forecast D+1", o_historique: "History", o_performance: "Performance", maj: "Site updated {d}",
+    jour_prec: "Previous day", jour_suiv: "Next day", modele_aff: "Model shown", contact: "Contact", modeles_menu: "Models", m_meilleur: "best of the day", m_meilleur_p: "best of the period", m_tout: "Select all", n_modeles: "{n} models", m_reset: "Back to the main model", t_moyenne: "Average price", t_erreur: "Mean error", t_erreur_quart: "Quarter-hour error", t_erreur_heure: "Hourly error", t_attente: "awaiting price", err_titre: "Mean error", err_quart: "per quarter-hour", err_heure: "per hour", err_pct: "{p} % of the average price", err_veille: "\"Day before\" benchmark: €{x} · {g}", err_mieux: "{p} % less error", err_moins: "{p} % more error", err_attente: "Computed as soon as the market price is published (around 13:45)", err_aide: "Average absolute gap between our forecast and the price set by the market", o_prevision: "Forecast D+1", o_historique: "History", o_performance: "Performance", vue_prev: "Forecast", vue_perf: "Performance / history", maj: "Site updated {d}",
     prix_du: "Prices for {d}",
     b_demain: "tomorrow", b_aujourdhui: "today", b_hier: "yesterday", b_passe: "past day", b_reel: "actual price known", b_calcul: "computing",
     retard: "The forecast for {d} is not published yet: it normally is around 11:15.",
@@ -1162,7 +1162,10 @@ function lireAncre() {
   else if (etat.onglet === "production" && jour && etat.d && jourDe(jour)) etat.jourProd = jour;
 }
 function afficher() {
-  document.querySelectorAll("[role=tab]").forEach((b) => { const actif = b.dataset.onglet === etat.onglet; b.setAttribute("aria-selected", String(actif)); b.tabIndex = actif ? 0 : -1; });
+  const ong = etat.onglet === "performance" ? "prevision" : etat.onglet;     // (17/11/2026) Performance = deuxième vue de « Prévision J+1 », comme dans « Prévision J+7 »
+  ["vue-j1-a", "vue-j1-b"].forEach((id) => segments(id, [["prevision", t("vue_prev")], ["performance", t("vue_perf")]], etat.onglet === "performance" ? "performance" : "prevision",
+    (v) => { location.hash = "#" + v; }));
+  document.querySelectorAll("[role=tab]").forEach((b) => { const actif = b.dataset.onglet === ong; b.setAttribute("aria-selected", String(actif)); b.tabIndex = actif ? 0 : -1; });
   document.querySelectorAll("[role=tabpanel]").forEach((p) => { p.hidden = p.id !== etat.onglet; });
   RENDUS[etat.onglet]();
 }
