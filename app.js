@@ -1152,7 +1152,7 @@ function ouvrirProd(iso) { etat.jourProd = iso; location.hash = "#production/" +
 /* ---------------------------------------------------------------- détails des modèles et sources */
 
 /* ---------------------------------------------------------------- navigation */
-const RENDUS = { prevision: rendrePrevision, performance: rendrePerformance, production: rendreProduction, ...(window.RECETTE ? window.RECETTE.rendus : {}) };   // onglets « Anciens modèles » et « Les modèles » : seulement avec infos_modeles.js
+const RENDUS = { prevision: rendrePrevision, performance: rendrePerformance, production: rendreProduction, ...(window.RECETTE ? window.RECETTE.rendus : {}), ...(window.SEMAINE ? { semaine: window.SEMAINE.rendre } : {}) };   // onglets « Anciens modèles » et « Les modèles » : seulement avec infos_modeles.js
 const ANCIENS = { historique: ["prevision"], modeles: ["apropos"], sources: ["apropos"] };       // anciens liens
 function lireAncre() {
   let [o, jour] = location.hash.replace("#", "").split("/");
