@@ -3,7 +3,7 @@
    les émissions passées (publiées, ou simulées après coup avec le même calcul), fourchette à 80 % décochée par défaut.
    Vue « Performance », sur le modèle de celle de J+1 : périodes (tout, 7 j, 30 j, depuis le 1er sept., en direct, dates précises), pas (quart d'heure, heure,
    jour), résumé par horizon contre deux repères naïfs, prévu contre marché sur la période, erreur par horizon, jour par jour, par heure de la journée,
-   évolution de la prévision d'un jour vu de J+7 à J+1, jours difficiles.
+   évolution de la prévision d'un jour vu de J+7 à J+1.
    Au quart d'heure : J+1 = la prévision du site ; J+2 à J+7 (prévision horaire) = courbe interpolée entre les heures, qui garde la moyenne de chaque heure
    (provisoire, en attendant le test de la forme au quart d'heure). S'appuie sur les utilitaires d'app.js. Site anonymisé : ni modèle, ni source. */
 window.SEMAINE = (() => {
@@ -372,14 +372,6 @@ window.SEMAINE = (() => {
     const a = Math.min(Math.abs(p - r) / 80, 1) * 0.22;
     return `<td style="background-color:rgba(var(--ecart-rgb),${a.toFixed(3)})" title="${L("écart", "gap")} ${signe(p - r)}">${nombre(p)}</td>`;
   }
-  function difficiles(js) {
-    const pas = E.ppas, e = (d, h) => erreurJour(d, h, pas), score = (d) => moy(HS.map((h) => e(d, h)));
-    const pire = js.filter((d) => Object.keys(d.p).length === 7 && serie(d, "r", pas)).sort((a, b) => score(b) - score(a)).slice(0, 10);
-    let html = `<thead><tr><th>${L("Jour visé", "Target day")}</th><th>${pastR()} ${L("Marché moyen", "Average market")}</th>${HS.map((h) => `<th>${pastH(h)} ${HZ(h)}</th>`).join("")}<th>${L("Moyenne", "Average")}</th></tr></thead><tbody>`;
-    for (const d of pire) html += `<tr class="cliquable" data-j="${d.j}"><td>${dateMoyenne(d.j)} ${d.j.slice(0, 4)}</td><td>${nombre(moy(d.r))}</td>${HS.map((h) => `<td>${nombre(e(d, h), 1)}</td>`).join("")}<td><strong>${nombre(score(d), 1)}</strong></td></tr>`;
-    $("sem-pd").innerHTML = html + "</tbody>";
-    $("sem-pd").querySelectorAll("tbody tr").forEach((tr) => tr.addEventListener("click", () => { E.cible = tr.dataset.j; convergence(); $("sem-cible").scrollIntoView({ behavior: "smooth", block: "center" }); }));
-  }
   function vuePerformance(corps) {
     const H = S.historique || [];
     if (H.length && (!E.du || !E.au)) { E.du = H[0].j; E.au = H[H.length - 1].j; }
@@ -402,16 +394,14 @@ window.SEMAINE = (() => {
       + carte(L("Erreur selon l'heure de la journée", "Error by hour of day"), `<div class="graphique"><canvas id="sem-ph2" role="img" aria-label="${L("Erreur selon l'heure", "Error by hour")}"></canvas></div>`) + `</div>`
       + carte(L("Comment la prévision d'un jour a évolué", "How the forecast of one day evolved"),
         `<div class="barre-outils"><label>${L("Jour visé", "Target day")} <select id="sem-cible"></select></label></div>`
-        + `<div class="duo"><div class="cadre-table"><table id="sem-pc-t" class="table-donnees"></table></div><div class="graphique"><canvas id="sem-pc" role="img" aria-label="${L("Prévisions successives d'un jour", "Successive forecasts of one day")}"></canvas></div></div><p class="note" id="sem-pc-n"></p>`)
-      + carte(L("Jours les plus difficiles", "Hardest days"), `<div class="cadre-table libre"><table id="sem-pd" class="table-donnees"></table></div>`,
-        L("Jours visés de la période où l'erreur moyenne des 7 horizons est la plus forte (€/MWh). Cliquer pour voir le jour plus haut.", "Target days of the period with the largest average error over the 7 horizons (€/MWh). Click to show the day above."));
+        + `<div class="graphique haut"><canvas id="sem-pc" role="img" aria-label="${L("Prévisions successives d'un jour", "Successive forecasts of one day")}"></canvas></div><div class="cadre-table grand"><table id="sem-pc-t" class="table-donnees"></table></div><p class="note" id="sem-pc-n"></p>`);
     segments("sem-per", [["tout", L("Tout", "All")], ["7", L("7 derniers jours", "Last 7 days")], ["30", L("30 derniers jours", "Last 30 days")], ["sept", L("Depuis le 1er sept.", "Since 1 Sept.")], ["direct", L("En direct", "Live")], ["dates", L("Dates précises", "Custom dates")]],
       E.per, (v) => { E.per = v; rendre(); });
     segments("sem-ppas", [["quart", L("Quart d'heure", "Quarter-hour")], ["heure", L("Heure", "Hour")], ["jour", L("Par jour", "Daily")]], E.ppas, (v) => { E.ppas = v; rendre(); });
     const date = (cle, id) => $(id).addEventListener("change", (e) => { const v = e.target.value; if (!v) return; E[cle] = v; if (E.du > E.au) { if (cle === "du") E.au = v; else E.du = v; } rendre(); });
     date("du", "sem-du"); date("au", "sem-au");
     choixPerf("sem-choix");
-    resume(js); courbePeriode(js); courbeJours(js); courbeHeures(js); convergence(); difficiles(js);
+    resume(js); courbePeriode(js); courbeJours(js); courbeHeures(js); convergence();
   }
 
   /* ------------------------------------------------------------ onglet */
