@@ -555,6 +555,3 @@ details.plus.bat-ouvert { margin-top: 0; border-top: 0; padding-top: 0; }
 #semaine .sem-outils { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
 #semaine .sem-outils .perf-dates { margin: 0; }
 
-#semaine #sem-table td.naif { color: var(--ink-2, inherit); }
-#semaine #sem-table td.naif.mieux::after { content: " ✓"; color: var(--ok, #2e7d32); }
-#semaine #sem-table td.naif.moins-bien::after { content: " ✗"; color: #d03b3b; }

@@ -130,17 +130,16 @@ window.SEMAINE = (() => {
     $("sem-jn").textContent = n.join(" ");
   }
   function tableSemaine() {
-    const tete = [L("Jour", "Day"), L("Horizon", "Horizon"), L("Moyenne", "Average"), L("Heure la moins chère", "Cheapest hour"), L("Heure la plus chère", "Dearest hour"), L("Marché", "Market"), L("Écart", "Gap"), L("Erreur à l'heure (€/MWh)", "Hourly error (€/MWh)"), L("Erreur à l'heure (% du prix moyen)", "Hourly error (% of average price)"), L("Repère naïf (€/MWh)", "Naive benchmark (€/MWh)")];
+    const tete = [L("Jour", "Day"), L("Horizon", "Horizon"), L("Moyenne", "Average"), L("Heure la moins chère", "Cheapest hour"), L("Heure la plus chère", "Dearest hour"), L("Marché", "Market"), L("Écart", "Gap"), L("Erreur à l'heure (€/MWh)", "Hourly error (€/MWh)"), L("Erreur à l'heure (% du prix moyen)", "Hourly error (% of average price)"), L("Erreur du repère naïf (% du prix moyen)", "Naive benchmark error (% of average price)")];
     const HT = S.historique || [];                                      // (18/11/2026, Julien) repère naïf : prix du dernier jour connu à l'émission, même heure (pour J+h : il y a h jours)
     const lignes = EM().jours.map((j, k) => {
       const p = j.prix, a = imin(p), b = imax(p), hs = heuresDe(j), r = j.reel ? moy(j.reel) : null;
       const e = j.reel ? moy(p.map((x, i) => (vide(x) || vide(j.reel[i]) ? null : Math.abs(x - j.reel[i])))) : null;
       const d = HT.find((x) => x.j === j.jour), nv = d && d.n ? d.n[j.h] : null;
       const en = nv && d.r ? moy(nv.map((x, i) => (vide(x) || vide(d.r[i]) ? null : Math.abs(x - d.r[i])))) : null;
-      const cl = e !== null && en !== null ? (e < en ? " mieux" : e > en ? " moins-bien" : "") : "";
       return `<tr data-k="${k}" class="cliquable${k === E.k ? " actif" : ""}"><th scope="row">${dateMoyenne(j.jour)}</th><td>${pastH(j.h)} ${HZ(j.h)}</td><td class="num"><strong>${nombre(moy(p))}</strong></td>`
         + `<td class="num">${heure(hs[a])} · ${nombre(p[a], 0)}</td><td class="num">${heure(hs[b])} · ${nombre(p[b], 0)}</td><td class="num">${r !== null ? nombre(r) : "–"}</td>`
-        + (r !== null ? celluleEcart(moy(p), r) : "<td>–</td>") + `<td class="num">${e !== null ? nombre(e, 2) : "–"}</td><td class="num">${e !== null && r ? nombre(100 * e / Math.abs(r), 1) + " %" : "–"}</td><td class="num naif${cl}">${en !== null ? nombre(en, 2) : "–"}</td></tr>`;
+        + (r !== null ? celluleEcart(moy(p), r) : "<td>–</td>") + `<td class="num">${e !== null ? nombre(e, 2) : "–"}</td><td class="num">${e !== null && r ? nombre(100 * e / Math.abs(r), 1) + " %" : "–"}</td><td class="num">${en !== null && r ? nombre(100 * en / Math.abs(r), 1) + " %" : "–"}</td></tr>`;
     });
     $("sem-table").innerHTML = `<thead><tr>${tete.map((x) => `<th scope="col">${x}</th>`).join("")}</tr></thead><tbody>${lignes.join("")}</tbody>`;
     $("sem-table").querySelectorAll("tbody tr").forEach((tr) => tr.addEventListener("click", () => choisir(+tr.dataset.k)));
@@ -171,7 +170,7 @@ window.SEMAINE = (() => {
       + caseBande() + `<div class="graphique haut"><canvas id="sem-jg" role="img" aria-label="${dateLongue(j.jour)}"></canvas></div>`
       + `<div class="cadre-table grand"><table id="sem-jt" class="table-donnees"></table></div>`
       + `<p class="note" id="sem-jn"></p></div>`
-      + `<div class="carte"><h3 class="petit-titre">${L("Jour par jour", "Day by day")}</h3><p class="note">${L("Prix en €/MWh, heure de Paris ; erreur moyenne à l'heure. Repère naïf : erreur du prix du dernier jour connu à l'émission, même heure (pour J+h, le prix d'il y a h jours). ✓ : notre prévision fait mieux que ce repère, ✗ : moins bien.", "Prices in €/MWh, Paris time; mean hourly error. Naive benchmark: error of the last known day's price at issue time, same hour (for D+h, the price h days earlier). ✓: our forecast beats this benchmark, ✗: it does worse.")}</p><div class="cadre-table libre"><table id="sem-table" class="table-donnees"></table></div></div>`;
+      + `<div class="carte"><h3 class="petit-titre">${L("Jour par jour", "Day by day")}</h3><p class="note">${L("Prix en €/MWh, heure de Paris ; erreur moyenne à l'heure. Repère naïf : le prix du dernier jour connu à l'émission, même heure (pour J+h, le prix d'il y a h jours).", "Prices in €/MWh, Paris time; mean hourly error. Naive benchmark: the last known day's price at issue time, same hour (for D+h, the price h days earlier).")}</p><div class="cadre-table libre"><table id="sem-table" class="table-donnees"></table></div></div>`;
     corps.querySelectorAll(".sem-jour").forEach((b) => b.addEventListener("click", () => choisir(+b.dataset.k)));
     $("sem-av").addEventListener("click", () => choisir(E.k - 1));
     $("sem-ap").addEventListener("click", () => choisir(E.k + 1));
