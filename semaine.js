@@ -9,7 +9,7 @@
 window.SEMAINE = (() => {
   let S = null, demande = false, charge = 0;
   const E = { vue: "prevision", k: 0, pas: "heure", em: null, bande: false, 
-              per: "7", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: true, rw: false, cpas: "heure", cible: null, cz: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true } };
+              per: "7", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: true, rw: false, cpas: "heure", epas: "heure", cible: null, cz: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true } };
   const L = (fr, en) => (etat.langue === "fr" ? fr : en);
   const HS = [1, 2, 3, 4, 5, 6, 7];
   const HZ = (h) => L("J+", "D+") + h;
@@ -60,12 +60,16 @@ window.SEMAINE = (() => {
   /* ------------------------------------------------------------ vue Prévision */
   function carteJour(j, k) {
     const m = moy(j.prix), r = j.reel ? moy(j.reel) : null;
-    const e = j.reel ? moy(j.prix.map((x, i) => (vide(x) || vide(j.reel[i]) ? null : Math.abs(x - j.reel[i])))) : null;   // erreur moyenne à l'heure (17/11/2026, à la place de min / max)
+    let e = j.reel ? moy(j.prix.map((x, i) => (vide(x) || vide(j.reel[i]) ? null : Math.abs(x - j.reel[i])))) : null;   // erreur moyenne à l'heure (17/11/2026, à la place de min / max)
+    if (e !== null && E.epas === "quart") {                                // au quart d'heure (18/11/2026) : J+2 à J+7 interpolés entre les heures
+      const s = serieJour(j, "quart");
+      e = s.r && s.r.length === s.p.length ? moy(s.p.map((x, i) => (vide(x) || vide(s.r[i]) ? null : Math.abs(x - s.r[i])))) : null;
+    }
     return `<button type="button" class="sem-jour" data-k="${k}" aria-pressed="${k === E.k}" style="--c:${couleurH(j.h)}">`
       + `<span class="sem-hz">${HZ(j.h)}</span><span class="sem-date">${dateMoyenne(j.jour)}</span>`
       + `<span class="sem-prix">${nombre(m)}</span>`
       + (r !== null ? `<span class="sem-reel">${L("marché", "market")} ${nombre(r)}</span>` : "")
-      + (e !== null ? `<span class="sem-mm">${L("erreur/h", "error/h")} ${nombre(e, 1)} €</span><span class="sem-mm">${L("soit", "i.e.")} ${nombre(100 * e / Math.abs(r), 1)} %</span>` : `<span class="sem-mm">${L("en attente du prix", "awaiting price")}</span>`) + `</button>`;
+      + (e !== null ? `<span class="sem-mm">${E.epas === "quart" ? L("erreur/¼h", "error/¼h") : L("erreur/h", "error/h")} ${nombre(e, 1)} €</span><span class="sem-mm">${L("soit", "i.e.")} ${nombre(100 * e / Math.abs(r), 1)} %</span>` : `<span class="sem-mm">${L("en attente du prix", "awaiting price")}</span>`) + `</button>`;
   }
   const zone = {                                                       // jour choisi : fond gris léger sur la courbe de la semaine
     id: "zone",
@@ -162,6 +166,7 @@ window.SEMAINE = (() => {
       + `<button type="button" class="bouton" id="sem-em-ap" ${derniere ? "disabled" : ""} aria-label="${L("Prévision suivante", "Next forecast")}">›</button></div></div>`
       + `<p class="note">${M.simulee ? L(`Prévision émise le ${dateLongue(M.jour_emission)} (simulée). `, `Forecast issued on ${dateLongue(M.jour_emission)} (simulated). `) : L(`Prévision publiée le ${dateHeure(M.emis)}. `, `Forecast published on ${dateHeure(M.emis)}. `)}${L("Mise à jour chaque jour vers midi. Prix moyen de chaque journée en €/MWh, heure de Paris. Cliquer sur un jour pour le détail ; les flèches remontent les prévisions passées.",
         "Updated every day around noon. Daily average price in €/MWh, Paris time. Click a day for details; the arrows go back through past forecasts.")}</p>`
+      + `<div class="sem-epas"><span class="note">${L("Erreur des cartes :", "Card error:")}</span><div class="segments" id="sem-epas" role="group"></div></div>`
       + `<div class="sem-jours" role="group">${J.map(carteJour).join("")}</div>` + caseBande()
       + `<div class="graphique haut"><canvas id="sem-g" role="img" aria-label="${L("Prix prévus heure par heure sur 7 jours", "Hourly forecast prices over 7 days")}"></canvas></div></div>`
       + `<div class="carte"><div class="titre-jour"><h2>${L("Prix du", "Prices for")} ${dateLongue(j.jour)} <span class="sem-hz" style="--c:${couleurH(j.h)}">${HZ(j.h)}</span></h2></div>`
@@ -179,6 +184,7 @@ window.SEMAINE = (() => {
     $("sem-em-av").addEventListener("click", () => allerEm(ie - 1));
     $("sem-em-ap").addEventListener("click", () => allerEm(ie + 1));
     corps.querySelectorAll(".sem-bande").forEach((c) => c.addEventListener("change", () => { E.bande = c.checked; rendre(); }));
+    segments("sem-epas", [["heure", L("À l'heure", "Hourly")], ["quart", L("Au quart d'heure", "Quarter-hour")]], E.epas, (v) => { E.epas = v; rendre(); });
     segments("sem-pas", [["quart", L("Quart d'heure", "Quarter-hour")], ["heure", L("Heure", "Hour")]], E.pas, (v) => { E.pas = v; rendre(); });
     courbeSemaine(); detailJour(); tableSemaine();
   }
