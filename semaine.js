@@ -9,7 +9,7 @@
 window.SEMAINE = (() => {
   let S = null, demande = false, charge = 0;
   const E = { vue: "prevision", k: 0, pas: "heure", em: null, bande: false, 
-              per: "7", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: true, rw: false, cpas: "heure", cible: null };
+              per: "7", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: true, rw: false, cpas: "heure", cible: null, cz: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true } };
   const L = (fr, en) => (etat.langue === "fr" ? fr : en);
   const HS = [1, 2, 3, 4, 5, 6, 7];
   const HZ = (h) => L("J+", "D+") + h;
@@ -354,7 +354,10 @@ window.SEMAINE = (() => {
     if (!d) return;
     const r = serie(d, "r", pas) || serie(d, "r", "heure"), q = r.length > d.r.length;
     const hd = d.hr || [...Array(d.r.length).keys()], labels = q ? quarts(hd) : hd.map(heure);
-    const vus = HS.filter((h) => d.p[h]), P = Object.fromEntries(vus.map((h) => [h, serie(d, h, q ? "quart" : "heure")]));
+    const dispo = HS.filter((h) => d.p[h]), cz = $("sem-cz");             // horizons cochés pour cette carte seulement
+    cz.innerHTML = `<span class="choix-titre">${L("Afficher", "Show")}</span>` + dispo.map((h) => `<label class="choix-item"><input type="checkbox" data-h="${h}"${E.cz[h] ? " checked" : ""}>${pastH(h)}<span>${HZ(h)}</span></label>`).join("");
+    cz.querySelectorAll("input").forEach((i) => i.addEventListener("change", () => { E.cz[i.dataset.h] = i.checked; convergence(); }));
+    const vus = dispo.filter((h) => E.cz[h]), P = Object.fromEntries(vus.map((h) => [h, serie(d, h, q ? "quart" : "heure")]));
     const Nv = Object.fromEntries(vus.map((h) => [h, serie(d, "n" + h, q ? "quart" : "heure")]));
     const ds = [dsMarche(r)];
     for (const h of [...vus].reverse()) ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(h)}`, data: P[h], borderColor: couleurH(h), backgroundColor: couleurH(h), fill: false, borderWidth: h === 1 ? 2.5 : 1.8, cubicInterpolationMode: "monotone" });
@@ -406,7 +409,7 @@ window.SEMAINE = (() => {
       + `<div class="deux-cartes">` + carte(L("Erreur jour par jour", "Error day by day"), `<div class="graphique"><canvas id="sem-pj" role="img" aria-label="${L("Erreur jour par jour", "Error day by day")}"></canvas></div><p class="note" id="sem-pj-n"></p>`)
       + carte(L("Erreur selon l'heure de la journée", "Error by hour of day"), `<div class="graphique"><canvas id="sem-ph2" role="img" aria-label="${L("Erreur selon l'heure", "Error by hour")}"></canvas></div>`) + `</div>`
       + carte(L("Comment la prévision d'un jour a évolué", "How the forecast of one day evolved"),
-        `<div class="sem-outils"><label>${L("Jour visé", "Target day")} <select id="sem-cible"></select></label><div class="segments" id="sem-cpas" role="group"></div></div>`
+        `<div class="sem-outils"><label>${L("Jour visé", "Target day")} <select id="sem-cible"></select></label><div class="segments" id="sem-cpas" role="group"></div></div><div class="choix" id="sem-cz"></div>`
         + `<div class="graphique haut"><canvas id="sem-pc" role="img" aria-label="${L("Prévisions successives d'un jour", "Successive forecasts of one day")}"></canvas></div><div class="cadre-table grand"><table id="sem-pc-t" class="table-donnees"></table></div><p class="note" id="sem-pc-n"></p>`);
     segments("sem-per", [["tout", L("Tout l'historique", "Full history")], ["7", L("7 derniers jours", "Last 7 days")], ["30", L("30 derniers jours", "Last 30 days")], ["direct", L("Depuis la mise en ligne", "Since going live")], ["dates", L("Dates précises", "Custom dates")]],
       E.per, (v) => { E.per = v; rendre(); });
