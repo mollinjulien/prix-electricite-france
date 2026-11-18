@@ -82,13 +82,14 @@ window.SEMAINE = (() => {
   };
   function courbeSemaine() {
     const J = EM().jours, lab = [], prix = [], reel = [], qui = [], debut = [], bas = [], haut = [];
-    J.forEach((j, k) => { debut.push(prix.length); j.prix.forEach((p, i) => { lab.push(i === 0 ? dateMoyenne(j.jour) : ""); prix.push(p); reel.push(j.reel ? j.reel[i] : null); qui.push([k, i]); bas.push(j.bas ? j.bas[i] : null); haut.push(j.haut ? j.haut[i] : null); }); });
+    const SJ = J.map((j) => serieJour(j, E.epas));                       // à l'heure ou au quart d'heure (18/11/2026) : même pas que les cartes
+    J.forEach((j, k) => { const sj = SJ[k], R = sj.r && sj.r.length === sj.p.length ? sj.r : null; debut.push(prix.length); sj.p.forEach((p, i) => { lab.push(i === 0 ? dateMoyenne(j.jour) : ""); prix.push(p); reel.push(R ? R[i] : null); qui.push([k, i]); bas.push(sj.b ? sj.b[i] : null); haut.push(sj.hh ? sj.hh[i] : null); }); });
     debut.push(prix.length);
     const o = options(8, true);
     const court = (i) => dateObj(J[qui[i][0]].jour).toLocaleDateString(loc(), { weekday: "short", day: "numeric" });
     o.scales.x.ticks = { ...o.scales.x.ticks, autoSkip: false, maxRotation: 0, callback: (v, i) => (lab[i] ? (innerWidth < 600 ? court(i) : lab[i]) : null) };
     o.scales.x.grid = { display: true, drawTicks: false, color: (c) => (lab[c.index] ? css("--grid") : "transparent") };
-    o.plugins.tooltip.callbacks.title = (it) => { const [k, i] = qui[it[0].dataIndex], j = J[k]; return `${dateMoyenne(j.jour)} · ${heure(heuresDe(j)[i])} · ${HZ(j.h)}`; };
+    o.plugins.tooltip.callbacks.title = (it) => { const [k, i] = qui[it[0].dataIndex], j = J[k]; return `${dateMoyenne(j.jour)} · ${E.epas === "quart" ? SJ[k].labels[i] : heure(heuresDe(j)[i])} · ${HZ(j.h)}`; };
     o.plugins.zone = { a: debut[E.k], b: debut[E.k + 1] - 1 };
     o.onClick = (evt, els, chart) => { const p = chart.getElementsAtEventForMode(evt, "index", { intersect: false }, false); if (p.length) choisir(qui[p[0].index][0]); };
     infobulleBande(o, bas, haut);
@@ -166,7 +167,7 @@ window.SEMAINE = (() => {
       + `<button type="button" class="bouton" id="sem-em-ap" ${derniere ? "disabled" : ""} aria-label="${L("Prévision suivante", "Next forecast")}">›</button></div></div>`
       + `<p class="note">${M.simulee ? L(`Prévision émise le ${dateLongue(M.jour_emission)} (simulée). `, `Forecast issued on ${dateLongue(M.jour_emission)} (simulated). `) : L(`Prévision publiée le ${dateHeure(M.emis)}. `, `Forecast published on ${dateHeure(M.emis)}. `)}${L("Mise à jour chaque jour vers midi. Prix moyen de chaque journée en €/MWh, heure de Paris. Cliquer sur un jour pour le détail ; les flèches remontent les prévisions passées.",
         "Updated every day around noon. Daily average price in €/MWh, Paris time. Click a day for details; the arrows go back through past forecasts.")}</p>`
-      + `<div class="sem-epas"><span class="note">${L("Erreur des cartes :", "Card error:")}</span><div class="segments" id="sem-epas" role="group"></div></div>`
+      + `<div class="sem-epas"><span class="note">${L("Cartes et graphique :", "Cards and chart:")}</span><div class="segments" id="sem-epas" role="group"></div></div>`
       + `<div class="sem-jours" role="group">${J.map(carteJour).join("")}</div>` + caseBande()
       + `<div class="graphique haut"><canvas id="sem-g" role="img" aria-label="${L("Prix prévus heure par heure sur 7 jours", "Hourly forecast prices over 7 days")}"></canvas></div></div>`
       + `<div class="carte"><div class="titre-jour"><h2>${L("Prix du", "Prices for")} ${dateLongue(j.jour)} <span class="sem-hz" style="--c:${couleurH(j.h)}">${HZ(j.h)}</span></h2></div>`
