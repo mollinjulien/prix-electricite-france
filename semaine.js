@@ -351,12 +351,21 @@ window.SEMAINE = (() => {
     o.scales.y.title.text = L("erreur moyenne (€/MWh)", "mean error (€/MWh)");
     dessiner("sem-ph2", { type: "line", data: { labels: hs.map(heure), datasets: ds }, options: o, plugins: [curseur] });
   }
+  function futurs(H) {                                                 // jours visés pas encore passés (19/11/2026, demande de Julien) : prévisions des émissions déjà publiées, sans prix du marché
+    const der = H.length ? H[H.length - 1].j : "", F = {};
+    for (const e of S.emissions || []) for (const j of e.jours || []) {
+      if (j.jour <= der) continue;
+      const hs = heuresDe(j), d = F[j.jour] || (F[j.jour] = { j: j.jour, s: "futur", r: hs.map(() => null), hr: hs, p: {}, n: {} });
+      d.p[j.h] = j.prix;
+    }
+    return Object.values(F).sort((x, y) => (x.j < y.j ? -1 : 1));
+  }
   function convergence() {                                             // un jour visé : la prévision faite 7, 6 ... 1 jour avant, et le prix du marché
-    const H = HIST(), cp = E.cpas, pas = cp === "jour" ? "heure" : cp;
+    const H = [...HIST(), ...futurs(HIST())], cp = E.cpas, pas = cp === "jour" ? "heure" : cp;
     segments("sem-cpas", [["quart", L("Quart d'heure", "Quarter-hour")], ["heure", L("Heure", "Hour")], ["jour", L("Par jour", "Daily")]], cp, (v) => { E.cpas = v; convergence(); });
-    if (!E.cible || !H.find((d) => d.j === E.cible)) { const c = [...H].reverse().find((d) => Object.keys(d.p).length === 7); E.cible = c ? c.j : H.length ? H[H.length - 1].j : null; }
+    if (!E.cible || !H.find((d) => d.j === E.cible)) { const c = [...H].reverse().find((d) => d.s !== "futur" && Object.keys(d.p).length === 7); E.cible = c ? c.j : H.length ? H[H.length - 1].j : null; }
     const d = H.find((x) => x.j === E.cible), sel = $("sem-cible");
-    sel.innerHTML = [...H].reverse().map((x) => `<option value="${x.j}"${x.j === E.cible ? " selected" : ""}>${dateMoyenne(x.j)} ${x.j.slice(0, 4)}${x.s === "direct" ? " · " + L("en direct", "live") : ""}</option>`).join("");
+    sel.innerHTML = [...H].reverse().map((x) => `<option value="${x.j}"${x.j === E.cible ? " selected" : ""}>${dateMoyenne(x.j)} ${x.j.slice(0, 4)}${x.s === "direct" ? " · " + L("en direct", "live") : x.s === "futur" ? " · " + L("à venir", "upcoming") : ""}</option>`).join("");
     sel.onchange = () => { E.cible = sel.value; convergence(); };
     if (!d) return;
     const r = serie(d, "r", pas) || serie(d, "r", "heure"), q = r.length > d.r.length;
@@ -366,16 +375,16 @@ window.SEMAINE = (() => {
     cz.querySelectorAll("input").forEach((i) => i.addEventListener("change", () => { E.cz[i.dataset.h] = i.checked; convergence(); }));
     const vus = dispo.filter((h) => E.cz[h]), P = Object.fromEntries(vus.map((h) => [h, serie(d, h, q ? "quart" : "heure")]));
     const Nv = Object.fromEntries(vus.map((h) => [h, serie(d, "n" + h, q ? "quart" : "heure")]));
-    const ds = [dsMarche(r)];
+    const futur = d.s === "futur", ds = futur ? [] : [dsMarche(r)];
     for (const h of [...vus].reverse()) ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(h)}`, data: P[h], borderColor: couleurH(h), backgroundColor: couleurH(h), fill: false, borderWidth: h === 1 ? 2.5 : 1.8, cubicInterpolationMode: "monotone" });
     lier(dessiner("sem-pc", { type: "line", data: { labels, datasets: ds }, options: options(12, true), plugins: [curseur] }), "sem-pc-t");
-    const ea = (x) => (!x ? null : cp === "jour" ? (vide(moy(x)) ? null : Math.abs(moy(x) - moy(r)))                 // par jour : écart entre le prix moyen prévu et le prix moyen du marché
+    const ea = (x) => (!x || futur ? null : cp === "jour" ? (vide(moy(x)) ? null : Math.abs(moy(x) - moy(r)))                 // par jour : écart entre le prix moyen prévu et le prix moyen du marché
       : moy(x.map((p, i) => (vide(p) || vide(r[i]) ? null : Math.abs(p - r[i])))));
     const qui = cp === "jour" ? L("sur le prix moyen du jour", "on the daily average price") : q ? L("au quart d'heure", "per quarter-hour") : L("à l'heure", "per hour");
     const err = (h) => ea(P[h]), errN = (h) => ea(Nv[h]), mr = moy(r.map((x) => (vide(x) ? null : Math.abs(x))));
     const gain = (h) => { const a = err(h), b = errN(h); return vide(a) || vide(b) || !b ? "–" : `<span class="${a < b ? "positif" : ""}">${signe(100 * (1 - a / b), 0)} %</span>`; };
     let html = `<thead><tr><th>${L("Heure", "Time")}</th><th>${pastR()} ${L("Marché", "Market")}</th>${vus.map((h) => `<th>${pastH(h)} ${HZ(h)}</th>`).join("")}</tr></thead><tbody>`;
-    labels.forEach((x, i) => { html += `<tr data-i="${i}"><td>${x}</td><td class="reel">${nombre(r[i])}</td>${vus.map((h) => celluleEcartPrix(P[h][i], r[i])).join("")}</tr>`; });
+    labels.forEach((x, i) => { html += `<tr data-i="${i}"><td>${x}</td><td class="reel">${nombre(r[i])}</td>${vus.map((h) => (futur ? `<td>${nombre(P[h][i])}</td>` : celluleEcartPrix(P[h][i], r[i]))).join("")}</tr>`; });
     html += `</tbody><tfoot><tr><td>${L("Moyenne", "Average")}</td><td class="reel">${nombre(moy(r))}</td>${vus.map((h) => `<td>${nombre(moy(P[h]))}</td>`).join("")}</tr>`
       + `<tr><td>${L("Erreur", "Error")} ${qui} (€/MWh)</td><td class="reel">–</td>${vus.map((h) => `<td>${nombre(err(h), 2)}</td>`).join("")}</tr>`
       + `<tr><td>${L("Erreur", "Error")} ${qui} (${L("% du prix moyen", "% of average price")})</td><td class="reel">–</td>${vus.map((h) => `<td>${vide(err(h)) || !mr ? "–" : nombre((100 * err(h)) / mr, 1) + " %"}</td>`).join("")}</tr>`
@@ -383,6 +392,8 @@ window.SEMAINE = (() => {
       + `<tr><td>${L("Gain contre le dernier jour connu", "Gain vs last known day")}</td><td class="reel">–</td>${vus.map((h) => `<td>${gain(h)}</td>`).join("")}</tr></tfoot>`;
     $("sem-pc-t").innerHTML = html;
     collerEntetes($("sem-pc-t"));
+    if (futur) { $("sem-pc-n").textContent = L(`Jour à venir : prévisions successives déjà publiées (de J+${Math.max(...dispo)} à J+${Math.min(...dispo)}). Le prix du marché et les erreurs s'afficheront une fois le jour passé.`,
+      `Upcoming day: successive forecasts already published (from D+${Math.max(...dispo)} to D+${Math.min(...dispo)}). Market price and errors will appear once the day is over.`); return; }
     $("sem-pc-n").textContent = (d.s === "direct" ? L("Prévisions publiées. ", "Published forecasts. ") : L("Jour recalculé après coup, avec seulement ce qui était connu à midi le jour de chaque émission. ", "Day recomputed afterwards, using only what was known at noon on each issue day. "))
       + (cp === "jour" ? L("Par jour : écart entre le prix moyen prévu de la journée et le prix moyen du marché. ", "Daily: gap between the forecast daily average and the market daily average. ")
         : L(`Erreur ${qui} : écart moyen, en valeur absolue, entre le prix prévu et le prix du marché sur chaque ${q ? "quart d'heure" : "heure"} de la journée. `, `Error ${qui}: mean absolute gap between forecast and market price over each ${q ? "quarter-hour" : "hour"} of the day. `))
