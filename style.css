@@ -160,6 +160,7 @@ details.replie[open] summary { margin-bottom: 14px; }
 .pastille { width: 14px; height: 0; border-top: 3px solid currentColor; display: inline-block; border-radius: 2px; flex-shrink: 0; vertical-align: middle; }
 .pastille.tirets { border-top-style: dashed; }
 .pastille.points { border-top-style: dotted; }
+.pastille-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
 .etiquette { white-space: nowrap; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
 
 /* ---------------------------------------------------------------- tableau + graphique côte à côte */

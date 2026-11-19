@@ -24,6 +24,8 @@ window.SEMAINE = (() => {
   const imax = (a) => a.reduce((b, x, i) => (vide(x) ? b : b < 0 || x > a[b] ? i : b), -1);
   const tranche = (j, a, b) => moy(j.prix.filter((_, i) => heuresDe(j)[i] >= a && heuresDe(j)[i] < b));
   const pastH = (h) => `<span class="pastille" style="color:${couleurH(h)}"></span>`;
+  const TIRETS = { 1: [], 2: [14, 4], 3: [8, 4], 4: [4, 4], 5: [14, 4, 3, 4], 6: [8, 4, 2, 4, 2, 4], 7: [2, 5] };   // évolution d'un jour : un tracé par horizon (19/11/2026, couleurs trop proches)
+  const pastD = (h) => `<svg class="pastille-svg" width="24" height="6" viewBox="0 0 24 6" aria-hidden="true"><line x1="1" y1="3" x2="23" y2="3" stroke="${couleurH(h)}" stroke-width="${h === 1 ? 3 : 2.4}" stroke-linecap="round" stroke-dasharray="${TIRETS[h].map((x) => x / 2).join(" ")}"/></svg>`;
   const pastR = () => `<span class="pastille" style="color:${css("--ink")}"></span>`;
   const pastN = (tir) => `<span class="pastille ${tir ? "tirets" : "points"}" style="color:${css("--muted")}"></span>`;
   const sep = () => (etat.langue === "fr" ? " : " : ": ");
@@ -371,19 +373,25 @@ window.SEMAINE = (() => {
     const r = serie(d, "r", pas) || serie(d, "r", "heure"), q = r.length > d.r.length;
     const hd = d.hr || [...Array(d.r.length).keys()], labels = q ? quarts(hd) : hd.map(heure);
     const dispo = HS.filter((h) => d.p[h]), cz = $("sem-cz");             // horizons cochés pour cette carte seulement
-    cz.innerHTML = `<span class="choix-titre">${L("Afficher", "Show")}</span>` + dispo.map((h) => `<label class="choix-item"><input type="checkbox" data-h="${h}"${E.cz[h] ? " checked" : ""}>${pastH(h)}<span>${HZ(h)}</span></label>`).join("");
+    cz.innerHTML = `<span class="choix-titre">${L("Afficher", "Show")}</span>` + dispo.map((h) => `<label class="choix-item"><input type="checkbox" data-h="${h}"${E.cz[h] ? " checked" : ""}>${pastD(h)}<span>${HZ(h)}</span></label>`).join("");
     cz.querySelectorAll("input").forEach((i) => i.addEventListener("change", () => { E.cz[i.dataset.h] = i.checked; convergence(); }));
     const vus = dispo.filter((h) => E.cz[h]), P = Object.fromEntries(vus.map((h) => [h, serie(d, h, q ? "quart" : "heure")]));
     const Nv = Object.fromEntries(vus.map((h) => [h, serie(d, "n" + h, q ? "quart" : "heure")]));
     const futur = d.s === "futur", ds = futur ? [] : [dsMarche(r)];
-    for (const h of [...vus].reverse()) ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(h)}`, data: P[h], borderColor: couleurH(h), backgroundColor: couleurH(h), fill: false, borderWidth: h === 1 ? 2.5 : 1.8, cubicInterpolationMode: "monotone" });
-    lier(dessiner("sem-pc", { type: "line", data: { labels, datasets: ds }, options: options(12, true), plugins: [curseur] }), "sem-pc-t");
+    for (const h of [...vus].reverse()) ds.push({ label: `${L("Prévu", "Forecast")} ${HZ(h)}`, data: P[h], borderColor: couleurH(h), backgroundColor: couleurH(h), fill: false, borderWidth: h === 1 ? 2.8 : 2.2, borderDash: TIRETS[h], borderCapStyle: "round", pointStyle: "line", cubicInterpolationMode: "monotone" });
+    const oc = options(12, true);
+    const trait = (couleur, tirets, ep) => { const c = document.createElement("canvas"), k = 1; c.width = 30 * k; c.height = 8 * k; c.style.width = "30px"; c.style.height = "8px";
+      const x = c.getContext("2d"); x.scale(k, k); x.strokeStyle = couleur; x.lineWidth = ep; x.lineCap = "round"; x.setLineDash(tirets); x.beginPath(); x.moveTo(1, 4); x.lineTo(29, 4); x.stroke(); return c; };
+    oc.plugins.legend.labels = { ...oc.plugins.legend.labels, usePointStyle: true, pointStyleWidth: 30,
+      generateLabels: (ch) => ch.data.datasets.map((d, i) => ({ text: d.label, datasetIndex: i, hidden: !ch.isDatasetVisible(i), fontColor: css("--ink-2"), lineWidth: 0,
+        pointStyle: trait(d.borderColor, d.borderDash || [], d.borderWidth || 2) })).filter((it) => !it.text.startsWith("_")) };
+    lier(dessiner("sem-pc", { type: "line", data: { labels, datasets: ds }, options: oc, plugins: [curseur] }), "sem-pc-t");
     const ea = (x) => (!x || futur ? null : cp === "jour" ? (vide(moy(x)) ? null : Math.abs(moy(x) - moy(r)))                 // par jour : écart entre le prix moyen prévu et le prix moyen du marché
       : moy(x.map((p, i) => (vide(p) || vide(r[i]) ? null : Math.abs(p - r[i])))));
     const qui = cp === "jour" ? L("sur le prix moyen du jour", "on the daily average price") : q ? L("au quart d'heure", "per quarter-hour") : L("à l'heure", "per hour");
     const err = (h) => ea(P[h]), errN = (h) => ea(Nv[h]), mr = moy(r.map((x) => (vide(x) ? null : Math.abs(x))));
     const gain = (h) => { const a = err(h), b = errN(h); return vide(a) || vide(b) || !b ? "–" : `<span class="${a < b ? "positif" : ""}">${signe(100 * (1 - a / b), 0)} %</span>`; };
-    let html = `<thead><tr><th>${L("Heure", "Time")}</th><th>${pastR()} ${L("Marché", "Market")}</th>${vus.map((h) => `<th>${pastH(h)} ${HZ(h)}</th>`).join("")}</tr></thead><tbody>`;
+    let html = `<thead><tr><th>${L("Heure", "Time")}</th><th>${pastR()} ${L("Marché", "Market")}</th>${vus.map((h) => `<th>${pastD(h)} ${HZ(h)}</th>`).join("")}</tr></thead><tbody>`;
     labels.forEach((x, i) => { html += `<tr data-i="${i}"><td>${x}</td><td class="reel">${nombre(r[i])}</td>${vus.map((h) => (futur ? `<td>${nombre(P[h][i])}</td>` : celluleEcartPrix(P[h][i], r[i]))).join("")}</tr>`; });
     html += `</tbody><tfoot><tr><td>${L("Moyenne", "Average")}</td><td class="reel">${nombre(moy(r))}</td>${vus.map((h) => `<td>${nombre(moy(P[h]))}</td>`).join("")}</tr>`
       + `<tr><td>${L("Erreur", "Error")} ${qui} (€/MWh)</td><td class="reel">–</td>${vus.map((h) => `<td>${nombre(err(h), 2)}</td>`).join("")}</tr>`
