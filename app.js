@@ -509,6 +509,7 @@ function options(maxTicks, legende = false) {                       // sans lég
         backgroundColor: css("--surface"), titleColor: css("--ink"), bodyColor: css("--ink-2"), borderColor: css("--axis"), borderWidth: 1,
         padding: 11, cornerRadius: 8, boxPadding: 5, usePointStyle: true, titleMarginBottom: 6,
         filter: (it) => !it.dataset.label.startsWith("_") && it.dataset.label !== t("fourchette") && it.parsed.y !== null,
+        itemSort: (a, b) => (b.parsed.y ?? -Infinity) - (a.parsed.y ?? -Infinity),   // infobulle dans le même ordre que les courbes : la plus haute en premier (19/11/2026)
         callbacks: { label: (c) => ` ${c.dataset.label}${etat.langue === "fr" ? " : " : ": "}${nombre(c.parsed.y)} ${t("unite")}` },
       },
       marqueur: {},
