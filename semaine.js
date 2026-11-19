@@ -9,7 +9,7 @@
 window.SEMAINE = (() => {
   let S = null, demande = false, charge = 0;
   const E = { vue: "prevision", k: 0, pas: "heure", em: null, bande: false, 
-              per: "7", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: true, rw: false, cpas: "heure", epas: "heure", cible: null, cz: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true } };
+              per: "7", ppas: "heure", du: null, au: null, hz: { 1: true, 2: true, 4: true, 7: true }, rn: true, rw: false, cpas: "heure", epas: "heure", cible: null, emode: "jour", eidx: null, cz: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true } };
   const L = (fr, en) => (etat.langue === "fr" ? fr : en);
   const HS = [1, 2, 3, 4, 5, 6, 7];
   const HZ = (h) => L("J+", "D+") + h;
@@ -369,6 +369,7 @@ window.SEMAINE = (() => {
     const d = H.find((x) => x.j === E.cible), sel = $("sem-cible");
     sel.innerHTML = [...H].reverse().map((x) => `<option value="${x.j}"${x.j === E.cible ? " selected" : ""}>${dateMoyenne(x.j)} ${x.j.slice(0, 4)}${x.s === "direct" ? " · " + L("en direct", "live") : x.s === "futur" ? " · " + L("à venir", "upcoming") : ""}</option>`).join("");
     sel.onchange = () => { E.cible = sel.value; convergence(); };
+    evolutionPrix(H, d);
     if (!d) return;
     const r = serie(d, "r", pas) || serie(d, "r", "heure"), q = r.length > d.r.length;
     const hd = d.hr || [...Array(d.r.length).keys()], labels = q ? quarts(hd) : hd.map(heure);
@@ -410,6 +411,46 @@ window.SEMAINE = (() => {
         "The % divides the error by the day's average price. Last known day = price of the last day known at issue time (same hour): for D+h, the price h days before. Gain: error reduction vs this benchmark. ")
       + (q ? L("Au quart d'heure, J+2 à J+7 : courbe interpolée entre les heures.", "At quarter-hour resolution, D+2 to D+7: curve interpolated between hours.") : "");
   }
+  function evolutionPrix(H, d) {                                      // un jour visé : prix prévu (moyenne du jour, une heure ou un quart d'heure) à chaque émission, de J+7 à J+1 ; droite = prix du marché (19/11/2026, demande de Julien)
+    const sel = $("sem-ecible");
+    if (!sel) return;
+    sel.innerHTML = $("sem-cible").innerHTML;
+    sel.onchange = () => { E.cible = sel.value; convergence(); };
+    segments("sem-emode", [["jour", L("Moyenne du jour", "Daily average")], ["heure", L("Une heure", "One hour")], ["quart", L("Un quart d'heure", "One quarter-hour")]], E.emode,
+      (v) => { E.emode = v; E.eidx = null; convergence(); });
+    if (!d) return;
+    const hd = d.hr || [...Array(d.r.length).keys()], mode = E.emode, lbl = $("sem-eidx-l"), ix = $("sem-eidx");
+    lbl.hidden = mode === "jour";
+    const libs = mode === "quart" ? quarts(hd) : hd.map(heure);
+    if (mode !== "jour") {
+      const n = libs.length, def = Math.max(0, hd.indexOf(18)) * (mode === "quart" ? 4 : 1);
+      if (E.eidx === null || E.eidx >= n) E.eidx = def;
+      ix.innerHTML = libs.map((x, i) => `<option value="${i}"${i === E.eidx ? " selected" : ""}>${x}</option>`).join("");
+      ix.onchange = () => { E.eidx = +ix.value; convergence(); };
+    }
+    const prevu = (h) => {
+      const p = d.p[h];
+      if (!p) return null;
+      if (mode === "jour") return moy(p);
+      if (mode === "heure") return vide(p[E.eidx]) ? null : p[E.eidx];
+      const q = h === 1 && d.p1q && d.p1q.length === 4 * hd.length ? d.p1q : interp(p);
+      return q && !vide(q[E.eidx]) ? q[E.eidx] : null;
+    };
+    const mq = MQ(d.j), reel = d.s === "futur" ? null : mode === "jour" ? moy(d.r) : mode === "heure" ? d.r[E.eidx] : mq && mq.length === 4 * hd.length ? mq[E.eidx] : null;
+    const hs = [7, 6, 5, 4, 3, 2, 1], labels = hs.map((h) => `${HZ(h)} · ${dateCourte(ajouterJours(d.j, -h))}`), vals = hs.map(prevu);
+    const ds = [{ label: L("Prix prévu", "Forecast price"), data: vals, borderColor: couleurH(1), backgroundColor: hs.map(couleurH), pointBackgroundColor: hs.map(couleurH), pointBorderColor: hs.map(couleurH),
+      pointRadius: 5, pointHoverRadius: 7, borderWidth: 2.2, fill: false, spanGaps: true, tension: 0 }];
+    if (!vide(reel)) ds.push({ label: L("Prix du marché", "Market price"), data: hs.map(() => reel), borderColor: css("--ink"), backgroundColor: css("--ink"), borderWidth: 2, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 0, fill: false });
+    const o = options(12, true);
+    o.scales.y.title.text = "€/MWh";
+    o.plugins.tooltip.callbacks.label = (c) => ` ${c.dataset.label}${sep()}${nombre(c.parsed.y)} €/MWh` + (c.datasetIndex === 0 && !vide(reel) ? ` (${L("écart", "gap")} ${signe(c.parsed.y - reel)})` : "");
+    dessiner("sem-pe", { type: "line", data: { labels, datasets: ds }, options: o, plugins: [curseur] });
+    const quoi = mode === "jour" ? L("la moyenne du jour", "the daily average") : `${mode === "heure" ? L("l'heure", "the hour") : L("le quart d'heure", "the quarter-hour")} ${libs[E.eidx]}`;
+    $("sem-pe-n").textContent = L(`Chaque point : le prix prévu pour ${quoi} du ${dateLongue(d.j)}, tel que publié le jour indiqué (J+7 = une semaine avant, J+1 = la veille). `, `Each point: the forecast price for ${quoi} of ${dateLongue(d.j)}, as published on the date shown (D+7 = one week before, D+1 = the day before). `)
+      + (!vide(reel) ? L("Ligne en tirets : le prix du marché.", "Dashed line: the market price.") : d.s === "futur" ? L("Jour à venir : les émissions suivantes s'ajouteront, et la ligne du prix du marché apparaîtra une fois le jour passé.", "Upcoming day: later issues will be added, and the market price line will appear once the day is over.")
+        : L("Prix du marché au quart d'heure indisponible pour ce jour.", "Quarter-hour market price not available for this day."))
+      + (mode === "quart" ? " " + L("J+2 à J+7 : valeur interpolée entre les heures.", "D+2 to D+7: value interpolated between hours.") : "");
+  }
   function celluleEcartPrix(p, r) {                                    // prix prévu, case teintée selon l'écart au marché
     if (vide(p) || vide(r)) return "<td>–</td>";
     const a = Math.min(Math.abs(p - r) / 80, 1) * 0.22;
@@ -436,7 +477,10 @@ window.SEMAINE = (() => {
       + carte(L("Erreur selon l'heure de la journée", "Error by hour of day"), `<div class="graphique"><canvas id="sem-ph2" role="img" aria-label="${L("Erreur selon l'heure", "Error by hour")}"></canvas></div>`) + `</div>`
       + carte(L("Comment la prévision d'un jour a évolué", "How the forecast of one day evolved"),
         `<div class="sem-outils"><label>${L("Jour visé", "Target day")} <select id="sem-cible"></select></label><div class="segments" id="sem-cpas" role="group"></div></div><div class="choix" id="sem-cz"></div>`
-        + `<div class="graphique haut"><canvas id="sem-pc" role="img" aria-label="${L("Prévisions successives d'un jour", "Successive forecasts of one day")}"></canvas></div><div class="cadre-table grand"><table id="sem-pc-t" class="table-donnees"></table></div><p class="note" id="sem-pc-n"></p>`);
+        + `<div class="graphique haut"><canvas id="sem-pc" role="img" aria-label="${L("Prévisions successives d'un jour", "Successive forecasts of one day")}"></canvas></div><div class="cadre-table grand"><table id="sem-pc-t" class="table-donnees"></table></div><p class="note" id="sem-pc-n"></p>`)
+      + carte(L("Le prix prévu d'un jour, émission après émission (de J+7 à J+1)", "A day's forecast price, issue after issue (from D+7 to D+1)"),
+        `<div class="sem-outils"><label>${L("Jour visé", "Target day")} <select id="sem-ecible"></select></label><div class="segments" id="sem-emode" role="group"></div><label id="sem-eidx-l"><select id="sem-eidx"></select></label></div>`
+        + `<div class="graphique moyen"><canvas id="sem-pe" role="img" aria-label="${L("Prix prévu selon l'horizon", "Forecast price by horizon")}"></canvas></div><p class="note" id="sem-pe-n"></p>`);
     segments("sem-per", [["tout", L("Tout l'historique", "Full history")], ["7", L("7 derniers jours", "Last 7 days")], ["30", L("30 derniers jours", "Last 30 days")], ["direct", L("Depuis la mise en ligne", "Since going live")], ["dates", L("Dates précises", "Custom dates")]],
       E.per, (v) => { E.per = v; rendre(); });
     segments("sem-ppas", [["quart", L("Quart d'heure", "Quarter-hour")], ["heure", L("Heure", "Hour")], ["jour", L("Par jour", "Daily")]], E.ppas, (v) => { E.ppas = v; rendre(); });
