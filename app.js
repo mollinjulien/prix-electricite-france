@@ -69,7 +69,7 @@ const TXT = {
     perf_difficiles: "Les jours les plus difficiles pour le modèle principal (classés selon son erreur moyenne)",
     mise_en_ligne: "mise en ligne",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
-    tag_principal: "principal", tag_secours_jour: "modèle de secours",
+    tag_principal: "principal", tag_secours_jour: "modèle de secours", tag_publie: "modèle publié", tag_publie_d: "Ce jour-là, le modèle principal n'a pas pu être calculé à temps : c'est ce modèle qui a été publié la veille.",
     conf_haute: "Confiance haute", conf_moyenne: "Confiance moyenne", conf_basse: "Confiance basse", conf_detail: "jours comparables : {x} €/MWh d'erreur en moyenne ({n} jours)",
     conf_aide: "Indice calculé au moment de la prévision, avant de connaître le prix : plus nos modèles sont d'accord entre eux, plus la confiance est haute. Fonction à l'essai.",
     licence: "Prévisions © 2026 Julien Mollin, sous licence <a href=\"https://creativecommons.org/licenses/by-nc/4.0/deed.fr\" target=\"_blank\" rel=\"noopener license\">CC BY-NC 4.0</a> : réutilisation libre en citant la source, sans usage commercial. Code et présentation du site : tous droits réservés.",
@@ -213,7 +213,7 @@ const TXT = {
     perf_difficiles: "The hardest days for the main model (ranked by its average error)",
     mise_en_ligne: "live",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
-    tag_principal: "main", tag_secours_jour: "backup model",
+    tag_principal: "main", tag_secours_jour: "backup model", tag_publie: "published model", tag_publie_d: "That day the main model could not be computed in time: this model was published the day before.",
     conf_haute: "High confidence", conf_moyenne: "Medium confidence", conf_basse: "Low confidence", conf_detail: "comparable days: {x} €/MWh mean error ({n} days)",
     conf_aide: "Computed when the forecast is made, before the price is known: the more our models agree with each other, the higher the confidence. Trial feature.",
     licence: "Forecasts © 2026 Julien Mollin, licensed under <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\" target=\"_blank\" rel=\"noopener license\">CC BY-NC 4.0</a>: free reuse with attribution, no commercial use. Website code and design: all rights reserved.",
@@ -683,7 +683,14 @@ function principalDe(j) {                                             // modèle
   return CHAINE.find((c) => j[c]) || (TOUS.find((m) => j[m.code]) || {}).code;
 }
 const estSecours = (code, j) => code !== PRINCIPAL && code === principalDe(j);          // ce modèle remplace Zéphyr ce jour-là
+const DEBUT_PRINCIPAL = "2026-11-16";                                  // (21/11/2026) premier jour visé avec E2 en service
+function publieAuLieuDuPrincipal(code, j) {                           // (21/11/2026, demande de Julien) pastille « modèle publié » : un secours a été publié alors que le service a tourné à l'heure
+  if (!j.principal || j.principal === PRINCIPAL || code !== j.principal || !j.genere || j.jour < DEBUT_PRINCIPAL || !j.reel) return false;   // seulement une fois le prix réel connu (le matin, S1 est publié normalement en attendant E2)
+  const g = new Date(j.genere), veille = new Date(j.jour + "T12:00:00+01:00"); veille.setDate(veille.getDate() - 1);
+  return g < veille;                                                   // publié avant midi la veille : vrai raté ; publié plus tard (passe lancée trop tard) : pas de pastille
+}
 const tagJour = (code, j) => (code === PRINCIPAL ? `<span class="etiquette principal">${t("tag_principal")}</span>`
+  : publieAuLieuDuPrincipal(code, j) ? `<span class="etiquette publie" title="${t("tag_publie_d")}">${t("tag_publie")}</span>`
   : estSecours(code, j) ? `<span class="etiquette secours">${t("tag_secours_jour")}</span>` : "");
 const etiquetteJour = (m, j) => " " + (tagJour(m.code, j) || `<span class="etiquette">${t(m.tag)}</span>`);
 function blocErreur(j, code, pas) {                                  // l'erreur de la prévision : valeur, part du prix moyen et repère « veille »
