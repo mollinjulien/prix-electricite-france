@@ -723,8 +723,8 @@ function tuileModele(m, j, best, pas) {
 }
 function tuilesJour(j, pas) {
   const T = [], b = meilleurDuJour(j, pas);
+  for (const m of visibles(j)) T.push(tuileModele(m, j, b, pas));       // (21/11/2026, demande de Julien) les modèles choisis d'abord, le prix du marché ensuite
   if (j.reel) T.push(`<div class="tuile marche"><div class="libelle">${pastille("reel")}${t("marche_moyen")}</div><div class="duo-valeurs"><div><div class="petit">${t("t_moyenne")}</div><div class="valeur">${enEuros(moyenne(j.reel))}</div></div></div></div>`);
-  for (const m of visibles(j)) T.push(tuileModele(m, j, b, pas));
   const prin = principalDe(j) || null, lab = heuresLabels(j.heures);
   const bloc = (code, serie, nom) => {                                // heure la moins chère et la plus chère d'une série (moyennes horaires), avec son étiquette
     const h = parHeure(serie, j.heures), v = h.filter((x) => x !== null);
