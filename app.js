@@ -70,7 +70,7 @@ const TXT = {
     mise_en_ligne: "mise en ligne",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     tag_principal: "principal", tag_secours_jour: "modèle de secours", tag_publie: "modèle publié", tag_publie_d: "Ce jour-là, le modèle principal n'a pas pu être calculé à temps : c'est ce modèle qui a été publié la veille.",
-    conf_haute: "Confiance haute", conf_moyenne: "Confiance moyenne", conf_basse: "Confiance basse", conf_detail: "jours comparables : {x} €/MWh d'erreur en moyenne ({n} jours)",
+    conf_haute: "Confiance haute", conf_moyenne: "Confiance moyenne", conf_basse: "Confiance basse", conf_detail: "jours comparables : {x} €/MWh d'erreur en moyenne ({n} jours)", conf_detail_pct: "jours comparables : {x} €/MWh d'erreur en moyenne, soit {p} % du prix moyen de {m} €/MWh ({n} jours)",
     conf_aide: "Indice calculé au moment de la prévision, avant de connaître le prix : plus nos modèles sont d'accord entre eux, plus la confiance est haute. Fonction à l'essai.",
     licence: "Prévisions © 2026 Julien Mollin, sous licence <a href=\"https://creativecommons.org/licenses/by-nc/4.0/deed.fr\" target=\"_blank\" rel=\"noopener license\">CC BY-NC 4.0</a> : réutilisation libre en citant la source, sans usage commercial. Code et présentation du site : tous droits réservés.",
     cond_titre: "Conditions d'utilisation",
@@ -214,7 +214,7 @@ const TXT = {
     mise_en_ligne: "live",
     court_GR: "GFS-G", court_CR: "GFS-G-P", court_GT: "GFS-RG",
     tag_principal: "main", tag_secours_jour: "backup model", tag_publie: "published model", tag_publie_d: "That day the main model could not be computed in time: this model was published the day before.",
-    conf_haute: "High confidence", conf_moyenne: "Medium confidence", conf_basse: "Low confidence", conf_detail: "comparable days: {x} €/MWh mean error ({n} days)",
+    conf_haute: "High confidence", conf_moyenne: "Medium confidence", conf_basse: "Low confidence", conf_detail: "comparable days: {x} €/MWh mean error ({n} days)", conf_detail_pct: "comparable days: {x} €/MWh mean error, i.e. {p} % of the {m} €/MWh average price ({n} days)",
     conf_aide: "Computed when the forecast is made, before the price is known: the more our models agree with each other, the higher the confidence. Trial feature.",
     licence: "Forecasts © 2026 Julien Mollin, licensed under <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\" target=\"_blank\" rel=\"noopener license\">CC BY-NC 4.0</a>: free reuse with attribution, no commercial use. Website code and design: all rights reserved.",
     cond_titre: "Terms of use",
@@ -711,7 +711,7 @@ function blocConfiance(code, j) {                                     // (15/11/
   if (code !== "E2" || !c || !j.E2) return "";
   const s = etat.d && etat.d.confiance ? etat.d.confiance[c.niveau] : null;
   return `<div class="confiance-ligne" title="${t("conf_aide")}"><span class="confiance ${c.niveau}">${t("conf_" + c.niveau)}</span>`
-    + (s ? `<span class="confiance-detail">${t("conf_detail", { x: nombre(s.mae, 1), n: s.n })}</span>` : "") + `</div>`;
+    + (s ? `<span class="confiance-detail">${s.pct != null ? t("conf_detail_pct", { x: nombre(s.mae, 1), p: nombre(s.pct, 1), m: nombre(s.prix, 0), n: s.n }) : t("conf_detail", { x: nombre(s.mae, 1), n: s.n })}</span>` : "") + `</div>`;
 }
 function tuileModele(m, j, best, pas) {
   const e = erreurJour(j, m.code, pas);
